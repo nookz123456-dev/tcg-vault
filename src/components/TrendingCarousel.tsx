@@ -128,10 +128,7 @@ export default function TrendingCarousel() {
                   }`}>
                     {card.game === 'pokemon' ? 'Pokemon' : 'One Piece'}
                   </span>
-                  {/* Rank */}
-                  <span className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-sm flex items-center justify-center text-xs font-bold text-amber-400 border border-amber-500/20">
-                    {i + 1}
-                  </span>
+                  {/* Rank - removed per Boss request */}
                 </div>
 
                 {/* Card info */}
