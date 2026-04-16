@@ -391,12 +391,12 @@ export default function SearchResults() {
                     </div>
                   )}
                   {card.rarity && (
-                    <span className="absolute top-2.5 right-2.5 px-2 py-0.5 bg-black/70 text-[10px] text-amber-400 rounded-lg backdrop-blur-sm font-medium">
+                    <span className="absolute top-2.5 right-2.5 px-2 py-0.5 bg-amber-950/70 text-[10px] text-amber-400 rounded-lg backdrop-blur-sm font-medium">
                       {card.rarity}
                     </span>
                   )}
                   {card.game === 'onepiece' && card.color && (
-                    <span className="absolute bottom-2.5 left-2.5 px-2 py-0.5 bg-black/70 text-[10px] text-gray-200 rounded-lg backdrop-blur-sm font-medium">
+                    <span className="absolute bottom-2.5 left-2.5 px-2 py-0.5 bg-amber-950/70 text-[10px] text-amber-100 rounded-lg backdrop-blur-sm font-medium">
                       {card.color}
                     </span>
                   )}
@@ -485,7 +485,7 @@ function CardDetailModal({
   isInCollection: boolean
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-amber-950/80 backdrop-blur-md" onClick={onClose}>
       <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="flex flex-col md:flex-row gap-6 p-6">
           <div className="flex-shrink-0 flex justify-center">

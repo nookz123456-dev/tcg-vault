@@ -10,7 +10,7 @@ export default function Home() {
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2">
               <span className="text-2xl">🃏</span>
-              <span className="text-xl font-bold bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold text-amber-400">
                 TCG Vault
               </span>
             </Link>
@@ -56,7 +56,7 @@ export default function Home() {
             {/* Title */}
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               <span className="text-white">Track Your </span>
-              <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-amber-600 bg-clip-text text-transparent">
+              <span className="text-amber-400">
                 Card Collection
               </span>
             </h1>
@@ -213,7 +213,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <span className="text-xl">🃏</span>
-              <span className="text-sm font-semibold bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">
+              <span className="text-sm font-semibold text-amber-400">
                 TCG Vault
               </span>
             </div>

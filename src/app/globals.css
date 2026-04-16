@@ -20,7 +20,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 /* Card hover effect */
@@ -44,12 +44,10 @@ body {
   animation: shimmer 1.5s infinite;
 }
 
-/* Gradient text */
+/* Gradient text — replaced with solid amber-400 per Impeccable */
 .gradient-text {
-  background: var(--pokemon-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--accent);
+  -webkit-text-fill-color: var(--accent);
 }
 
 /* Scrollbar */
