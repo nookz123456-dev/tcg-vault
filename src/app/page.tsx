@@ -32,6 +32,13 @@ export default function Home() {
         </div>
       </nav>
 
+      {/* Trending Cards Carousel — top of page */}
+      <section className="border-b border-[var(--card-border)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <TrendingCarousel />
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background effects */}
@@ -93,13 +100,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Trending Cards Carousel */}
-      <section className="border-t border-[var(--card-border)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <TrendingCarousel />
         </div>
       </section>
 
