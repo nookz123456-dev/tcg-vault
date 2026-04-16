@@ -297,10 +297,10 @@ export default function SearchResults() {
           {cards.map((card) => {
             const isInCollection = addedCards.has(card.id)
             return (
-              <button
+              <a
                 key={card.id}
-                onClick={() => setSelectedCard(card)}
-                className="group bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden card-hover text-left cursor-pointer relative transition-all duration-300 hover:border-amber-500/40 hover:shadow-lg hover:shadow-amber-500/5"
+                href={card.game === 'pokemon' ? `/card/pokemon/${card.id}` : undefined}
+                className="group bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden card-hover text-left cursor-pointer relative transition-all duration-300 hover:border-amber-500/40 hover:shadow-lg hover:shadow-amber-500/5 block"
               >
                 {isInCollection && (
                   <div className="absolute top-2.5 left-2.5 z-10 bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-lg font-bold shadow-sm">
@@ -352,7 +352,7 @@ export default function SearchResults() {
                     </p>
                   ) : null}
                 </div>
-              </button>
+              </a>
             )
           })}
         </div>

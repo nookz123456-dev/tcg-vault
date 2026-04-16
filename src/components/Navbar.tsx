@@ -11,6 +11,7 @@ export default function Navbar() {
   const links = [
     { href: '/', label: 'Home', icon: '🏠' },
     { href: '/search', label: 'Search', icon: '🔍' },
+    { href: '/sealed', label: 'Sealed', icon: '📦' },
     { href: '/collection', label: 'Collection', icon: '🃏' },
   ]
 
