@@ -37,7 +37,7 @@ export async function GET() {
           const price = getCardPrice(card)
           return { card, market: price?.market ?? 0 }
         })
-        .filter(c => c.market > 10) // Only cards priced $10+
+        .filter(c => c.market > 50) // Only cards priced $50+
         .sort((a, b) => b.market - a.market)
 
       for (const { card, market } of withPrices) {
