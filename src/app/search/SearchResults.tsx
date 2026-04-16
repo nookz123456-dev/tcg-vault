@@ -94,6 +94,7 @@ export default function SearchResults() {
   const [totalCount, setTotalCount] = useState(0)
   const [selectedCard, setSelectedCard] = useState<DisplayCard | null>(null)
   const [addedCards, setAddedCards] = useState<Set<string>>(new Set())
+  const [priceMap, setPriceMap] = useState<Record<string, number>>({})
 
   const { addCard, cards: collectionCards } = useLocalCollection()
 
@@ -118,6 +119,25 @@ export default function SearchResults() {
   const fetchOnePieceCards = async (q: string, p: number) => {
     const res = await fetch(`/api/cards/onepiece?q=${encodeURIComponent(q)}&page=${p}&pageSize=20&lang=${opLang}&type=${opType}${opRarity !== 'all' ? `&rarity=${opRarity}` : ''}`)
     return res.json()
+  }
+
+  // Fetch prices from TCG Price Lookup API for One Piece / Pokemon JP
+  const fetchPrices = async (q: string, game: string) => {
+    try {
+      const res = await fetch(`/api/prices?q=${encodeURIComponent(q)}&game=${game}&pageSize=5`)
+      if (!res.ok) return {}
+      const data = await res.json()
+      const priceMap: Record<string, number> = {}
+      for (const card of data.data || []) {
+        const nm = card.prices?.nearMint
+        if (nm?.market) {
+          priceMap[card.name.toLowerCase()] = nm.market
+        }
+      }
+      return priceMap
+    } catch {
+      return {}
+    }
   }
 
   const fetchCards = useCallback(async () => {
@@ -222,6 +242,20 @@ export default function SearchResults() {
         if (page === 1) setCards(mapped)
         else setCards(prev => [...prev, ...mapped])
         setTotalCount(data.totalCount || 0)
+
+        // Fetch prices for One Piece / Pokemon JP from TCG Price Lookup
+        const priceGame: string | null = game === 'onepiece' ? 'onepiece' : game === 'pokemon' && pokeLang === 'jp' ? 'pokemon-jp' : null
+        if (mapped.length > 0 && priceGame) {
+          const prices = await fetchPrices(query, priceGame)
+          if (Object.keys(prices).length > 0) {
+            setCards(prev => prev.map(c => {
+              const price = prices[c.name.toLowerCase()]
+              if (price && !c.marketPrice) return { ...c, marketPrice: price }
+              return c
+            }))
+            setPriceMap(prices)
+          }
+        }
       }
     } catch (err) {
       console.error('Search error:', err)

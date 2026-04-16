@@ -50,6 +50,18 @@ interface CardDetail {
   } | null
   cardmarketUrl: string | null
   cardmarketUpdatedAt: string | null
+  // Graded prices from TCG Price Lookup API
+  gradedPrices?: Record<string, {
+    ebay?: { avg_7d: number | null; avg_30d: number | null }
+    tcgplayer?: { market: number | null }
+  }> | null
+  conditionPrices?: {
+    nearMint: { market: number | null; low: number | null; mid: number | null; high: number | null } | null
+    lightlyPlayed: { market: number | null; low: number | null; mid: number | null; high: number | null } | null
+    moderatelyPlayed: { market: number | null; low: number | null; mid: number | null; high: number | null } | null
+    heavilyPlayed: { market: number | null; low: number | null; mid: number | null; high: number | null } | null
+    damaged: { market: number | null; low: number | null; mid: number | null; high: number | null } | null
+  } | null
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -92,6 +104,29 @@ export default function CardDetailPage() {
       .then(data => {
         setCard(data)
         setLoading(false)
+        // Fetch graded + condition prices from TCG Price Lookup
+        fetch(`/api/prices?q=${encodeURIComponent(data.name + ' ' + data.set.name)}&game=pokemon&pageSize=5`)
+          .then(r => r.json())
+          .then(priceData => {
+            if (priceData.data && priceData.data.length > 0) {
+              // Find best match (same set name)
+              const match = priceData.data.find((c: { setName: string; number: string }) => 
+                c.setName?.toLowerCase().includes(data.set.name.toLowerCase())
+              ) || priceData.data[0]
+              setCard(prev => prev ? {
+                ...prev,
+                gradedPrices: match.graded || null,
+                conditionPrices: match.prices ? {
+                  nearMint: match.prices.nearMint || null,
+                  lightlyPlayed: match.prices.lightlyPlayed || null,
+                  moderatelyPlayed: match.prices.moderatelyPlayed || null,
+                  heavilyPlayed: match.prices.heavilyPlayed || null,
+                  damaged: match.prices.damaged || null,
+                } : null,
+              } : prev)
+            }
+          })
+          .catch(() => {}) // Non-critical, don't block UI
       })
       .catch(() => setLoading(false))
   }, [id])
@@ -347,6 +382,94 @@ export default function CardDetailPage() {
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* ========== Condition Prices — Like PriceCharting ========== */}
+            {card.conditionPrices && (
+              <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden">
+                <div className="px-5 py-4 border-b border-[var(--card-border)]">
+                  <h2 className="text-lg font-bold text-white">Prices by Condition</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">TCGplayer prices across all conditions</p>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-xs text-gray-500 uppercase tracking-wider">
+                        <th className="text-left px-5 py-3 font-medium">Condition</th>
+                        <th className="text-right px-4 py-3 font-medium">Market</th>
+                        <th className="text-right px-4 py-3 font-medium">Low</th>
+                        <th className="text-right px-4 py-3 font-medium">Mid</th>
+                        <th className="text-right px-5 py-3 font-medium">High</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { label: 'Near Mint', data: card.conditionPrices.nearMint, color: 'text-emerald-400' },
+                        { label: 'Lightly Played', data: card.conditionPrices.lightlyPlayed, color: 'text-lime-400' },
+                        { label: 'Moderately Played', data: card.conditionPrices.moderatelyPlayed, color: 'text-yellow-400' },
+                        { label: 'Heavily Played', data: card.conditionPrices.heavilyPlayed, color: 'text-orange-400' },
+                        { label: 'Damaged', data: card.conditionPrices.damaged, color: 'text-red-400' },
+                      ].map((row, i) => row.data ? (
+                        <tr key={row.label} className={i % 2 === 0 ? 'bg-[var(--surface-1)]/30' : ''}>
+                          <td className="px-5 py-3 text-gray-200 font-medium">
+                            <span className={row.color}>●</span> {row.label}
+                          </td>
+                          <td className={`text-right px-4 py-3 font-bold ${row.data.market ? row.color : 'text-gray-500'}`}>
+                            {formatPrice(row.data.market)}
+                          </td>
+                          <td className="text-right px-4 py-3 text-gray-300">{formatPrice(row.data.low)}</td>
+                          <td className="text-right px-4 py-3 text-gray-300">{formatPrice(row.data.mid)}</td>
+                          <td className="text-right px-5 py-3 text-gray-300">{formatPrice(row.data.high)}</td>
+                        </tr>
+                      ) : null)}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* ========== Graded Prices — PSA / BGS / CGC ========== */}
+            {card.gradedPrices && Object.keys(card.gradedPrices).length > 0 && (
+              <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden">
+                <div className="px-5 py-4 border-b border-[var(--card-border)]">
+                  <h2 className="text-lg font-bold text-white">Graded Prices</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">PSA / BGS / CGC slab values</p>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-xs text-gray-500 uppercase tracking-wider">
+                        <th className="text-left px-5 py-3 font-medium">Grade</th>
+                        <th className="text-right px-4 py-3 font-medium">eBay 7d Avg</th>
+                        <th className="text-right px-4 py-3 font-medium">eBay 30d Avg</th>
+                        <th className="text-right px-5 py-3 font-medium">TCGplayer</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(card.gradedPrices)
+                        .sort(([a], [b]) => parseInt(b) - parseInt(a))
+                        .map(([grade, data], i) => (
+                          <tr key={grade} className={i % 2 === 0 ? 'bg-[var(--surface-1)]/30' : ''}>
+                            <td className="px-5 py-3">
+                              <span className={`font-bold ${parseInt(grade) >= 9 ? 'text-amber-400' : parseInt(grade) >= 7 ? 'text-gray-200' : 'text-gray-400'}`}>
+                                {grade}
+                              </span>
+                            </td>
+                            <td className="text-right px-4 py-3 text-gray-300">
+                              {data.ebay?.avg_7d ? `$${data.ebay.avg_7d.toFixed(2)}` : '—'}
+                            </td>
+                            <td className="text-right px-4 py-3 text-gray-300">
+                              {data.ebay?.avg_30d ? `$${data.ebay.avg_30d.toFixed(2)}` : '—'}
+                            </td>
+                            <td className="text-right px-5 py-3 text-gray-300">
+                              {data.tcgplayer?.market ? `$${data.tcgplayer.market.toFixed(2)}` : '—'}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
