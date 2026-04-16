@@ -16,13 +16,13 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="border-b border-[var(--card-border)] bg-[var(--surface-1)]/50 backdrop-blur-xl sticky top-0 z-50">
+    <nav className="border-b border-[var(--card-border)] bg-[var(--surface-1)]/80 backdrop-blur-xl sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl">🃏</span>
-            <span className="text-xl font-bold text-amber-400">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <span className="text-2xl transition-transform group-hover:scale-110">🃏</span>
+            <span className="text-xl font-bold text-amber-400 tracking-tight">
               TCG Vault
             </span>
           </Link>
@@ -36,7 +36,7 @@ export default function Navbar() {
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   pathname === link.href
                     ? 'text-amber-400 bg-amber-500/10'
-                    : 'text-gray-400 hover:text-white hover:bg-[var(--surface-2)]'
+                    : 'text-[var(--warm-300)] hover:text-amber-400 hover:bg-[var(--surface-2)]'
                 }`}
               >
                 <span className="mr-1">{link.icon}</span>
@@ -52,16 +52,16 @@ export default function Navbar() {
                 {isGuest ? (
                   <Link
                     href="/login"
-                    className="text-xs px-3 py-1.5 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20 transition-colors"
+                    className="text-xs px-4 py-1.5 bg-amber-500/10 text-amber-400 rounded-lg hover:bg-amber-500/20 transition-colors font-semibold"
                   >
                     Sign In
                   </Link>
                 ) : (
                   <>
-                    <span className="text-xs text-gray-500 hidden sm:block">{user?.email}</span>
+                    <span className="text-xs text-[var(--warm-400)] hidden sm:block">{user?.email}</span>
                     <button
                       onClick={logout}
-                      className="text-xs px-3 py-1.5 bg-[var(--surface-1)] text-gray-400 rounded-lg hover:text-white transition-colors"
+                      className="text-xs px-3 py-1.5 bg-[var(--surface-1)] text-[var(--warm-300)] rounded-lg hover:text-[var(--foreground)] transition-colors border border-[var(--card-border)]"
                     >
                       Sign Out
                     </button>
@@ -71,7 +71,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="text-sm px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-black font-semibold rounded-xl hover:from-amber-400 hover:to-amber-500 transition-all"
+                className="text-sm px-5 py-2 bg-amber-500 text-[var(--warm-900)] font-bold rounded-xl hover:bg-amber-400 transition-all"
               >
                 Sign In
               </Link>
