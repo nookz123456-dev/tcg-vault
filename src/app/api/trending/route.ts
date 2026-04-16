@@ -4,12 +4,12 @@ import { searchPokemonCards, getCardPrice } from '@/lib/api'
 // Trending cards — mix of popular Pokemon + One Piece with current prices
 
 const TRENDING_POKEMON_QUERIES = [
-  // High-value Scarlet & Violet cards
-  'set.series:"Scarlet & Violet" rarity:"Ultra Rare"',
-  // Special Illustration Rares (the chase cards)
+  // Highest market price cards in Scarlet & Violet
+  'set.series:"Scarlet & Violet" supertype:"Pokemon" -subtypes:"BREAK" -subtypes:"MEGA" -subtypes:"V-UNION"',
+  // Special Illustration Rares (chase cards, high value)
   'rarity:"Special Illustration Rare"',
-  // Rare Ultra across all sets
-  'rarity:"Rare Ultra"',
+  // Illustration Rares
+  'rarity:"Illustration Rare"',
 ]
 
 interface TrendingCard {
@@ -31,24 +31,28 @@ export async function GET() {
     for (const q of TRENDING_POKEMON_QUERIES) {
       if (cards.length >= 8) break
       const results = await searchPokemonCards(q, 1, 8)
-      // Shuffle and pick cards with prices
-      const shuffled = results.data.sort(() => Math.random() - 0.5)
-      for (const card of shuffled) {
+      // Sort by market price descending, pick highest value cards
+      const withPrices = results.data
+        .map(card => {
+          const price = getCardPrice(card)
+          return { card, market: price?.market ?? 0 }
+        })
+        .filter(c => c.market > 10) // Only cards priced $10+
+        .sort((a, b) => b.market - a.market)
+
+      for (const { card, market } of withPrices) {
         if (cards.length >= 8) break
         if (seen.has(card.id)) continue
-        const price = getCardPrice(card)
-        if (price && price.market && price.market > 1) {
-          seen.add(card.id)
-          cards.push({
-            id: card.id,
-            name: card.name,
-            image: card.images.small,
-            game: 'pokemon',
-            setName: card.set.name,
-            rarity: card.rarity || '',
-            marketPrice: price.market,
-          })
-        }
+        seen.add(card.id)
+        cards.push({
+          id: card.id,
+          name: card.name,
+          image: card.images.small,
+          game: 'pokemon',
+          setName: card.set.name,
+          rarity: card.rarity || '',
+          marketPrice: market,
+        })
       }
     }
   } catch (e) {
