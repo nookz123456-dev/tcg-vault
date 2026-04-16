@@ -122,17 +122,32 @@ export default function SearchResults() {
   }
 
   // Fetch prices from TCG Price Lookup API for One Piece / Pokemon JP
-  const fetchPrices = async (q: string, game: string) => {
+  const fetchPrices = async (cards: DisplayCard[], game: string) => {
+    const priceMap: Record<string, { market: number | null; low: number | null; mid: number | null; high: number | null; graded: Record<string, any> | null; conditionPrices: any | null }> = {}
     try {
-      const res = await fetch(`/api/prices?q=${encodeURIComponent(q)}&game=${game}&pageSize=5`)
-      if (!res.ok) return {}
-      const data = await res.json()
-      const priceMap: Record<string, number> = {}
-      for (const card of data.data || []) {
-        const nm = card.prices?.nearMint
-        if (nm?.market) {
-          priceMap[card.name.toLowerCase()] = nm.market
-        }
+      // Search price for each unique card name (deduped, max 10 to respect rate limits)
+      const uniqueNames = [...new Set(cards.map(c => c.name))].slice(0, 10)
+      for (const name of uniqueNames) {
+        try {
+          const res = await fetch(`/api/prices?q=${encodeURIComponent(name)}&game=${game}&pageSize=5`)
+          if (!res.ok) continue
+          const data = await res.json()
+          const match = (data.data || []).find((c: { setName: string; number: string; name: string }) =>
+            c.name?.toLowerCase() === name.toLowerCase()
+          ) || (data.data || [])[0]
+          if (match) {
+            priceMap[name.toLowerCase()] = {
+              market: match.prices?.nearMint?.market ?? null,
+              low: match.prices?.nearMint?.low ?? null,
+              mid: match.prices?.nearMint?.mid ?? null,
+              high: match.prices?.nearMint?.high ?? null,
+              graded: match.graded || null,
+              conditionPrices: match.prices || null,
+            }
+          }
+          // Rate limit: wait 300ms between requests
+          await new Promise(r => setTimeout(r, 300))
+        } catch { continue }
       }
       return priceMap
     } catch {
@@ -246,14 +261,14 @@ export default function SearchResults() {
         // Fetch prices for One Piece / Pokemon JP from TCG Price Lookup
         const priceGame: string | null = game === 'onepiece' ? 'onepiece' : game === 'pokemon' && pokeLang === 'jp' ? 'pokemon-jp' : null
         if (mapped.length > 0 && priceGame) {
-          const prices = await fetchPrices(query, priceGame)
+          const prices = await fetchPrices(mapped, priceGame)
           if (Object.keys(prices).length > 0) {
             setCards(prev => prev.map(c => {
-              const price = prices[c.name.toLowerCase()]
-              if (price && !c.marketPrice) return { ...c, marketPrice: price }
+              const p = prices[c.name.toLowerCase()]
+              if (p && !c.marketPrice) return { ...c, marketPrice: p.market, lowPrice: p.low, midPrice: p.mid, highPrice: p.high }
               return c
             }))
-            setPriceMap(prices)
+            setPriceMap(prices as any)
           }
         }
       }
@@ -333,7 +348,12 @@ export default function SearchResults() {
             return (
               <a
                 key={card.id}
-                href={card.game === 'pokemon' ? `/card/pokemon/${card.id}` : undefined}
+                href={card.game === 'pokemon' 
+                  ? (pokeLang === 'jp' 
+                    ? `/card/pokemon-jp/${encodeURIComponent(card.name)}` 
+                    : `/card/pokemon/${card.id}`)
+                  : `/card/onepiece/${encodeURIComponent(card.name)}`
+                }
                 className="group bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden card-hover text-left cursor-pointer relative transition-all duration-300 hover:border-amber-500/40 hover:shadow-lg hover:shadow-amber-500/5 block"
               >
                 {isInCollection && (
