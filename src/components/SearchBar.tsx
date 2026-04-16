@@ -55,6 +55,30 @@ const POKEMON_RARITIES: Record<string, string> = {
   Promo: 'Promo',
 }
 
+// Pokemon JP evolution types (client-side filter)
+const JP_EVOLUTION: Record<string, string> = {
+  all: 'All Stages',
+  basic: 'Basic',
+  'stage1': 'Stage 1',
+  'stage2': 'Stage 2',
+}
+
+// Pokemon JP types (client-side filter)
+const JP_TYPES: Record<string, string> = {
+  all: 'All Types',
+  grass: 'Grass',
+  fire: 'Fire',
+  water: 'Water',
+  lightning: 'Lightning',
+  psychic: 'Psychic',
+  fighting: 'Fighting',
+  darkness: 'Darkness',
+  metal: 'Metal',
+  fairy: 'Fairy',
+  dragon: 'Dragon',
+  colorless: 'Colorless',
+}
+
 function FilterSelect({
   label,
   value,
@@ -138,6 +162,10 @@ export default function SearchBar() {
   const [pokeSubtype, setPokeSubtype] = useState('all')
   const [pokeSeries, setPokeSeries] = useState('all')
   const [pokeRarity, setPokeRarity] = useState('all')
+  // JP client-side filters
+  const [jpEvolution, setJpEvolution] = useState('all')
+  const [jpType, setJpType] = useState('all')
+  const [jpRarity, setJpRarity] = useState('all')
   const router = useRouter()
 
   const handleSearch = (e: React.FormEvent) => {
@@ -160,6 +188,11 @@ export default function SearchBar() {
         if (pokeSubtype !== 'all') params.set('subtype', pokeSubtype)
         if (pokeSeries !== 'all') params.set('series', pokeSeries)
         if (pokeRarity !== 'all') params.set('rarity', pokeRarity)
+      } else {
+        // JP filters (client-side)
+        if (jpEvolution !== 'all') params.set('jpEvolution', jpEvolution)
+        if (jpType !== 'all') params.set('jpType', jpType)
+        if (jpRarity !== 'all') params.set('jpRarity', jpRarity)
       }
     }
     router.push(`/search?${params.toString()}`)
@@ -170,17 +203,21 @@ export default function SearchBar() {
       ? opType !== 'all' || opRarity !== 'all'
       : pokeLang === 'en'
         ? pokeSupertype !== 'all' || pokeSubtype !== 'all' || pokeSeries !== 'all' || pokeRarity !== 'all'
-        : false
+        : jpEvolution !== 'all' || jpType !== 'all' || jpRarity !== 'all'
 
   const clearFilters = () => {
     if (game === 'onepiece') {
       setOpType('all')
       setOpRarity('all')
-    } else {
+    } else if (pokeLang === 'en') {
       setPokeSupertype('all')
       setPokeSubtype('all')
       setPokeSeries('all')
       setPokeRarity('all')
+    } else {
+      setJpEvolution('all')
+      setJpType('all')
+      setJpRarity('all')
     }
   }
 
@@ -210,12 +247,18 @@ export default function SearchBar() {
       {game === 'pokemon' && (
         <div className="flex flex-wrap items-center gap-3 bg-[var(--surface-1)]/50 border border-[var(--card-border)] rounded-xl px-4 py-3">
           <LangToggle value={pokeLang} onChange={setPokeLang} options={{ en: 'EN Cards', jp: 'JP Cards' }} />
-          {pokeLang === 'en' && (
+          {pokeLang === 'en' ? (
             <>
               <FilterSelect label="Type" value={pokeSupertype} onChange={setPokeSupertype} options={POKEMON_SUPERTYPES} />
               <FilterSelect label="Subtype" value={pokeSubtype} onChange={setPokeSubtype} options={POKEMON_SUBTYPES} />
               <FilterSelect label="Rarity" value={pokeRarity} onChange={setPokeRarity} options={POKEMON_RARITIES} />
               <FilterSelect label="Series" value={pokeSeries} onChange={setPokeSeries} options={POKEMON_SERIES} />
+            </>
+          ) : (
+            <>
+              <FilterSelect label="Stage" value={jpEvolution} onChange={setJpEvolution} options={JP_EVOLUTION} />
+              <FilterSelect label="Type" value={jpType} onChange={setJpType} options={JP_TYPES} />
+              <FilterSelect label="Rarity" value={jpRarity} onChange={setJpRarity} options={POKEMON_RARITIES} />
             </>
           )}
           {hasActiveFilters && (

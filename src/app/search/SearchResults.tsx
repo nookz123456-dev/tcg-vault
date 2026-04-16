@@ -87,6 +87,10 @@ export default function SearchResults() {
   const pokeSeries = searchParams.get('series') || 'all'
   const pokeRarity = searchParams.get('rarity') || 'all'
   const opRarity = searchParams.get('rarity') || 'all'
+  // JP client-side filters
+  const jpEvolution = searchParams.get('jpEvolution') || 'all'
+  const jpType = searchParams.get('jpType') || 'all'
+  const jpRarity = searchParams.get('jpRarity') || 'all'
 
   const [cards, setCards] = useState<DisplayCard[]>([])
   const [loading, setLoading] = useState(false)
@@ -224,6 +228,18 @@ export default function SearchResults() {
             }
           })
         }
+        // Apply JP client-side filters
+        if (pokeLang === 'jp') {
+          if (jpEvolution !== 'all') {
+            mapped = mapped.filter(c => c.cardType?.toLowerCase() === jpEvolution.toLowerCase())
+          }
+          if (jpType !== 'all') {
+            mapped = mapped.filter(c => c.types?.some(t => t.toLowerCase() === jpType.toLowerCase()))
+          }
+          if (jpRarity !== 'all') {
+            mapped = mapped.filter(c => c.rarity?.toLowerCase().includes(jpRarity.toLowerCase()))
+          }
+        }
         if (page === 1) setCards(mapped)
         else setCards(prev => [...prev, ...mapped])
         setTotalCount(data.totalCount || 0)
@@ -277,13 +293,13 @@ export default function SearchResults() {
     } finally {
       setLoading(false)
     }
-  }, [query, page, game, pokeLang, opLang, opType, opRarity, pokeSupertype, pokeSubtype, pokeSeries, pokeRarity])
+  }, [query, page, game, pokeLang, opLang, opType, opRarity, pokeSupertype, pokeSubtype, pokeSeries, pokeRarity, jpEvolution, jpType, jpRarity])
 
   useEffect(() => {
     setPage(1)
     setCards([])
     fetchCards()
-  }, [query, game, pokeLang, opLang, opType, opRarity, pokeSupertype, pokeSubtype, pokeSeries, pokeRarity])
+  }, [query, game, pokeLang, opLang, opType, opRarity, pokeSupertype, pokeSubtype, pokeSeries, pokeRarity, jpEvolution, jpType, jpRarity])
 
   useEffect(() => {
     if (page > 1) fetchCards()
