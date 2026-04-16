@@ -56,11 +56,12 @@ export async function GET() {
   }
 
   // Add One Piece cards (static — scraping too slow for homepage)
+  // Images go through /api/proxy-image to bypass Bandai hotlink protection
   const onePieceCards: TrendingCard[] = [
     {
       id: 'op-st01-001',
       name: 'Monkey.D.Luffy',
-      image: 'https://www.onepiece-cardgame.com/images/cardlist/card/ST01-001.png',
+      image: '/api/proxy-image?url=' + encodeURIComponent('https://www.onepiece-cardgame.com/images/cardlist/card/ST01-001.png'),
       game: 'onepiece',
       setName: 'Straw Hat Crew',
       rarity: 'L',
@@ -69,7 +70,7 @@ export async function GET() {
     {
       id: 'op-op02-001',
       name: 'Monkey.D.Luffy',
-      image: 'https://www.onepiece-cardgame.com/images/cardlist/card/OP02-001.png',
+      image: '/api/proxy-image?url=' + encodeURIComponent('https://www.onepiece-cardgame.com/images/cardlist/card/OP02-001.png'),
       game: 'onepiece',
       setName: 'Paramount War',
       rarity: 'SEC',
