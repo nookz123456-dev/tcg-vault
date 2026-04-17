@@ -12,6 +12,20 @@ export default function Navbar() {
   const { user, isGuest, isAuthenticated, logout } = useAuth()
   const t = useT()
   const [unreadCount, setUnreadCount] = useState(0)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return }
+    // Check admin role
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+    const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}&select=role`, {
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${user.access_token}` },
+    })
+      .then(r => r.json())
+      .then(data => setIsAdmin(data?.[0]?.role === 'admin'))
+      .catch(() => setIsAdmin(false))
+  }, [user])
 
   useEffect(() => {
     if (!user) return
@@ -79,6 +93,15 @@ export default function Navbar() {
                 ) : (
                   <>
                     {/* Notifications bell */}
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        className="p-2 rounded-lg hover:bg-[#6366f1]/5 transition-colors"
+                        title="Admin Panel"
+                      >
+                        <span className="text-lg">🛡️</span>
+                      </Link>
+                    )}
                     <Link
                       href="/notifications"
                       className="relative p-2 rounded-lg hover:bg-[#6366f1]/5 transition-colors"

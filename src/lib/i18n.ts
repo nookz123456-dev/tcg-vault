@@ -222,6 +222,7 @@ const translations = {
   'common.ago': { th: 'ที่แล้ว', en: 'ago' },
   'common.from': { th: 'จาก', en: 'from' },
   'common.to': { th: 'ถึง', en: 'to' },
+  'common.admin': { th: 'ผู้ดูแลระบบ', en: 'Admin' },
 } as const
 
 export type Locale = 'th' | 'en'
