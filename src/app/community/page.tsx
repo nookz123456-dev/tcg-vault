@@ -165,6 +165,25 @@ export default function CommunityPage() {
           </p>
         </div>
 
+        {/* Quick Links */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <Link href="/discussions" className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-5 card-hover group text-center">
+            <div className="text-3xl mb-2">💬</div>
+            <h3 className="text-sm font-bold text-[var(--foreground)] group-hover:text-amber-400 transition-colors">Discussion Boards</h3>
+            <p className="text-xs text-[var(--warm-400)] mt-1">Chat with fellow collectors</p>
+          </Link>
+          <Link href="/trades" className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-5 card-hover group text-center">
+            <div className="text-3xl mb-2">🤝</div>
+            <h3 className="text-sm font-bold text-[var(--foreground)] group-hover:text-amber-400 transition-colors">Trade Center</h3>
+            <p className="text-xs text-[var(--warm-400)] mt-1">Find trade partners</p>
+          </Link>
+          <Link href="/badges" className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-5 card-hover group text-center">
+            <div className="text-3xl mb-2">🏅</div>
+            <h3 className="text-sm font-bold text-[var(--foreground)] group-hover:text-amber-400 transition-colors">Badges</h3>
+            <p className="text-xs text-[var(--warm-400)] mt-1">Earn achievements</p>
+          </Link>
+        </div>
+
         {/* Tabs */}
         <div className="flex gap-1 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-xl p-1 mb-8 max-w-md mx-auto">
           {[
