@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { searchPokemonJPCards } from '@/lib/pokemon-jp-api'
+import { getJapanesePokemonName } from '@/lib/pokemon-jp-names'
 
 const TCG_API_BASE = 'https://api.tcgpricelookup.com/v1'
 
@@ -65,6 +66,7 @@ export async function GET(
         id: priceData.id || cardId,
         tcgplayerId: priceData.tcgplayer_id,
         name: priceData.name || cardId,
+        nameJP: await getJapanesePokemonName(priceData.name || cardId).catch(() => null),
         number: priceData.number || '',
         rarity: priceData.rarity || null,
         variant: priceData.variant || null,
@@ -94,12 +96,16 @@ export async function GET(
       return NextResponse.json({ error: 'Card not found' }, { status: 404 })
     }
 
+    // Step 3: Fetch Japanese name from PokeAPI if not already available
+    const englishName = cardData.name || cardId
+    const nameJP = cardData.nameJP || await getJapanesePokemonName(englishName).catch(() => null)
+
     // Merge card data with price data
     const result: any = {
       id: cardData.id || cardId,
       tcgplayerId: priceData?.tcgplayer_id || null,
-      name: cardData.name || cardId,
-      nameJP: cardData.nameJP || null, // Japanese name from pokemon-card.com
+      name: englishName,
+      nameJP: nameJP, // Japanese name from PokeAPI
       number: cardData.number || '',
       rarity: cardData.rarity || (priceData?.rarity || null),
       variant: priceData?.variant || null,

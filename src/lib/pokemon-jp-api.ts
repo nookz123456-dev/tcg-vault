@@ -31,28 +31,13 @@ const BASE_URL_JP = 'https://www.pokemon-card.com'
 const BASE_URL_EN_ASIA = 'https://asia.pokemon-card.com/id'
 
 /**
- * Fetch the Japanese name for a card from the JP site.
- * Uses the same card ID as the Asia/ID site.
+ * Fetch the Japanese name for a card using PokeAPI.
+ * Uses the English name to look up the species, then gets the Japanese name.
  */
-async function fetchJPName(cardId: string): Promise<string | null> {
+async function fetchJPName(englishName: string): Promise<string | null> {
   try {
-    const jpUrl = `https://www.pokemon-card.com/card-search/detail/${cardId}/`
-    const res = await fetch(jpUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'text/html',
-      },
-    })
-    if (!res.ok) return null
-    const html = await res.text()
-    // Name: <h1 class="pageHeader cardDetail">ピカチュウ</h1>
-    const nameMatch = html.match(/class="pageHeader cardDetail"[^>]*>([\s\S]*?)<\/h1>/)
-    if (nameMatch) {
-      // Remove evolve marker span from name
-      const jpName = nameMatch[1].replace(/<span[^>]*>[\s\S]*?<\/span>/g, '').trim()
-      return jpName || null
-    }
-    return null
+    const { getJapanesePokemonName } = await import('./pokemon-jp-names')
+    return await getJapanesePokemonName(englishName)
   } catch {
     return null
   }
@@ -327,7 +312,8 @@ export async function searchPokemonJPCards(
         const parsed = parseCardDetail(detailHtml, card.id, card.image)
         
         // Fetch Japanese name from JP site
-        const jpName = await fetchJPName(card.id)
+        // Fetch Japanese name from PokeAPI
+        const jpName = await fetchJPName(parsed.name)
         parsed.nameJP = jpName
         // Add JP name to keywords for searchability
         if (jpName) {
