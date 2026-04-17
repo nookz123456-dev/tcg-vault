@@ -23,16 +23,33 @@ export async function GET(request: NextRequest) {
         cache: 'no-store'
       })
       const testData = await testRes.json()
+      
+      // Also test the search function
+      const searchResult = await searchPokemonJPCardsTCGdex(keyword, page)
+      
       return NextResponse.json({
         debug: true,
         keyword,
-        status: testRes.status,
-        resultCount: Array.isArray(testData) ? testData.length : 'NOT_ARRAY',
-        sample: Array.isArray(testData) && testData.length > 0 ? { id: testData[0].id, name: testData[0].name } : null,
+        keywordBytes: Buffer.from(keyword).toString('hex'),
+        isJapanese: isJapaneseCheck(keyword),
+        directApi: {
+          status: testRes.status,
+          resultCount: Array.isArray(testData) ? testData.length : 'NOT_ARRAY',
+          sample: Array.isArray(testData) && testData.length > 0 ? { id: testData[0].id, name: testData[0].name } : null,
+        },
+        searchFunction: {
+          cardsFound: searchResult.data.length,
+          totalCount: searchResult.totalCount,
+        },
       })
     } catch (err: any) {
-      return NextResponse.json({ debug: true, error: String(err), keyword })
+      return NextResponse.json({ debug: true, error: String(err), message: err?.message, keyword })
     }
+  }
+  
+  // Helper for debug
+  function isJapaneseCheck(text: string): boolean {
+    return /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/.test(text)
   }
 
   try {
