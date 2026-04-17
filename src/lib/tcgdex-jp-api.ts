@@ -151,7 +151,12 @@ export async function searchPokemonJPCardsTCGdex(
   }
 
   // Filter to only Pokemon category
-  const pokemonCards = allCards.filter(c => c.category === 'Pokemon')
+  // Note: TCGdex list search returns cards with category=null (summary format)
+  // So we accept null categories and only exclude Trainer/Energy
+  const pokemonCards = allCards.filter(c => {
+    if (!c.category) return true // Accept null (will be Pokemon in most cases)
+    return c.category === 'Pokemon'
+  })
 
   console.log(`[TCGdex JP] Search "${keyword}" → found ${pokemonCards.length} Pokemon cards (total candidates: ${allCards.length})`)
   return { data: pokemonCards, totalCount: pokemonCards.length, page }
