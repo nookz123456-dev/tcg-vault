@@ -20,6 +20,7 @@ interface CardPriceData {
   id: string
   tcgplayerId?: string | null
   name: string
+  nameJP?: string | null  // Japanese name from pokemon-card.com
   number: string
   rarity: string | null
   variant: string | null
@@ -200,7 +201,10 @@ export default function PokemonJPCardPage() {
                   </span>
                 )}
               </div>
-              <h1 className="text-3xl font-bold text-[#1e2235] mb-2">{card.name}</h1>
+              <h1 className="text-3xl font-bold text-[#1e2235] mb-1">{card.nameJP || card.name}</h1>
+              {card.nameJP && (
+                <p className="text-[#8b8fa6] text-sm">{card.name}</p>
+              )}
               <p className="text-[#5c6078] text-sm">{card.setName} &middot; #{card.number}</p>
             </div>
 

@@ -417,6 +417,9 @@ export default function SearchResults() {
                 </div>
                 <div className="p-3.5">
                   <h3 className="text-sm font-semibold text-[#1e2235] truncate">{card.name}</h3>
+                  {'nameJP' in card && (card as any).nameJP && (
+                    <p className="text-xs text-[#8b8fa6] truncate">{(card as any).nameJP}</p>
+                  )}
                   <p className="text-xs text-[#5c6078] truncate mt-0.5">{card.setName}</p>
                   {/* Keywords / Tags */}
                   {card.keywords && card.keywords.length > 0 && (

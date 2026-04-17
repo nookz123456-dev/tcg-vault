@@ -12,7 +12,8 @@ export type PokemonLang = 'en' | 'jp'
 
 export interface PokemonJPCardData {
   id: string
-  name: string
+  name: string          // English name (from Asia/ID site)
+  nameJP: string | null // Japanese name (from JP site)
   image: string
   setName: string
   rarity: string | null
@@ -28,6 +29,34 @@ export interface PokemonJPCardData {
 
 const BASE_URL_JP = 'https://www.pokemon-card.com'
 const BASE_URL_EN_ASIA = 'https://asia.pokemon-card.com/id'
+
+/**
+ * Fetch the Japanese name for a card from the JP site.
+ * Uses the same card ID as the Asia/ID site.
+ */
+async function fetchJPName(cardId: string): Promise<string | null> {
+  try {
+    const jpUrl = `https://www.pokemon-card.com/card-search/detail/${cardId}/`
+    const res = await fetch(jpUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'text/html',
+      },
+    })
+    if (!res.ok) return null
+    const html = await res.text()
+    // Name: <h1 class="pageHeader cardDetail">ピカチュウ</h1>
+    const nameMatch = html.match(/class="pageHeader cardDetail"[^>]*>([\s\S]*?)<\/h1>/)
+    if (nameMatch) {
+      // Remove evolve marker span from name
+      const jpName = nameMatch[1].replace(/<span[^>]*>[\s\S]*?<\/span>/g, '').trim()
+      return jpName || null
+    }
+    return null
+  } catch {
+    return null
+  }
+}
 
 const ENERGY_MAP: Record<string, string> = {
   Grass: 'Grass',
@@ -225,6 +254,7 @@ function parseCardDetail(html: string, id: string, image: string): PokemonJPCard
   return {
     id,
     name: name || `Pokemon ${id}`,
+    nameJP: null, // Will be filled in by fetchJPName after parsing
     image,
     setName,
     rarity,
@@ -295,12 +325,22 @@ export async function searchPokemonJPCards(
       if (detailRes.ok) {
         const detailHtml = await detailRes.text()
         const parsed = parseCardDetail(detailHtml, card.id, card.image)
+        
+        // Fetch Japanese name from JP site
+        const jpName = await fetchJPName(card.id)
+        parsed.nameJP = jpName
+        // Add JP name to keywords for searchability
+        if (jpName) {
+          parsed.keywords = [...parsed.keywords, ...jpName.split(/[\s\u3000]+/).filter(w => w.length >= 2)]
+        }
+        
         detailedCards.push(parsed)
       } else {
         // Fallback: use basic info from list
         detailedCards.push({
           id: card.id,
           name: `Card #${card.id}`,
+          nameJP: null,
           image: card.image,
           setName: '',
           rarity: null,
@@ -319,6 +359,7 @@ export async function searchPokemonJPCards(
       detailedCards.push({
         id: card.id,
         name: `Card #${card.id}`,
+        nameJP: null,
         image: card.image,
         setName: '',
         rarity: null,

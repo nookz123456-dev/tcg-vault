@@ -99,6 +99,7 @@ export async function GET(
       id: cardData.id || cardId,
       tcgplayerId: priceData?.tcgplayer_id || null,
       name: cardData.name || cardId,
+      nameJP: cardData.nameJP || null, // Japanese name from pokemon-card.com
       number: cardData.number || '',
       rarity: cardData.rarity || (priceData?.rarity || null),
       variant: priceData?.variant || null,
