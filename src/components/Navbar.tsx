@@ -23,6 +23,7 @@ export default function Navbar() {
   const links = [
     { href: '/', label: 'Home', icon: '🏠' },
     { href: '/search', label: 'Search', icon: '🔍' },
+    { href: '/sets', label: 'Sets', icon: '📂' },
     { href: '/sealed', label: 'Sealed', icon: '📦' },
     { href: '/discussions', label: 'Discuss', icon: '💬' },
     { href: '/community', label: 'Community', icon: '👥' },
