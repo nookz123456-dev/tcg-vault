@@ -1,29 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
-  /* Light & Bright — clean white/gray base with vibrant accents */
-  --background: #f8f9fb;
-  --foreground: #1a1d2e;
+  /* Pokedata-inspired — clean indigo/violet accent on light gray */
+  --background: #f5f6fa;
+  --foreground: #1e2235;
   --card-bg: #ffffff;
-  --card-border: #e5e7ef;
-  --accent: #f59e0b;
-  --accent-hover: #d97706;
-  --accent-soft: #f59e0b10;
-  --pokemon-gradient: linear-gradient(135deg, #f59e0b, #ef4444);
+  --card-border: #e8eaf0;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --accent-soft: #6366f110;
+  --pokemon-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
   --onepiece-gradient: linear-gradient(135deg, #ef4444, #f59e0b);
   --surface-1: #ffffff;
-  --surface-2: #f1f3f8;
-  /* Light neutrals */
-  --warm-100: #1a1d2e;
-  --warm-200: #3a3f54;
-  --warm-300: #5c6178;
+  --surface-2: #f0f1f6;
+  /* Neutrals */
+  --warm-100: #1e2235;
+  --warm-200: #3b3f56;
+  --warm-300: #5c6078;
   --warm-400: #8b8fa6;
-  --warm-500: #b0b4c8;
-  --warm-600: #d1d5e4;
-  --warm-700: #e5e7ef;
-  --warm-800: #f1f3f8;
-  --warm-900: #f8f9fb;
+  --warm-500: #b5b8c8;
+  --warm-600: #d5d7e2;
+  --warm-700: #e8eaf0;
+  --warm-800: #f0f1f6;
+  --warm-900: #f5f6fa;
 }
 
 * {
@@ -33,18 +33,18 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Card hover effect — bright lift */
+/* Card hover — clean lift */
 .card-hover {
-  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .card-hover:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(245, 158, 11, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 /* Shimmer animation for loading */
@@ -54,7 +54,7 @@ body {
 }
 
 .shimmer {
-  background: linear-gradient(90deg, var(--surface-2) 25%, #e8eaf2 50%, var(--surface-2) 75%);
+  background: linear-gradient(90deg, var(--surface-2) 25%, #e4e6ee 50%, var(--surface-2) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -65,9 +65,9 @@ body {
   -webkit-text-fill-color: var(--accent);
 }
 
-/* Scrollbar — light tinted */
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -76,7 +76,7 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: var(--warm-600);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {

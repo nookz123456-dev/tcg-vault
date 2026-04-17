@@ -31,7 +31,6 @@ export default function LoginPage() {
     setCaptchaToken('')
   }, [])
 
-  // Auto-confirm user after signup
   async function autoConfirmUser(userId: string) {
     try {
       await fetch('/api/auth/confirm', {
@@ -39,9 +38,7 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
       })
-    } catch {
-      // Silent fail — user can still confirm via email
-    }
+    } catch { /* Silent fail */ }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,14 +53,12 @@ export default function LoginPage() {
       return
     }
 
-    // Require captcha for signup
     if (!isLogin && TURNSTILE_SITE_KEY && !captchaToken) {
       setError('Please complete the captcha verification.')
       setLoading(false)
       return
     }
 
-    // Verify captcha server-side for signup
     if (!isLogin && TURNSTILE_SITE_KEY && captchaToken) {
       try {
         const captchaRes = await fetch('/api/captcha', {
@@ -89,15 +84,12 @@ export default function LoginPage() {
       if (isLogin) {
         const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
           method: 'POST',
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Content-Type': 'application/json',
-          },
+          headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
         })
         const data = await res.json()
         if (!res.ok || data.error) {
-          setError(data.error_description || data.msg || data.error || 'Login failed. Check your email and password.')
+          setError(data.error_description || data.msg || data.error || 'Login failed.')
           return
         }
         localStorage.setItem('tcg-vault-session', JSON.stringify(data))
@@ -106,28 +98,18 @@ export default function LoginPage() {
       } else {
         const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
           method: 'POST',
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Content-Type': 'application/json',
-          },
+          headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
         })
         const data = await res.json()
         if (!res.ok || data.error) {
-          setError(data.msg || data.error_description || data.error || 'Signup failed. Please try again.')
+          setError(data.msg || data.error_description || data.error || 'Signup failed.')
           return
         }
-
-        if (data.id) {
-          await autoConfirmUser(data.id)
-        }
-
+        if (data.id) await autoConfirmUser(data.id)
         const loginRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
           method: 'POST',
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Content-Type': 'application/json',
-          },
+          headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
         })
         const loginData = await loginRes.json()
@@ -142,27 +124,27 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error('Auth error:', err)
-      setError('Network error. Please check your connection and try again.')
+      setError('Network error. Please try again.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-[#f8f9fb]">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#f5f6fa]">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🃏</div>
-          <h1 className="text-3xl font-extrabold text-amber-500 tracking-tight">
+          <h1 className="text-3xl font-extrabold text-[#6366f1] tracking-tight">
             TCG Vault
           </h1>
-          <p className="text-[#5c6178] mt-2">Your card collection, tracked.</p>
+          <p className="text-[#5c6078] mt-2">Your card collection, tracked.</p>
         </div>
 
         {/* Form */}
-        <div className="bg-white border border-[#e5e7ef] rounded-2xl p-6 shadow-sm">
-          <h2 className="text-xl font-bold text-[#1a1d2e] mb-6">
+        <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6 shadow-sm">
+          <h2 className="text-xl font-bold text-[#1e2235] mb-6">
             {isLogin ? 'Welcome back' : 'Create account'}
           </h2>
 
@@ -171,7 +153,6 @@ export default function LoginPage() {
               {error}
             </div>
           )}
-
           {success && (
             <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-600 text-sm">
               {success}
@@ -180,26 +161,26 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-[#5c6178] mb-1">Email</label>
+              <label className="block text-sm text-[#5c6078] mb-1 font-medium">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-[#f8f9fb] border border-[#e5e7ef] rounded-xl text-[#1a1d2e] placeholder-[#b0b4c8] focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-100"
+                className="w-full px-4 py-3 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder-[#b5b8c8] focus:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
                 placeholder="your@email.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-[#5c6178] mb-1">Password</label>
+              <label className="block text-sm text-[#5c6078] mb-1 font-medium">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-4 py-3 bg-[#f8f9fb] border border-[#e5e7ef] rounded-xl text-[#1a1d2e] placeholder-[#b0b4c8] focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-100"
+                className="w-full px-4 py-3 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder-[#b5b8c8] focus:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
                 placeholder="Min 6 characters"
               />
             </div>
@@ -225,7 +206,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || (!isLogin && !!TURNSTILE_SITE_KEY && !captchaToken)}
-              className="w-full py-3 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-amber-500/25"
+              className="w-full py-3 bg-[#6366f1] text-white font-bold rounded-xl hover:bg-[#4f46e5] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-[#6366f1]/25"
             >
               {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
             </button>
@@ -234,19 +215,16 @@ export default function LoginPage() {
           <div className="mt-4 text-center">
             <button
               onClick={() => { setIsLogin(!isLogin); setError(''); setSuccess('') }}
-              className="text-sm text-[#5c6178] hover:text-amber-500 transition-colors"
+              className="text-sm text-[#5c6078] hover:text-[#6366f1] transition-colors"
             >
               {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
             </button>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-[#e5e7ef]">
+          <div className="mt-4 pt-4 border-t border-[#e8eaf0]">
             <button
-              onClick={() => {
-                localStorage.setItem('tcg-vault-guest', 'true')
-                window.location.href = '/collection'
-              }}
-              className="w-full py-2 text-[#8b8fa6] hover:text-[#1a1d2e] transition-colors text-sm"
+              onClick={() => { localStorage.setItem('tcg-vault-guest', 'true'); window.location.href = '/collection' }}
+              className="w-full py-2 text-[#8b8fa6] hover:text-[#1e2235] transition-colors text-sm"
             >
               Continue as Guest (saved locally only)
             </button>
