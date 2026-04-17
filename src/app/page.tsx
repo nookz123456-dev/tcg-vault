@@ -18,6 +18,9 @@ export default function Home() {
               <Link href="/search" className="text-sm text-[var(--warm-300)] hover:text-amber-400 transition-colors font-medium">
                 Search
               </Link>
+              <Link href="/community" className="text-sm text-[var(--warm-300)] hover:text-amber-400 transition-colors font-medium">
+                Community
+              </Link>
               <Link href="/collection" className="text-sm text-[var(--warm-300)] hover:text-amber-400 transition-colors font-medium">
                 Collection
               </Link>
@@ -182,6 +185,65 @@ export default function Home() {
               </div>
               <h3 className="text-[var(--foreground)] font-bold mb-2">Track your portfolio</h3>
               <p className="text-[var(--warm-400)] text-sm">Watch your total value grow. See profit, loss, and individual card performance.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Community CTA */}
+      <section className="border-t border-[var(--card-border)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-xs font-semibold mb-4">
+                👥 Community
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-[var(--foreground)] mb-4 tracking-tight">
+                Collect together
+              </h2>
+              <p className="text-[var(--warm-300)] leading-relaxed mb-6">
+                See what other collectors are adding. Join the leaderboard. Share your collection. Trade cards with the community.
+              </p>
+              <div className="flex gap-3">
+                <Link
+                  href="/community"
+                  className="px-6 py-3 bg-amber-500 text-[var(--warm-900)] font-bold rounded-xl hover:bg-amber-400 transition-all"
+                >
+                  View Community
+                </Link>
+                <Link
+                  href="/login"
+                  className="px-6 py-3 bg-[var(--surface-1)] border border-[var(--card-border)] text-[var(--warm-200)] font-bold rounded-xl hover:text-amber-400 hover:border-amber-500/30 transition-all"
+                >
+                  Join Now
+                </Link>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {<div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4 flex items-center gap-3">
+                <div className="w-8 h-8 bg-amber-500/10 rounded-full flex items-center justify-center text-sm">👤</div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-[var(--foreground)]">PikachuCollector</p>
+                  <p className="text-xs text-[var(--warm-400)]">added Charizard 1st Edition</p>
+                </div>
+                <span className="text-xs text-[var(--warm-500)]">2m ago</span>
+              </div>}
+              {<div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4 flex items-center gap-3">
+                <div className="w-8 h-8 bg-red-500/10 rounded-full flex items-center justify-center text-sm">🏴‍☠️</div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-[var(--foreground)]">LuffyFan99</p>
+                  <p className="text-xs text-[var(--warm-400)]">listed for trade: OP01 Luffy</p>
+                </div>
+                <span className="text-xs text-[var(--warm-500)]">15m ago</span>
+              </div>}
+              {<div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4 flex items-center gap-3">
+                <div className="w-8 h-8 bg-emerald-500/10 rounded-full flex items-center justify-center text-sm">⭐</div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-[var(--foreground)]">CardMaster</p>
+                  <p className="text-xs text-[var(--warm-400)]">reached 500 cards in collection</p>
+                </div>
+                <span className="text-xs text-[var(--warm-500)]">1h ago</span>
+              </div>}
             </div>
           </div>
         </div>

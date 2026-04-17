@@ -12,6 +12,7 @@ export default function Navbar() {
     { href: '/', label: 'Home', icon: '🏠' },
     { href: '/search', label: 'Search', icon: '🔍' },
     { href: '/sealed', label: 'Sealed', icon: '📦' },
+    { href: '/community', label: 'Community', icon: '👥' },
     { href: '/collection', label: 'Collection', icon: '🃏' },
   ]
 
