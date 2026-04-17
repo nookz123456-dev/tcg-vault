@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ClientLayout } from "@/components/ClientLayout";
 
 export const metadata: Metadata = {
-  title: "TCG Vault — Card Collection Tracker",
-  description: "Track your Pokemon and One Piece card collections with real-time pricing",
+  title: "TCG Vault — ติดตามราคาการ์ด TCG | Card Price Tracker",
+  description: "ฐานข้อมูลการ์ดโปเกม่อน One Piece ครบทุกเซ็ต พร้อมราคาอัปเดต จัดการคอลเลกชัน พูดคุยกับนักสะสมคนอื่น",
   icons: {
     icon: "/favicon.ico",
   },
@@ -17,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="th">
       <body className="antialiased">
-        {children}
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

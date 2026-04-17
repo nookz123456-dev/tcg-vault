@@ -1,0 +1,172 @@
+// Thai/English UI translations for TCG Vault
+// Card data stays in its original language (EN/JP)
+
+const translations = {
+  // Nav
+  'nav.home': { th: 'หน้าแรก', en: 'Home' },
+  'nav.search': { th: 'ค้นหา', en: 'Search' },
+  'nav.sets': { th: 'เซ็ตการ์ด', en: 'Sets' },
+  'nav.sealed': { th: 'ซีลผลิตภัณฑ์', en: 'Sealed' },
+  'nav.discuss': { th: 'พูดคุย', en: 'Discuss' },
+  'nav.community': { th: 'ชุมชน', en: 'Community' },
+  'nav.collection': { th: 'คอลเลกชัน', en: 'Collection' },
+  'nav.signIn': { th: 'เข้าสู่ระบบ', en: 'Sign In' },
+  'nav.signOut': { th: 'ออกจากระบบ', en: 'Sign Out' },
+
+  // Homepage
+  'home.hero.title': { th: 'ติดตามราคาการ์ด TCG ทุกเซ็ต', en: 'Track TCG card prices across every set' },
+  'home.hero.subtitle': { th: 'ฐานข้อมูลการ์ดโปเกม่อน One Piece ครบทุกภาษา พร้อมราคาอัปเดต', en: 'Complete Pokemon & One Piece card database with live pricing' },
+  'home.hero.cta': { th: 'เริ่มค้นหา', en: 'Start Searching' },
+  'home.hero.cta2': { th: 'ดูเซ็ตการ์ด', en: 'Browse Sets' },
+  'home.stats.cards': { th: 'การ์ดในระบบ', en: 'Cards in Database' },
+  'home.stats.sets': { th: 'เซ็ตการ์ด', en: 'Card Sets' },
+  'home.stats.prices': { th: 'ราคาอัปเดต', en: 'Price Updates' },
+  'home.features.title': { th: 'ฟีเจอร์หลัก', en: 'Key Features' },
+  'home.features.search': { th: 'ค้นหาการ์ด', en: 'Card Search' },
+  'home.features.searchDesc': { th: 'ค้นหาจากชื่อ ประเภท ความหายาก รองรับทั้ง EN และ JP', en: 'Search by name, type, rarity. Supports EN and JP' },
+  'home.features.prices': { th: 'ราคาแบบเรียลไทม์', en: 'Live Pricing' },
+  'home.features.pricesDesc': { th: 'ราคาจาก TCGplayer, CardMarket พร้อมแปลงสกุลเงิน THB', en: 'TCGplayer & CardMarket prices with THB conversion' },
+  'home.features.graded': { th: 'ราคาจัดเกรด', en: 'Graded Prices' },
+  'home.features.gradedDesc': { th: 'ราคา PSA, CGC, BGS สำหรับการ์ดจัดเกรด', en: 'PSA, CGC, BGS pricing for graded cards' },
+  'home.features.collection': { th: 'จัดการคอลเลกชัน', en: 'Collection Management' },
+  'home.features.collectionDesc': { th: 'เก็บการ์ดของคุณ ติดตามมูลค่า แชร์ให้เพื่อนดู', en: 'Track your cards, monitor value, share with friends' },
+  'home.features.community': { th: 'ชุมชนนักสะสม', en: 'Collector Community' },
+  'home.features.communityDesc': { th: 'พูดคุย แลกเปลี่ยน ตามนักสะสมคนอื่น', en: 'Discuss, trade, and follow other collectors' },
+  'home.features.sealed': { th: 'ซีลผลิตภัณฑ์', en: 'Sealed Products' },
+  'home.features.sealedDesc': { th: 'ราคากล่อง Booster, ETB, Blister Pack อัปเดต', en: 'Booster Box, ETB, Blister Pack pricing updated live' },
+  'home.how.title': { th: 'ใช้งานง่าย 3 ขั้นตอน', en: 'Get Started in 3 Steps' },
+  'home.how.step1': { th: '1. ค้นหาการ์ด', en: '1. Search for a Card' },
+  'home.how.step1Desc': { th: 'พิมพ์ชื่อการ์ด ภาษาอังกฤษหรือญี่ปุ่นก็ได้', en: 'Type any card name in English or Japanese' },
+  'home.how.step2': { th: '2. ดูราคาเต็มๆ', en: '2. Check Prices' },
+  'home.how.step2Desc': { th: 'ราคาตามสภาพ ราคาจัดเกรด กราฟราคาย้อนหลัง', en: 'Condition prices, graded prices, price history charts' },
+  'home.how.step3': { th: '3. เพิ่มเข้าคอลเลกชัน', en: '3. Add to Collection' },
+  'home.how.step3Desc': { th: 'เก็บการ์ดที่สนใจ ติดตามมูลค่ารวมอัตโนมัติ', en: 'Save cards you love, track total value automatically' },
+  'home.community.title': { th: 'เข้าร่วมชุมชนนักสะสม', en: 'Join the Collector Community' },
+  'home.community.desc': { th: 'พูดคุยเรื่องการ์ด แลกเปลี่ยน ตามกระแสตลาด ร่วมกับนักสะสมคนอื่น', en: 'Discuss cards, trade with others, follow market trends' },
+  'home.community.cta': { th: 'เข้าชุมชน', en: 'Join Community' },
+  'home.footer.desc': { th: 'ฐานข้อมูลการ์ด TCG ที่ครบที่สุด สำหรับนักสะสมไทย', en: 'The most complete TCG card database for Thai collectors' },
+
+  // Sets page
+  'sets.title': { th: 'เซ็ตการ์ด', en: 'Card Sets' },
+  'sets.subtitle': { th: 'เรียกดูทุกเซ็ต — ทุกการ์ดบนโลก', en: 'Browse all sets — every card in existence' },
+  'sets.search': { th: 'ค้นหาเซ็ต...', en: 'Search sets...' },
+  'sets.cards': { th: 'การ์ด', en: 'cards' },
+  'sets.sets': { th: 'เซ็ต', en: 'sets' },
+  'sets.in': { th: 'ใน', en: 'in' },
+  'sets.noSets': { th: 'ไม่พบเซ็ต', en: 'No sets found' },
+  'sets.tryDifferent': { th: 'ลองค้นหาด้วยคำอื่น', en: 'Try a different search' },
+  'sets.loading': { th: 'กำลังโหลดเซ็ต...', en: 'Loading sets...' },
+
+  // Set detail
+  'set.released': { th: 'วางจำหน่าย', en: 'Released' },
+  'set.allRarities': { th: 'ทุกความหายาก', en: 'All Rarities' },
+  'set.allTypes': { th: 'ทุกประเภท', en: 'All Types' },
+  'set.showing': { th: 'แสดง', en: 'Showing' },
+  'set.of': { th: 'จาก', en: 'of' },
+  'set.loadMore': { th: 'โหลดเพิ่ม', en: 'Load More' },
+  'set.remaining': { th: 'ยังเหลือ', en: 'remaining' },
+
+  // Search
+  'search.placeholder': { th: 'ค้นหาการ์ด... ชื่ออังกฤษหรือญี่ปุ่น', en: 'Search cards... English or Japanese' },
+  'search.noResults': { th: 'ไม่พบการ์ด', en: 'No cards found' },
+  'search.tryDifferent': { th: 'ลองค้นหาด้วยคำอื่น', en: 'Try a different search' },
+  'search.added': { th: 'เพิ่มแล้ว', en: 'Added' },
+  'search.addToCollection': { th: 'เพิ่มในคอลเลกชัน', en: 'Add to Collection' },
+  'search.viewDetails': { th: 'ดูรายละเอียด', en: 'View Full Details' },
+  'search.allGames': { th: 'ทั้งหมด', en: 'All Games' },
+  'search.filter': { th: 'ตัวกรอง', en: 'Filter' },
+  'search.results': { th: 'ผลลัพธ์', en: 'results' },
+
+  // Card detail
+  'card.priceGuide': { th: 'ราคาตามสภาพ', en: 'Price Guide' },
+  'card.condition': { th: 'สภาพ', en: 'Condition' },
+  'card.graded': { th: 'ราคาจัดเกรด', en: 'Graded Prices' },
+  'card.priceHistory': { th: 'กราฟราคา', en: 'Price History' },
+  'card.cardDetails': { th: 'รายละเอียดการ์ด', en: 'Card Details' },
+  'card.weakness': { th: 'จุดอ่อน', en: 'Weakness' },
+  'card.resistance': { th: 'ความต้านทาน', en: 'Resistance' },
+  'card.retreat': { th: 'ล่าถอย', en: 'Retreat Cost' },
+  'card.set': { th: 'เซ็ต', en: 'Set' },
+  'card.number': { th: 'หมายเลข', en: 'Number' },
+  'card.rarity': { th: 'ความหายาก', en: 'Rarity' },
+  'card.illustrator': { th: 'ผู้วาด', en: 'Illustrator' },
+  'card.regulation': { th: 'เครื่องหมายกฎ', en: 'Regulation Mark' },
+  'card.trend': { th: 'แนวโน้มราคา', en: 'Price Trend' },
+  'card.wishlist': { th: 'เพิ่มในวิชลิสต์', en: 'Add to Wishlist' },
+  'card.inWishlist': { th: 'อยู่ในวิชลิสต์', en: 'In Wishlist' },
+  'card.discussion': { th: 'พูดคุยเกี่ยวกับการ์ดใบนี้', en: 'Community Discussion' },
+  'card.signInToComment': { th: 'เข้าสู่ระบบเพื่อแสดงความคิดเห็น', en: 'Sign in to comment' },
+  'card.writeComment': { th: 'เขียนความคิดเห็น...', en: 'Write a comment...' },
+  'card.post': { th: 'ส่ง', en: 'Post' },
+  'card.comments': { th: 'ความคิดเห็น', en: 'comments' },
+
+  // Collection
+  'collection.title': { th: 'คอลเลกชันของฉัน', en: 'My Collection' },
+  'collection.empty': { th: 'ยังไม่มีการ์ดในคอลเลกชัน', en: 'No cards in collection yet' },
+  'collection.addCards': { th: 'เพิ่มการ์ดเลย!', en: 'Add some cards!' },
+  'collection.totalValue': { th: 'มูลค่ารวม', en: 'Total Value' },
+  'collection.totalCards': { th: 'การ์ดทั้งหมด', en: 'Total Cards' },
+  'collection.makePublic': { th: 'ทำเป็นสาธารณะ', en: 'Make Public' },
+  'collection.viewProfile': { th: 'ดูโปรไฟล์', en: 'View Profile' },
+  'collection.remove': { th: 'ลบ', en: 'Remove' },
+
+  // Sealed
+  'sealed.title': { th: 'ซีลผลิตภัณฑ์', en: 'Sealed Products' },
+  'sealed.subtitle': { th: 'ราคาผลิตภัณฑ์ที่ยังไม่แกะ', en: 'Unopened product pricing' },
+  'sealed.latestSets': { th: 'เซ็ตล่าสุด', en: 'Latest Sets' },
+  'sealed.viewOnTCGplayer': { th: 'ดูบน TCGplayer', en: 'View on TCGplayer' },
+
+  // Community
+  'community.title': { th: 'ชุมชน', en: 'Community' },
+  'community.activity': { th: 'กิจกรรมล่าสุด', en: 'Activity Feed' },
+  'community.leaderboard': { th: 'อันดับนักสะสม', en: 'Leaderboard' },
+  'community.trending': { th: 'การ์ดยอดนิยม', en: 'Trending Cards' },
+
+  // Login
+  'login.title': { th: 'เข้าสู่ระบบ', en: 'Sign In' },
+  'login.subtitle': { th: 'เข้าสู่ระบบเพื่อจัดการคอลเลกชัน', en: 'Sign in to manage your collection' },
+  'login.email': { th: 'อีเมล', en: 'Email' },
+  'login.password': { th: 'รหัสผ่าน', en: 'Password' },
+  'login.signIn': { th: 'เข้าสู่ระบบ', en: 'Sign In' },
+  'login.signUp': { th: 'สมัครสมาชิก', en: 'Sign Up' },
+  'login.or': { th: 'หรือ', en: 'or' },
+  'login.noAccount': { th: 'ยังไม่มีบัญชี?', en: "Don't have an account?" },
+  'login.hasAccount': { th: 'มีบัญชีอยู่แล้ว?', en: 'Already have an account?' },
+  'login.guest': { th: 'ใช้แบบไม่เข้าระบบ', en: 'Continue as Guest' },
+
+  // Common
+  'common.loading': { th: 'กำลังโหลด...', en: 'Loading...' },
+  'common.noImage': { th: 'ไม่มีรูป', en: 'No image' },
+  'common.back': { th: 'กลับ', en: 'Back' },
+  'common.save': { th: 'บันทึก', en: 'Save' },
+  'common.cancel': { th: 'ยกเลิก', en: 'Cancel' },
+  'common.delete': { th: 'ลบ', en: 'Delete' },
+} as const
+
+export type Locale = 'th' | 'en'
+export type TranslationKey = keyof typeof translations
+
+export function t(key: TranslationKey, locale: Locale): string {
+  return translations[key]?.[locale] || translations[key]?.['en'] || key
+}
+
+// Simple context without JSX (JSX is in ClientLayout.tsx)
+import { createContext, useContext } from 'react'
+
+export const LocaleContext = createContext<Locale>('th')
+
+export function useLocale() {
+  const locale = useContext(LocaleContext)
+  const setLocale = (newLocale: Locale) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('tcg-vault-locale', newLocale)
+      window.location.reload()
+    }
+  }
+  return { locale, setLocale }
+}
+
+export function useT() {
+  const locale = useContext(LocaleContext)
+  return (key: TranslationKey) => t(key, locale)
+}

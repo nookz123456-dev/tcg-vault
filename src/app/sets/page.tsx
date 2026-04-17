@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
+import { useT } from '@/lib/i18n'
 
 type Game = 'pokemon' | 'pokemon-jp' | 'onepiece'
 
@@ -18,10 +19,10 @@ interface SetInfo {
   symbol?: string | null
 }
 
-const GAME_CONFIG: Record<Game, { label: string; color: string; emoji: string }> = {
-  pokemon: { label: 'Pokemon EN', color: 'bg-yellow-500', emoji: '⚡' },
-  'pokemon-jp': { label: 'Pokemon JP', color: 'bg-indigo-500', emoji: '🗼' },
-  onepiece: { label: 'One Piece', color: 'bg-red-500', emoji: '🏴‍☠️' },
+const GAME_CONFIG: Record<Game, { labelTh: string; labelEn: string; color: string; emoji: string }> = {
+  pokemon: { labelTh: 'โปเกม่อน EN', labelEn: 'Pokemon EN', color: 'bg-yellow-500', emoji: '⚡' },
+  'pokemon-jp': { labelTh: 'โปเกม่อน JP', labelEn: 'Pokemon JP', color: 'bg-indigo-500', emoji: '🗼' },
+  onepiece: { labelTh: 'วันพีซ', labelEn: 'One Piece', color: 'bg-red-500', emoji: '🏴‍☠️' },
 }
 
 export default function SetsPage() {
@@ -30,6 +31,7 @@ export default function SetsPage() {
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [totalCount, setTotalCount] = useState(0)
+  const t = useT()
 
   useEffect(() => {
     fetchSets()
@@ -54,13 +56,11 @@ export default function SetsPage() {
     s.id.toLowerCase().includes(search.toLowerCase())
   )
 
-  // Group sets
   const grouped = filtered.reduce((acc, set) => {
     let key: string
     if (game === 'pokemon') {
       key = set.series || 'Other'
     } else if (game === 'pokemon-jp') {
-      // Group by ID prefix (e.g. PMCG, SV, S, etc.)
       const prefix = set.id.replace(/\d+.*$/, '')
       key = prefix || 'Other'
     } else {
@@ -84,9 +84,11 @@ export default function SetsPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className={'text-3xl font-bold text-[#1e2235]'}>Card Sets</h1>
-          <p className="text-[#5c6078] mt-1">Browse all sets — every card in existence</p>
-          <p className="text-[#8b8fa6] text-sm mt-1">{totalCount.toLocaleString()} sets in {GAME_CONFIG[game].label}</p>
+          <h1 className={'text-3xl font-bold text-[#1e2235]'}>{t('sets.title')}</h1>
+          <p className="text-[#5c6078] mt-1">{t('sets.subtitle')}</p>
+          <p className="text-[#8b8fa6] text-sm mt-1">
+            {totalCount.toLocaleString()} {t('sets.sets')} {t('sets.in')} {GAME_CONFIG[game].labelTh}
+          </p>
         </div>
 
         {/* Game Tabs */}
@@ -101,7 +103,7 @@ export default function SetsPage() {
                   : 'bg-white text-[#5c6078] hover:bg-[#e8eaf0]'
               }`}
             >
-              {GAME_CONFIG[g].emoji} {GAME_CONFIG[g].label}
+              {GAME_CONFIG[g].emoji} {GAME_CONFIG[g].labelTh}
             </button>
           ))}
         </div>
@@ -110,7 +112,7 @@ export default function SetsPage() {
         <div className="mb-6">
           <input
             type="text"
-            placeholder={`Search ${GAME_CONFIG[game].label} sets...`}
+            placeholder={t('sets.search')}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full max-w-md px-4 py-2.5 rounded-lg border border-[#e8eaf0] bg-white text-[#1e2235] focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -121,7 +123,7 @@ export default function SetsPage() {
         {loading && (
           <div className="flex items-center justify-center py-20">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500" />
-            <span className="ml-3 text-[#5c6078]">Loading sets...</span>
+            <span className="ml-3 text-[#5c6078]">{t('sets.loading')}</span>
           </div>
         )}
 
@@ -132,7 +134,7 @@ export default function SetsPage() {
               <span className="w-1.5 h-6 bg-indigo-500 rounded-full" />
               {group}
               <span className="text-sm font-normal text-[#8b8fa6]">
-                ({groupSets.length} sets)
+                ({groupSets.length} {t('sets.sets')})
               </span>
             </h2>
 
@@ -143,7 +145,6 @@ export default function SetsPage() {
                   href={`/set/${game}/${set.id}`}
                   className="bg-white rounded-xl border border-[#e8eaf0] p-4 hover:shadow-lg hover:border-indigo-300 transition-all group"
                 >
-                  {/* Set Image */}
                   <div className="aspect-square bg-[#f5f6fa] rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                     {(set.images?.logo || set.logo) ? (
                       <img
@@ -158,13 +159,11 @@ export default function SetsPage() {
                       </span>
                     )}
                   </div>
-
-                  {/* Set Info */}
                   <h3 className="font-semibold text-sm text-[#1e2235] leading-tight line-clamp-2 group-hover:text-indigo-600 transition-colors">
                     {set.name}
                   </h3>
                   <div className="mt-1.5 flex items-center gap-2 text-xs text-[#8b8fa6]">
-                    <span>{(set.totalCards || set.cardCount || 0).toLocaleString()} cards</span>
+                    <span>{(set.totalCards || set.cardCount || 0).toLocaleString()} {t('sets.cards')}</span>
                     {set.releaseDate && (
                       <>
                         <span>·</span>
@@ -182,8 +181,8 @@ export default function SetsPage() {
         {/* Empty */}
         {!loading && filtered.length === 0 && (
           <div className="text-center py-20 text-[#8b8fa6]">
-            <p className="text-lg">No sets found</p>
-            <p className="text-sm mt-1">Try a different search or game</p>
+            <p className="text-lg">{t('sets.noSets')}</p>
+            <p className="text-sm mt-1">{t('sets.tryDifferent')}</p>
           </div>
         )}
       </div>

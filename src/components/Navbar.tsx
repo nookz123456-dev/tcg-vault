@@ -3,11 +3,14 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
+import { useT, useLocale } from '@/lib/i18n'
+import { LangToggle } from '@/components/LangToggle'
 import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const pathname = usePathname()
   const { user, isGuest, isAuthenticated, logout } = useAuth()
+  const t = useT()
   const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
@@ -21,13 +24,13 @@ export default function Navbar() {
   }, [user])
 
   const links = [
-    { href: '/', label: 'Home', icon: '🏠' },
-    { href: '/search', label: 'Search', icon: '🔍' },
-    { href: '/sets', label: 'Sets', icon: '📂' },
-    { href: '/sealed', label: 'Sealed', icon: '📦' },
-    { href: '/discussions', label: 'Discuss', icon: '💬' },
-    { href: '/community', label: 'Community', icon: '👥' },
-    { href: '/collection', label: 'Collection', icon: '🃏' },
+    { href: '/', labelKey: 'nav.home' as const, icon: '🏠' },
+    { href: '/search', labelKey: 'nav.search' as const, icon: '🔍' },
+    { href: '/sets', labelKey: 'nav.sets' as const, icon: '📂' },
+    { href: '/sealed', labelKey: 'nav.sealed' as const, icon: '📦' },
+    { href: '/discussions', labelKey: 'nav.discuss' as const, icon: '💬' },
+    { href: '/community', labelKey: 'nav.community' as const, icon: '👥' },
+    { href: '/collection', labelKey: 'nav.collection' as const, icon: '🃏' },
   ]
 
   return (
@@ -55,13 +58,15 @@ export default function Navbar() {
                 }`}
               >
                 <span className="mr-1">{link.icon}</span>
-                <span className="hidden sm:inline">{link.label}</span>
+                <span className="hidden sm:inline">{t(link.labelKey)}</span>
               </Link>
             ))}
           </div>
 
-          {/* Auth */}
+          {/* Auth + Language */}
           <div className="flex items-center gap-3">
+            <LangToggle />
+
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
                 {isGuest ? (
@@ -69,7 +74,7 @@ export default function Navbar() {
                     href="/login"
                     className="text-xs px-4 py-1.5 bg-[#6366f1]/10 text-[#6366f1] rounded-lg hover:bg-[#6366f1]/20 transition-colors font-semibold"
                   >
-                    Sign In
+                    {t('nav.signIn')}
                   </Link>
                 ) : (
                   <>
@@ -108,7 +113,7 @@ export default function Navbar() {
                       onClick={logout}
                       className="text-xs px-3 py-1.5 bg-white text-[#5c6078] rounded-lg hover:text-[#1e2235] transition-colors border border-[#e8eaf0]"
                     >
-                      Sign Out
+                      {t('nav.signOut')}
                     </button>
                   </>
                 )}
@@ -118,7 +123,7 @@ export default function Navbar() {
                 href="/login"
                 className="text-sm px-5 py-2 bg-[#6366f1] text-white font-semibold rounded-lg hover:bg-[#4f46e5] transition-all shadow-sm shadow-[#6366f1]/25"
               >
-                Sign In
+                {t('nav.signIn')}
               </Link>
             )}
           </div>
