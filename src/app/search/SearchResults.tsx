@@ -23,6 +23,7 @@ import { OnePieceCardData } from '@/lib/onepiece-api'
 import { PokemonJPCardData } from '@/lib/pokemon-jp-api'
 import { getCardPrice, GAME_LABELS } from '@/lib/api'
 import { useLocalCollection, LocalCard } from '@/lib/useLocalCollection'
+import { useExchangeRates } from '@/lib/useExchangeRates'
 import Navbar from '@/components/Navbar'
 import SearchBar from '@/components/SearchBar'
 
@@ -99,8 +100,16 @@ export default function SearchResults() {
   const [selectedCard, setSelectedCard] = useState<DisplayCard | null>(null)
   const [addedCards, setAddedCards] = useState<Set<string>>(new Set())
   const [priceMap, setPriceMap] = useState<Record<string, number>>({})
+  const [showTHB, setShowTHB] = useState(false)
 
   const { addCard, cards: collectionCards } = useLocalCollection()
+  const { formatUSD, formatTHB, toTHB } = useExchangeRates()
+
+  const fmtPrice = (usd: number | null | undefined): string => {
+    if (usd === null || usd === undefined) return ''
+    if (showTHB) return formatTHB(toTHB(usd))
+    return formatUSD(usd)
+  }
 
   const fetchPokemonCards = async (q: string, p: number) => {
     if (pokeLang === 'jp') {
@@ -340,21 +349,31 @@ export default function SearchResults() {
 
         {query && (
           <div className="flex items-center justify-between mb-6">
-            <p className="text-sm font-medium text-gray-300">
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-                  Searching...
-                </span>
-              ) : (
-                <>
-                  <span className="text-white font-bold">{totalCount.toLocaleString()}</span> results for &quot;{query}&quot;
-                </>
-              )}
-            </p>
-            <p className="text-xs text-gray-400 font-medium">
-              {GAME_LABELS[game]}{game === 'onepiece' ? ` · ${opLang === 'en' ? 'English' : 'Japanese'}` : game === 'pokemon' && pokeLang === 'jp' ? ' · JP Edition' : pokeSupertype !== 'all' ? ` · ${pokeSupertype}` : ''}
-            </p>
+            <div>
+              <p className="text-sm font-medium text-gray-300">
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+                    Searching...
+                  </span>
+                ) : (
+                  <>
+                    <span className="text-white font-bold">{totalCount.toLocaleString()}</span> results for &quot;{query}&quot;
+                  </>
+                )}
+              </p>
+              <p className="text-xs text-gray-400 font-medium">
+                {GAME_LABELS[game]}{game === 'onepiece' ? ` · ${opLang === 'en' ? 'English' : 'Japanese'}` : game === 'pokemon' && pokeLang === 'jp' ? ' · JP Edition' : pokeSupertype !== 'all' ? ` · ${pokeSupertype}` : ''}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowTHB(!showTHB)}
+              className="flex items-center gap-2 px-3 py-1.5 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-lg text-xs font-semibold transition-all hover:border-amber-500/30"
+            >
+              <span className={showTHB ? 'text-[var(--warm-400)]' : 'text-amber-400'}>$ USD</span>
+              <span className="text-[var(--warm-500)]">/</span>
+              <span className={showTHB ? 'text-amber-400' : 'text-[var(--warm-400)]'}>฿ THB</span>
+            </button>
           </div>
         )}
 
@@ -409,7 +428,7 @@ export default function SearchResults() {
                   )}
                   {card.marketPrice ? (
                     <p className="text-sm font-bold text-amber-400 mt-1.5">
-                      ${card.marketPrice.toFixed(2)}
+                      {fmtPrice(card.marketPrice)}
                     </p>
                   ) : card.game === 'onepiece' && card.cost ? (
                     <p className="text-xs text-gray-400 mt-1.5">
@@ -475,6 +494,7 @@ export default function SearchResults() {
             onClose={() => setSelectedCard(null)}
             onAdd={() => handleAddToCollection(selectedCard)}
             isInCollection={addedCards.has(selectedCard.id)}
+            showTHB={showTHB}
           />
         )}
       </div>
@@ -486,13 +506,21 @@ function CardDetailModal({
   card,
   onClose,
   onAdd,
-  isInCollection
+  isInCollection,
+  showTHB
 }: {
   card: DisplayCard
   onClose: () => void
   onAdd: () => void
   isInCollection: boolean
+  showTHB: boolean
 }) {
+  const { formatUSD, formatTHB, toTHB } = useExchangeRates()
+  const fmtPrice = (usd: number | null | undefined): string => {
+    if (usd === null || usd === undefined) return ''
+    if (showTHB) return formatTHB(toTHB(usd))
+    return formatUSD(usd)
+  }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-amber-950/80 backdrop-blur-md" onClick={onClose}>
       <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
@@ -566,25 +594,25 @@ function CardDetailModal({
                   {card.marketPrice && (
                     <div>
                       <p className="text-xs text-gray-400">Market</p>
-                      <p className="text-lg font-bold text-amber-400">${card.marketPrice.toFixed(2)}</p>
+                      <p className="text-lg font-bold text-amber-400">{fmtPrice(card.marketPrice)}</p>
                     </div>
                   )}
                   {card.lowPrice && (
                     <div>
                       <p className="text-xs text-gray-400">Low</p>
-                      <p className="text-sm text-gray-200">${card.lowPrice.toFixed(2)}</p>
+                      <p className="text-sm text-gray-200">{fmtPrice(card.lowPrice)}</p>
                     </div>
                   )}
                   {card.midPrice && (
                     <div>
                       <p className="text-xs text-gray-400">Mid</p>
-                      <p className="text-sm text-gray-200">${card.midPrice.toFixed(2)}</p>
+                      <p className="text-sm text-gray-200">{fmtPrice(card.midPrice)}</p>
                     </div>
                   )}
                   {card.highPrice && (
                     <div>
                       <p className="text-xs text-gray-400">High</p>
-                      <p className="text-sm text-gray-200">${card.highPrice.toFixed(2)}</p>
+                      <p className="text-sm text-gray-200">{fmtPrice(card.highPrice)}</p>
                     </div>
                   )}
                 </div>
