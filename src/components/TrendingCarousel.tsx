@@ -61,24 +61,24 @@ export default function TrendingCarousel() {
         <div className="flex items-center gap-3">
           <div className="w-2 h-8 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full" />
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-white">
+            <h2 className="text-2xl md:text-3xl font-bold text-[#1e2235]">
               Trending Cards
             </h2>
-            <p className="text-sm text-gray-500 mt-0.5">Live market prices updated in real-time</p>
+            <p className="text-sm text-[#8b8fa6] mt-0.5">Live market prices updated in real-time</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => scroll('left')}
             disabled={!canScrollLeft}
-            className="w-10 h-10 rounded-xl border border-[var(--card-border)] bg-[var(--surface-1)] flex items-center justify-center text-gray-400 hover:text-white hover:border-amber-500/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-10 h-10 rounded-xl border border-[#e8eaf0] bg-[#f5f6fa] flex items-center justify-center text-[#5c6078] hover:text-[#1e2235] hover:border-[#6366f1]/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
           </button>
           <button
             onClick={() => scroll('right')}
             disabled={!canScrollRight}
-            className="w-10 h-10 rounded-xl border border-[var(--card-border)] bg-[var(--surface-1)] flex items-center justify-center text-gray-400 hover:text-white hover:border-amber-500/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-10 h-10 rounded-xl border border-[#e8eaf0] bg-[#f5f6fa] flex items-center justify-center text-[#5c6078] hover:text-[#1e2235] hover:border-[#6366f1]/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
           </button>
@@ -95,7 +95,7 @@ export default function TrendingCarousel() {
           // Loading skeleton
           Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex-shrink-0 w-[260px] snap-start">
-              <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden">
+              <div className="bg-white border border-[#e8eaf0] rounded-2xl overflow-hidden">
                 <div className="shimmer w-full h-[220px]" />
                 <div className="p-4 space-y-2">
                   <div className="shimmer h-4 w-3/4 rounded" />
@@ -111,9 +111,9 @@ export default function TrendingCarousel() {
               key={card.id}
               className="flex-shrink-0 w-[260px] snap-start group"
             >
-              <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden hover:border-amber-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1">
+              <div className="bg-white border border-[#e8eaf0] rounded-2xl overflow-hidden hover:border-[#6366f1]/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1">
                 {/* Card image */}
-                <div className="relative w-full h-[220px] bg-[var(--surface-1)] flex items-center justify-center overflow-hidden">
+                <div className="relative w-full h-[220px] bg-[#f5f6fa] flex items-center justify-center overflow-hidden">
                   <img
                     src={card.image}
                     alt={card.name}
@@ -133,30 +133,30 @@ export default function TrendingCarousel() {
 
                 {/* Card info */}
                 <div className="p-4">
-                  <h3 className="text-sm font-semibold text-gray-100 truncate">
+                  <h3 className="text-sm font-semibold text-[#1e2235] truncate">
                     {card.name}
                   </h3>
-                  <p className="text-xs text-gray-500 truncate mt-0.5">
+                  <p className="text-xs text-[#8b8fa6] truncate mt-0.5">
                     {card.setName}
                   </p>
                   {card.rarity && (
-                    <span className="inline-block mt-1.5 px-2 py-0.5 bg-amber-500/10 text-amber-400 text-[10px] font-medium rounded-md border border-amber-500/20">
+                    <span className="inline-block mt-1.5 px-2 py-0.5 bg-[#6366f1]/10 text-[#6366f1] text-[10px] font-medium rounded-md border border-[#6366f1]/20">
                       {card.rarity}
                     </span>
                   )}
 
                   {/* Price */}
-                  <div className="mt-3 pt-3 border-t border-[var(--card-border)]">
+                  <div className="mt-3 pt-3 border-t border-[#e8eaf0]">
                     {card.marketPrice ? (
                       <div>
-                        <span className="text-xs text-gray-500">Market Price</span>
-                        <div className="text-lg font-bold text-emerald-400">
+                        <span className="text-xs text-[#8b8fa6]">Market Price</span>
+                        <div className="text-lg font-bold text-emerald-500">
                           ${card.marketPrice.toFixed(2)}
                         </div>
                       </div>
                     ) : (
                       <div>
-                        <span className="text-xs text-gray-500">Price</span>
+                        <span className="text-xs text-[#8b8fa6]">Price</span>
                         <div className="text-sm text-gray-600 italic">
                           Check marketplace
                         </div>

@@ -100,13 +100,13 @@ export default function DiscussionsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-extrabold text-[var(--foreground)]">Discussion Boards</h1>
-            <p className="text-sm text-[var(--warm-400)] mt-1">Chat with fellow collectors</p>
+            <h1 className="text-2xl font-extrabold text-[#1e2235]">Discussion Boards</h1>
+            <p className="text-sm text-[#8b8fa6] mt-1">Chat with fellow collectors</p>
           </div>
           {user && selectedBoard && (
             <button
               onClick={() => setShowNewThread(true)}
-              className="px-5 py-2.5 bg-amber-500 text-[var(--warm-900)] font-bold rounded-xl hover:bg-amber-400 transition-all text-sm"
+              className="px-5 py-2.5 bg-[#6366f1] text-[#1e2235] font-bold rounded-xl hover:bg-[#4f46e5] transition-all text-sm"
             >
               + New Thread
             </button>
@@ -116,13 +116,13 @@ export default function DiscussionsPage() {
         <div className="flex gap-6">
           {/* Board Sidebar */}
           <div className="w-56 flex-shrink-0 hidden md:block">
-            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-2 sticky top-24">
+            <div className="bg-white border border-[#e8eaf0] rounded-2xl p-2 sticky top-24">
               <button
                 onClick={() => setSelectedBoard(null)}
                 className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   !selectedBoard
-                    ? 'bg-amber-500/15 text-amber-400'
-                    : 'text-[var(--warm-300)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]'
+                    ? 'bg-[#6366f1]/15 text-[#6366f1]'
+                    : 'text-[#5c6078] hover:text-[#1e2235] hover:bg-[#e8eaf0]'
                 }`}
               >
                 All Threads
@@ -133,14 +133,14 @@ export default function DiscussionsPage() {
                   onClick={() => setSelectedBoard(board.id)}
                   className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${
                     selectedBoard === board.id
-                      ? 'bg-amber-500/15 text-amber-400'
-                      : 'text-[var(--warm-300)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]'
+                      ? 'bg-[#6366f1]/15 text-[#6366f1]'
+                      : 'text-[#5c6078] hover:text-[#1e2235] hover:bg-[#e8eaf0]'
                   }`}
                 >
                   <span>{board.icon}</span>
                   <span className="flex-1 truncate">{board.name}</span>
                   {board.thread_count > 0 && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface-2)] text-[var(--warm-400)]">{board.thread_count}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#e8eaf0] text-[#8b8fa6]">{board.thread_count}</span>
                   )}
                 </button>
               ))}
@@ -154,7 +154,7 @@ export default function DiscussionsPage() {
               <button
                 onClick={() => setSelectedBoard(null)}
                 className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  !selectedBoard ? 'bg-amber-500 text-[var(--warm-900)]' : 'bg-[var(--surface-1)] text-[var(--warm-300)] border border-[var(--card-border)]'
+                  !selectedBoard ? 'bg-[#6366f1] text-[#1e2235]' : 'bg-[#f5f6fa] text-[#5c6078] border border-[#e8eaf0]'
                 }`}
               >
                 All
@@ -164,7 +164,7 @@ export default function DiscussionsPage() {
                   key={board.id}
                   onClick={() => setSelectedBoard(board.id)}
                   className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    selectedBoard === board.id ? 'bg-amber-500 text-[var(--warm-900)]' : 'bg-[var(--surface-1)] text-[var(--warm-300)] border border-[var(--card-border)]'
+                    selectedBoard === board.id ? 'bg-[#6366f1] text-[#1e2235]' : 'bg-[#f5f6fa] text-[#5c6078] border border-[#e8eaf0]'
                   }`}
                 >
                   {board.icon} {board.name}
@@ -174,14 +174,14 @@ export default function DiscussionsPage() {
 
             {/* New Thread Form */}
             {showNewThread && (
-              <div className="bg-[var(--card-bg)] border border-amber-500/30 rounded-2xl p-5 mb-4">
-                <h3 className="text-lg font-bold text-[var(--foreground)] mb-3">New Thread</h3>
+              <div className="bg-white border border-amber-500/30 rounded-2xl p-5 mb-4">
+                <h3 className="text-lg font-bold text-[#1e2235] mb-3">New Thread</h3>
                 <input
                   value={newTitle}
                   onChange={e => setNewTitle(e.target.value)}
                   placeholder="Thread title..."
                   maxLength={200}
-                  className="w-full px-4 py-2.5 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-xl text-[var(--foreground)] placeholder:text-[var(--warm-500)] focus:outline-none focus:border-amber-500/50 text-sm mb-3"
+                  className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-amber-500/50 text-sm mb-3"
                 />
                 <textarea
                   value={newContent}
@@ -189,21 +189,21 @@ export default function DiscussionsPage() {
                   placeholder="Share your thoughts..."
                   maxLength={5000}
                   rows={4}
-                  className="w-full px-4 py-2.5 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-xl text-[var(--foreground)] placeholder:text-[var(--warm-500)] focus:outline-none focus:border-amber-500/50 resize-none text-sm"
+                  className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-amber-500/50 resize-none text-sm"
                 />
                 <div className="flex justify-between items-center mt-3">
-                  <span className="text-xs text-[var(--warm-500)]">{newContent.length}/5000</span>
+                  <span className="text-xs text-[#b5b8c8]">{newContent.length}/5000</span>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setShowNewThread(false)}
-                      className="px-4 py-2 text-xs font-semibold text-[var(--warm-400)] hover:text-[var(--foreground)] transition-colors"
+                      className="px-4 py-2 text-xs font-semibold text-[#8b8fa6] hover:text-[#1e2235] transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleNewThread}
                       disabled={submitting || !newTitle.trim() || !newContent.trim()}
-                      className="px-5 py-2 bg-amber-500 text-[var(--warm-900)] rounded-lg text-xs font-bold hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                      className="px-5 py-2 bg-[#6366f1] text-[#1e2235] rounded-lg text-xs font-bold hover:bg-[#4f46e5] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     >
                       {submitting ? 'Posting...' : 'Post Thread'}
                     </button>
@@ -220,10 +220,10 @@ export default function DiscussionsPage() {
                 ))}
               </div>
             ) : threads.length === 0 ? (
-              <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-12 text-center">
+              <div className="bg-white border border-[#e8eaf0] rounded-2xl p-12 text-center">
                 <div className="text-5xl mb-4 opacity-50">💬</div>
-                <h3 className="text-lg font-bold text-[var(--foreground)] mb-2">No threads yet</h3>
-                <p className="text-[var(--warm-400)] text-sm">
+                <h3 className="text-lg font-bold text-[#1e2235] mb-2">No threads yet</h3>
+                <p className="text-[#8b8fa6] text-sm">
                   {user ? 'Start the conversation — create the first thread!' : 'Sign in to start a discussion'}
                 </p>
               </div>
@@ -239,10 +239,10 @@ export default function DiscussionsPage() {
                   <Link
                     key={thread.id}
                     href={`/discussions/${thread.id}`}
-                    className="block bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-4 card-hover group"
+                    className="block bg-white border border-[#e8eaf0] rounded-2xl p-4 card-hover group"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-full bg-amber-500/20 flex items-center justify-center text-sm font-bold text-amber-400 flex-shrink-0 overflow-hidden">
+                      <div className="w-9 h-9 rounded-full bg-[#6366f1]/20 flex items-center justify-center text-sm font-bold text-[#6366f1] flex-shrink-0 overflow-hidden">
                         {thread.profiles?.avatar_url ? (
                           <img src={thread.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
                         ) : (
@@ -251,14 +251,14 @@ export default function DiscussionsPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          {thread.is_pinned && <span className="text-xs text-amber-400">📌</span>}
-                          <h3 className="text-sm font-bold text-[var(--foreground)] group-hover:text-amber-400 transition-colors truncate">
+                          {thread.is_pinned && <span className="text-xs text-[#6366f1]">📌</span>}
+                          <h3 className="text-sm font-bold text-[#1e2235] group-hover:text-[#6366f1] transition-colors truncate">
                             {thread.title}
                           </h3>
                         </div>
-                        <p className="text-xs text-[var(--warm-400)] line-clamp-1">{thread.content}</p>
-                        <div className="flex items-center gap-3 mt-2 text-[10px] text-[var(--warm-500)]">
-                          <span className="font-semibold text-[var(--warm-300)]">{thread.profiles?.username || 'Unknown'}</span>
+                        <p className="text-xs text-[#8b8fa6] line-clamp-1">{thread.content}</p>
+                        <div className="flex items-center gap-3 mt-2 text-[10px] text-[#b5b8c8]">
+                          <span className="font-semibold text-[#5c6078]">{thread.profiles?.username || 'Unknown'}</span>
                           <span>{thread.discussion_boards?.icon} {thread.discussion_boards?.name}</span>
                           <span>{timeAgo(thread.created_at)}</span>
                           <span>👁 {thread.views}</span>

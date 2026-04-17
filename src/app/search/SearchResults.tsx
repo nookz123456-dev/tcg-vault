@@ -350,7 +350,7 @@ export default function SearchResults() {
         {query && (
           <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-sm font-medium text-gray-300">
+              <p className="text-sm font-medium text-[#3b3f56]">
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <span className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
@@ -358,21 +358,21 @@ export default function SearchResults() {
                   </span>
                 ) : (
                   <>
-                    <span className="text-white font-bold">{totalCount.toLocaleString()}</span> results for &quot;{query}&quot;
+                    <span className="text-[#1e2235] font-bold">{totalCount.toLocaleString()}</span> results for &quot;{query}&quot;
                   </>
                 )}
               </p>
-              <p className="text-xs text-gray-400 font-medium">
+              <p className="text-xs text-[#5c6078] font-medium">
                 {GAME_LABELS[game]}{game === 'onepiece' ? ` · ${opLang === 'en' ? 'English' : 'Japanese'}` : game === 'pokemon' && pokeLang === 'jp' ? ' · JP Edition' : pokeSupertype !== 'all' ? ` · ${pokeSupertype}` : ''}
               </p>
             </div>
             <button
               onClick={() => setShowTHB(!showTHB)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-lg text-xs font-semibold transition-all hover:border-amber-500/30"
+              className="flex items-center gap-2 px-3 py-1.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-lg text-xs font-semibold transition-all hover:border-[#6366f1]/30"
             >
-              <span className={showTHB ? 'text-[var(--warm-400)]' : 'text-amber-400'}>$ USD</span>
-              <span className="text-[var(--warm-500)]">/</span>
-              <span className={showTHB ? 'text-amber-400' : 'text-[var(--warm-400)]'}>฿ THB</span>
+              <span className={showTHB ? 'text-[#8b8fa6]' : 'text-[#6366f1]'}>$ USD</span>
+              <span className="text-[#b5b8c8]">/</span>
+              <span className={showTHB ? 'text-[#6366f1]' : 'text-[#8b8fa6]'}>฿ THB</span>
             </button>
           </div>
         )}
@@ -383,15 +383,15 @@ export default function SearchResults() {
             return (
               <div
                 key={card.id}
-                className="group bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden card-hover text-left cursor-pointer relative transition-all duration-300 hover:border-amber-500/40 hover:shadow-lg hover:shadow-amber-500/5 block"
+                className="group bg-white border border-[#e8eaf0] rounded-2xl overflow-hidden card-hover text-left cursor-pointer relative transition-all duration-300 hover:border-[#6366f1]/30 hover:shadow-lg hover:shadow-[#6366f1]/5 block"
                 onClick={() => setSelectedCard(card)}
               >
                 {isInCollection && (
-                  <div className="absolute top-2.5 left-2.5 z-10 bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-lg font-bold shadow-sm">
+                  <div className="absolute top-2.5 left-2.5 z-10 bg-emerald-500 text-[#1e2235] text-[10px] px-2 py-0.5 rounded-lg font-bold shadow-sm">
                     IN COLLECTION
                   </div>
                 )}
-                <div className="aspect-[2.5/3.5] relative overflow-hidden bg-gradient-to-br from-gray-800/50 to-gray-900/50">
+                <div className="aspect-[2.5/3.5] relative overflow-hidden bg-gradient-to-br from-[#f5f6fa] to-[#e8eaf0]">
                   {card.image ? (
                     <img
                       src={card.image}
@@ -400,38 +400,38 @@ export default function SearchResults() {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-500">
+                    <div className="w-full h-full flex items-center justify-center text-[#8b8fa6]">
                       No Image
                     </div>
                   )}
                   {card.rarity && (
-                    <span className="absolute top-2.5 right-2.5 px-2 py-0.5 bg-amber-950/70 text-[10px] text-amber-400 rounded-lg backdrop-blur-sm font-medium">
+                    <span className="absolute top-2.5 right-2.5 px-2 py-0.5 bg-white/80 text-[10px] text-[#6366f1] rounded-lg backdrop-blur-sm font-medium">
                       {card.rarity}
                     </span>
                   )}
                   {card.game === 'onepiece' && card.color && (
-                    <span className="absolute bottom-2.5 left-2.5 px-2 py-0.5 bg-amber-950/70 text-[10px] text-amber-100 rounded-lg backdrop-blur-sm font-medium">
+                    <span className="absolute bottom-2.5 left-2.5 px-2 py-0.5 bg-white/80 text-[10px] text-[#6366f1] rounded-lg backdrop-blur-sm font-medium">
                       {card.color}
                     </span>
                   )}
                 </div>
                 <div className="p-3.5">
-                  <h3 className="text-sm font-semibold text-gray-100 truncate">{card.name}</h3>
-                  <p className="text-xs text-gray-400 truncate mt-0.5">{card.setName}</p>
+                  <h3 className="text-sm font-semibold text-[#1e2235] truncate">{card.name}</h3>
+                  <p className="text-xs text-[#5c6078] truncate mt-0.5">{card.setName}</p>
                   {/* Keywords / Tags */}
                   {card.keywords && card.keywords.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1.5">
                       {card.keywords.filter(k => !['card','pokemon','onepiece'].includes(k)).slice(0, 5).map(k => (
-                        <span key={k} className="px-1.5 py-0.5 bg-amber-500/10 text-amber-400/80 text-[9px] rounded-md font-medium">{k}</span>
+                        <span key={k} className="px-1.5 py-0.5 bg-[#6366f1]/10 text-[#6366f1]/80 text-[9px] rounded-md font-medium">{k}</span>
                       ))}
                     </div>
                   )}
                   {card.marketPrice ? (
-                    <p className="text-sm font-bold text-amber-400 mt-1.5">
+                    <p className="text-sm font-bold text-[#6366f1] mt-1.5">
                       {fmtPrice(card.marketPrice)}
                     </p>
                   ) : card.game === 'onepiece' && card.cost ? (
-                    <p className="text-xs text-gray-400 mt-1.5">
+                    <p className="text-xs text-[#5c6078] mt-1.5">
                       Cost: {card.cost}{card.power ? ` · Power: ${card.power}` : ''}
                     </p>
                   ) : null}
@@ -443,8 +443,8 @@ export default function SearchResults() {
                     disabled={isInCollection}
                     className={`w-full py-2 rounded-lg font-semibold transition-all text-xs ${
                       isInCollection
-                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 cursor-default'
-                        : 'bg-amber-500 text-[var(--warm-900)] hover:bg-amber-400 shadow-sm'
+                        ? 'bg-emerald-50 text-emerald-500 border border-emerald-200 cursor-default'
+                        : 'bg-[#6366f1] text-[#1e2235] hover:bg-[#4f46e5] shadow-sm'
                     }`}
                   >
                     {isInCollection ? 'Added' : '+ Add to Collection'}
@@ -458,11 +458,11 @@ export default function SearchResults() {
         {loading && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 mt-4">
             {[...Array(5)].map((_, i) => (
-              <div key={`shimmer-${i}`} className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden shimmer">
+              <div key={`shimmer-${i}`} className="bg-white border border-[#e8eaf0] rounded-2xl overflow-hidden shimmer">
                 <div className="aspect-[2.5/3.5]" />
                 <div className="p-3.5 space-y-2">
-                  <div className="h-4 bg-[var(--surface-2)] rounded w-3/4" />
-                  <div className="h-3 bg-[var(--surface-2)] rounded w-1/2" />
+                  <div className="h-4 bg-[#e8eaf0] rounded w-3/4" />
+                  <div className="h-3 bg-[#e8eaf0] rounded w-1/2" />
                 </div>
               </div>
             ))}
@@ -473,7 +473,7 @@ export default function SearchResults() {
           <div className="text-center mt-10">
             <button
               onClick={() => setPage(p => p + 1)}
-              className="px-8 py-2.5 bg-[var(--surface-1)] border border-[var(--card-border)] text-gray-300 rounded-xl hover:text-amber-400 hover:border-amber-500/40 transition-all font-medium"
+              className="px-8 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] text-[#3b3f56] rounded-xl hover:text-[#6366f1] hover:border-[#6366f1]/30 transition-all font-medium"
             >
               Load More
             </button>
@@ -483,8 +483,8 @@ export default function SearchResults() {
         {!loading && query && cards.length === 0 && (
           <div className="text-center py-20">
             <div className="text-6xl mb-4 opacity-50">🔍</div>
-            <p className="text-gray-300 text-lg">No cards found for &quot;{query}&quot;</p>
-            <p className="text-gray-500 text-sm mt-1">Try a different search term or filter</p>
+            <p className="text-[#3b3f56] text-lg">No cards found for &quot;{query}&quot;</p>
+            <p className="text-[#8b8fa6] text-sm mt-1">Try a different search term or filter</p>
           </div>
         )}
 
@@ -522,8 +522,8 @@ function CardDetailModal({
     return formatUSD(usd)
   }
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-amber-950/80 backdrop-blur-md" onClick={onClose}>
-      <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1e2235]/80 backdrop-blur-md" onClick={onClose}>
+      <div className="bg-white border border-[#e8eaf0] rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="flex flex-col md:flex-row gap-6 p-6">
           <div className="flex-shrink-0 flex justify-center">
             {card.imageLarge ? (
@@ -533,7 +533,7 @@ function CardDetailModal({
                 className="max-w-[300px] rounded-xl shadow-lg"
               />
             ) : (
-              <div className="w-[300px] h-[420px] bg-[var(--surface-1)] rounded-xl flex items-center justify-center text-gray-500">
+              <div className="w-[300px] h-[420px] bg-[#f5f6fa] rounded-xl flex items-center justify-center text-[#8b8fa6]">
                 No Image Available
               </div>
             )}
@@ -550,14 +550,14 @@ function CardDetailModal({
                   {GAME_LABELS[card.game]}
                 </span>
               </div>
-              <h2 className="text-2xl font-bold text-white">{card.name}</h2>
-              <p className="text-gray-400 mt-0.5">{card.setName} #{card.number}</p>
+              <h2 className="text-2xl font-bold text-[#1e2235]">{card.name}</h2>
+              <p className="text-[#5c6078] mt-0.5">{card.setName} #{card.number}</p>
             </div>
 
             {/* Card details */}
             <div className="flex flex-wrap gap-2">
               {card.rarity && (
-                <span className="px-2.5 py-1 bg-amber-500/15 text-amber-400 rounded-lg text-xs font-medium">{card.rarity}</span>
+                <span className="px-2.5 py-1 bg-[#6366f1]/15 text-[#6366f1] rounded-lg text-xs font-medium">{card.rarity}</span>
               )}
               {card.hp && (
                 <span className="px-2.5 py-1 bg-red-500/15 text-red-400 rounded-lg text-xs font-medium">HP {card.hp}</span>
@@ -580,38 +580,38 @@ function CardDetailModal({
 
             {/* Ability for One Piece */}
             {card.ability && (
-              <div className="bg-[var(--surface-1)] rounded-xl p-4 border border-[var(--card-border)]">
-                <p className="text-xs text-gray-400 mb-1.5 font-medium uppercase tracking-wider">Effect</p>
+              <div className="bg-[#f5f6fa] rounded-xl p-4 border border-[#e8eaf0]">
+                <p className="text-xs text-[#5c6078] mb-1.5 font-medium uppercase tracking-wider">Effect</p>
                 <p className="text-sm text-gray-200 leading-relaxed">{card.ability}</p>
               </div>
             )}
 
             {/* Prices for Pokemon */}
             {(card.marketPrice || card.lowPrice) && (
-              <div className="bg-[var(--surface-1)] rounded-xl p-4 border border-[var(--card-border)] space-y-3">
-                <h3 className="text-sm font-semibold text-gray-300">Market Prices (TCGplayer)</h3>
+              <div className="bg-[#f5f6fa] rounded-xl p-4 border border-[#e8eaf0] space-y-3">
+                <h3 className="text-sm font-semibold text-[#3b3f56]">Market Prices (TCGplayer)</h3>
                 <div className="grid grid-cols-2 gap-3">
                   {card.marketPrice && (
                     <div>
-                      <p className="text-xs text-gray-400">Market</p>
-                      <p className="text-lg font-bold text-amber-400">{fmtPrice(card.marketPrice)}</p>
+                      <p className="text-xs text-[#5c6078]">Market</p>
+                      <p className="text-lg font-bold text-[#6366f1]">{fmtPrice(card.marketPrice)}</p>
                     </div>
                   )}
                   {card.lowPrice && (
                     <div>
-                      <p className="text-xs text-gray-400">Low</p>
+                      <p className="text-xs text-[#5c6078]">Low</p>
                       <p className="text-sm text-gray-200">{fmtPrice(card.lowPrice)}</p>
                     </div>
                   )}
                   {card.midPrice && (
                     <div>
-                      <p className="text-xs text-gray-400">Mid</p>
+                      <p className="text-xs text-[#5c6078]">Mid</p>
                       <p className="text-sm text-gray-200">{fmtPrice(card.midPrice)}</p>
                     </div>
                   )}
                   {card.highPrice && (
                     <div>
-                      <p className="text-xs text-gray-400">High</p>
+                      <p className="text-xs text-[#5c6078]">High</p>
                       <p className="text-sm text-gray-200">{fmtPrice(card.highPrice)}</p>
                     </div>
                   )}
@@ -620,7 +620,7 @@ function CardDetailModal({
             )}
 
             {card.artist && (
-              <p className="text-xs text-gray-400">Art by {card.artist}</p>
+              <p className="text-xs text-[#5c6078]">Art by {card.artist}</p>
             )}
 
             <button
@@ -628,8 +628,8 @@ function CardDetailModal({
               disabled={isInCollection}
               className={`w-full py-3 rounded-xl font-bold transition-all text-sm ${
                 isInCollection
-                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 cursor-default'
-                  : 'bg-amber-500 text-[var(--warm-900)] hover:bg-amber-400 shadow-lg shadow-amber-500/20'
+                  ? 'bg-emerald-50 text-emerald-500 border border-emerald-200 cursor-default'
+                  : 'bg-[#6366f1] text-[#1e2235] hover:bg-[#4f46e5] shadow-lg shadow-[#6366f1]/20'
               }`}
             >
               {isInCollection ? 'Added' : '+ Add to Collection'}
@@ -641,7 +641,7 @@ function CardDetailModal({
                   ? `/card/pokemon-jp/${encodeURIComponent(card.name)}`
                   : `/card/pokemon/${card.id}`)
                 : `/card/onepiece/${encodeURIComponent(card.name)}`}
-              className="block w-full py-2.5 text-center text-sm text-[var(--warm-300)] hover:text-amber-400 transition-colors font-medium"
+              className="block w-full py-2.5 text-center text-sm text-[#5c6078] hover:text-[#6366f1] transition-colors font-medium"
             >
               View Full Details →
             </a>
@@ -650,7 +650,7 @@ function CardDetailModal({
 
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-full flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 w-8 h-8 bg-[#f5f6fa] border border-[#e8eaf0] rounded-full flex items-center justify-center text-[#5c6078] hover:text-[#1e2235] transition-colors"
         >
           ✕
         </button>

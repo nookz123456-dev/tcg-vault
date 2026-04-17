@@ -22,10 +22,10 @@ interface TradeOffer {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-amber-500/15 text-amber-400',
-  accepted: 'bg-emerald-500/15 text-emerald-400',
+  pending: 'bg-[#6366f1]/15 text-[#6366f1]',
+  accepted: 'bg-emerald-50 text-emerald-500',
   rejected: 'bg-red-500/15 text-red-400',
-  cancelled: 'bg-[var(--surface-2)] text-[var(--warm-400)]',
+  cancelled: 'bg-[#e8eaf0] text-[#8b8fa6]',
   completed: 'bg-blue-500/15 text-blue-400',
 }
 
@@ -69,8 +69,8 @@ export default function TradesPage() {
       <div className="min-h-screen" style={{ background: 'var(--background)' }}>
         <Navbar />
         <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-          <p className="text-[var(--warm-400)]">Sign in to access trades</p>
-          <a href="/login" className="inline-block mt-3 px-5 py-2 bg-amber-500 text-[var(--warm-900)] rounded-xl text-sm font-bold hover:bg-amber-400">Sign In</a>
+          <p className="text-[#8b8fa6]">Sign in to access trades</p>
+          <a href="/login" className="inline-block mt-3 px-5 py-2 bg-[#6366f1] text-[#1e2235] rounded-xl text-sm font-bold hover:bg-[#4f46e5]">Sign In</a>
         </div>
       </div>
     )
@@ -82,8 +82,8 @@ export default function TradesPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-extrabold text-[var(--foreground)]">Trade Center</h1>
-            <p className="text-sm text-[var(--warm-400)] mt-1">Manage your trade offers</p>
+            <h1 className="text-2xl font-extrabold text-[#1e2235]">Trade Center</h1>
+            <p className="text-sm text-[#8b8fa6] mt-1">Manage your trade offers</p>
           </div>
         </div>
 
@@ -94,7 +94,7 @@ export default function TradesPage() {
               key={f}
               onClick={() => setFilter(f)}
               className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all flex-shrink-0 ${
-                filter === f ? 'bg-amber-500 text-[var(--warm-900)]' : 'bg-[var(--surface-1)] text-[var(--warm-300)] border border-[var(--card-border)] hover:text-[var(--foreground)]'
+                filter === f ? 'bg-[#6366f1] text-[#1e2235]' : 'bg-[#f5f6fa] text-[#5c6078] border border-[#e8eaf0] hover:text-[#1e2235]'
               }`}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -105,10 +105,10 @@ export default function TradesPage() {
         {loading ? (
           <div className="space-y-3">{[1, 2, 3].map(i => <div key={i} className="shimmer h-28 rounded-2xl" />)}</div>
         ) : offers.length === 0 ? (
-          <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-12 text-center">
+          <div className="bg-white border border-[#e8eaf0] rounded-2xl p-12 text-center">
             <div className="text-5xl mb-4 opacity-50">🤝</div>
-            <h3 className="text-lg font-bold text-[var(--foreground)] mb-2">No trades yet</h3>
-            <p className="text-[var(--warm-400)] text-sm">When you send or receive trade offers, they will appear here</p>
+            <h3 className="text-lg font-bold text-[#1e2235] mb-2">No trades yet</h3>
+            <p className="text-[#8b8fa6] text-sm">When you send or receive trade offers, they will appear here</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -117,15 +117,15 @@ export default function TradesPage() {
               const otherUser = isIncoming ? offer.from_user : offer.to_user
 
               return (
-                <div key={offer.id} className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-5">
+                <div key={offer.id} className="bg-white border border-[#e8eaf0] rounded-2xl p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <span className={`text-xs px-2.5 py-1 rounded-lg font-semibold ${STATUS_COLORS[offer.status] || ''}`}>
                         {offer.status}
                       </span>
-                      <span className="text-xs text-[var(--warm-400)]">
+                      <span className="text-xs text-[#8b8fa6]">
                         {isIncoming ? 'from' : 'to'}{' '}
-                        <a href={`/u/${otherUser?.username || ''}`} className="text-amber-400 hover:text-amber-300 font-semibold">
+                        <a href={`/u/${otherUser?.username || ''}`} className="text-[#6366f1] hover:text-amber-300 font-semibold">
                           {otherUser?.username || 'Unknown'}
                         </a>
                       </span>
@@ -135,23 +135,23 @@ export default function TradesPage() {
                   {/* Trade cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     {/* Offered card */}
-                    <div className="bg-[var(--surface-1)] rounded-xl p-3 border border-[var(--card-border)]">
-                      <p className="text-[10px] text-[var(--warm-500)] uppercase tracking-wider mb-1">Offered</p>
-                      <p className="text-sm font-semibold text-[var(--foreground)]">{offer.offered_card_id}</p>
-                      <p className="text-xs text-amber-400">{GAME_LABELS[offer.offered_game] || offer.offered_game}</p>
-                      <p className="text-[10px] text-[var(--warm-400)]">{offer.offered_condition}</p>
+                    <div className="bg-[#f5f6fa] rounded-xl p-3 border border-[#e8eaf0]">
+                      <p className="text-[10px] text-[#b5b8c8] uppercase tracking-wider mb-1">Offered</p>
+                      <p className="text-sm font-semibold text-[#1e2235]">{offer.offered_card_id}</p>
+                      <p className="text-xs text-[#6366f1]">{GAME_LABELS[offer.offered_game] || offer.offered_game}</p>
+                      <p className="text-[10px] text-[#8b8fa6]">{offer.offered_condition}</p>
                     </div>
                     {/* Requested card */}
-                    <div className="bg-[var(--surface-1)] rounded-xl p-3 border border-[var(--card-border)]">
-                      <p className="text-[10px] text-[var(--warm-500)] uppercase tracking-wider mb-1">Requested</p>
-                      <p className="text-sm font-semibold text-[var(--foreground)]">{offer.requested_card_id}</p>
-                      <p className="text-xs text-amber-400">{GAME_LABELS[offer.requested_game] || offer.requested_game}</p>
-                      <p className="text-[10px] text-[var(--warm-400)]">{offer.requested_condition}</p>
+                    <div className="bg-[#f5f6fa] rounded-xl p-3 border border-[#e8eaf0]">
+                      <p className="text-[10px] text-[#b5b8c8] uppercase tracking-wider mb-1">Requested</p>
+                      <p className="text-sm font-semibold text-[#1e2235]">{offer.requested_card_id}</p>
+                      <p className="text-xs text-[#6366f1]">{GAME_LABELS[offer.requested_game] || offer.requested_game}</p>
+                      <p className="text-[10px] text-[#8b8fa6]">{offer.requested_condition}</p>
                     </div>
                   </div>
 
                   {offer.message && (
-                    <p className="text-xs text-[var(--warm-300)] bg-[var(--surface-1)] rounded-lg p-3 mb-3 italic">&ldquo;{offer.message}&rdquo;</p>
+                    <p className="text-xs text-[#5c6078] bg-[#f5f6fa] rounded-lg p-3 mb-3 italic">&ldquo;{offer.message}&rdquo;</p>
                   )}
 
                   {/* Actions */}
@@ -161,7 +161,7 @@ export default function TradesPage() {
                         <>
                           <button
                             onClick={() => updateOfferStatus(offer.id, 'accepted')}
-                            className="px-4 py-2 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-400 transition-all"
+                            className="px-4 py-2 bg-emerald-500 text-[#1e2235] rounded-lg text-xs font-bold hover:bg-emerald-400 transition-all"
                           >
                             Accept
                           </button>
@@ -176,7 +176,7 @@ export default function TradesPage() {
                       {!isIncoming && (
                         <button
                           onClick={() => updateOfferStatus(offer.id, 'cancelled')}
-                          className="px-4 py-2 bg-[var(--surface-1)] text-[var(--warm-400)] border border-[var(--card-border)] rounded-lg text-xs font-semibold hover:text-[var(--foreground)] transition-all"
+                          className="px-4 py-2 bg-[#f5f6fa] text-[#8b8fa6] border border-[#e8eaf0] rounded-lg text-xs font-semibold hover:text-[#1e2235] transition-all"
                         >
                           Cancel Offer
                         </button>

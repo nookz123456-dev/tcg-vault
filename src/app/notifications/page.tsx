@@ -70,8 +70,8 @@ export default function NotificationsPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
         <Navbar />
         <div className="text-center">
-          <p className="text-[var(--warm-400)]">Sign in to see notifications</p>
-          <a href="/login" className="inline-block mt-3 px-5 py-2 bg-amber-500 text-[var(--warm-900)] rounded-xl text-sm font-bold hover:bg-amber-400">Sign In</a>
+          <p className="text-[#8b8fa6]">Sign in to see notifications</p>
+          <a href="/login" className="inline-block mt-3 px-5 py-2 bg-[#6366f1] text-[#1e2235] rounded-xl text-sm font-bold hover:bg-[#4f46e5]">Sign In</a>
         </div>
       </div>
     )
@@ -83,15 +83,15 @@ export default function NotificationsPage() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-extrabold text-[var(--foreground)]">Notifications</h1>
+            <h1 className="text-2xl font-extrabold text-[#1e2235]">Notifications</h1>
             {unreadCount > 0 && (
-              <p className="text-sm text-amber-400 mt-1">{unreadCount} unread</p>
+              <p className="text-sm text-[#6366f1] mt-1">{unreadCount} unread</p>
             )}
           </div>
           {unreadCount > 0 && (
             <button
               onClick={markAllRead}
-              className="px-4 py-2 text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors"
+              className="px-4 py-2 text-xs font-semibold text-[#6366f1] hover:text-amber-300 transition-colors"
             >
               Mark all read
             </button>
@@ -101,10 +101,10 @@ export default function NotificationsPage() {
         {loading ? (
           <div className="space-y-3">{[1, 2, 3, 4].map(i => <div key={i} className="shimmer h-16 rounded-xl" />)}</div>
         ) : notifications.length === 0 ? (
-          <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-12 text-center">
+          <div className="bg-white border border-[#e8eaf0] rounded-2xl p-12 text-center">
             <div className="text-5xl mb-4 opacity-50">🔔</div>
-            <p className="text-[var(--warm-400)]">No notifications yet</p>
-            <p className="text-[var(--warm-500)] text-xs mt-1">When someone follows you, replies to your thread, or sends a trade offer, you will see it here</p>
+            <p className="text-[#8b8fa6]">No notifications yet</p>
+            <p className="text-[#b5b8c8] text-xs mt-1">When someone follows you, replies to your thread, or sends a trade offer, you will see it here</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -113,21 +113,21 @@ export default function NotificationsPage() {
                 key={n.id}
                 className={`flex items-start gap-3 p-4 rounded-2xl border transition-all ${
                   n.is_read
-                    ? 'bg-[var(--card-bg)] border-[var(--card-border)]'
-                    : 'bg-amber-500/5 border-amber-500/20'
+                    ? 'bg-white border-[#e8eaf0]'
+                    : 'bg-[#6366f1]/5 border-[#6366f1]/20'
                 }`}
               >
                 <div className="text-xl flex-shrink-0 mt-0.5">{TYPE_ICONS[n.type] || '🔔'}</div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm leading-relaxed ${n.is_read ? 'text-[var(--warm-300)]' : 'text-[var(--foreground)] font-medium'}`}>
+                  <p className={`text-sm leading-relaxed ${n.is_read ? 'text-[#5c6078]' : 'text-[#1e2235] font-medium'}`}>
                     {n.actor && (
-                      <a href={`/u/${n.actor.username || ''}`} className="text-amber-400 hover:text-amber-300 font-semibold">
+                      <a href={`/u/${n.actor.username || ''}`} className="text-[#6366f1] hover:text-amber-300 font-semibold">
                         {n.actor.username}
                       </a>
                     )}{' '}
                     {n.message}
                   </p>
-                  <p className="text-[10px] text-[var(--warm-500)] mt-1">{timeAgo(n.created_at)}</p>
+                  <p className="text-[10px] text-[#b5b8c8] mt-1">{timeAgo(n.created_at)}</p>
                 </div>
                 {!n.is_read && <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-2" />}
               </div>

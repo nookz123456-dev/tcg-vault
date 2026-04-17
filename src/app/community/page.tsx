@@ -46,7 +46,7 @@ const ACTION_LABELS: Record<string, string> = {
 const GAME_COLORS: Record<string, string> = {
   pokemon: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
   onepiece: 'bg-red-500/10 text-red-400 border-red-500/20',
-  'pokemon-jp': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  'pokemon-jp': 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
 }
 
 export default function CommunityPage() {
@@ -157,35 +157,35 @@ export default function CommunityPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold text-[var(--foreground)] tracking-tight mb-3">
+          <h1 className="text-4xl font-extrabold text-[#1e2235] tracking-tight mb-3">
             Community
           </h1>
-          <p className="text-[var(--warm-300)] text-lg">
+          <p className="text-[#5c6078] text-lg">
             See what other collectors are adding, trading, and talking about.
           </p>
         </div>
 
         {/* Quick Links */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <Link href="/discussions" className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-5 card-hover group text-center">
+          <Link href="/discussions" className="bg-white border border-[#e8eaf0] rounded-2xl p-5 card-hover group text-center">
             <div className="text-3xl mb-2">💬</div>
-            <h3 className="text-sm font-bold text-[var(--foreground)] group-hover:text-amber-400 transition-colors">Discussion Boards</h3>
-            <p className="text-xs text-[var(--warm-400)] mt-1">Chat with fellow collectors</p>
+            <h3 className="text-sm font-bold text-[#1e2235] group-hover:text-[#6366f1] transition-colors">Discussion Boards</h3>
+            <p className="text-xs text-[#8b8fa6] mt-1">Chat with fellow collectors</p>
           </Link>
-          <Link href="/trades" className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-5 card-hover group text-center">
+          <Link href="/trades" className="bg-white border border-[#e8eaf0] rounded-2xl p-5 card-hover group text-center">
             <div className="text-3xl mb-2">🤝</div>
-            <h3 className="text-sm font-bold text-[var(--foreground)] group-hover:text-amber-400 transition-colors">Trade Center</h3>
-            <p className="text-xs text-[var(--warm-400)] mt-1">Find trade partners</p>
+            <h3 className="text-sm font-bold text-[#1e2235] group-hover:text-[#6366f1] transition-colors">Trade Center</h3>
+            <p className="text-xs text-[#8b8fa6] mt-1">Find trade partners</p>
           </Link>
-          <Link href="/badges" className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-5 card-hover group text-center">
+          <Link href="/badges" className="bg-white border border-[#e8eaf0] rounded-2xl p-5 card-hover group text-center">
             <div className="text-3xl mb-2">🏅</div>
-            <h3 className="text-sm font-bold text-[var(--foreground)] group-hover:text-amber-400 transition-colors">Badges</h3>
-            <p className="text-xs text-[var(--warm-400)] mt-1">Earn achievements</p>
+            <h3 className="text-sm font-bold text-[#1e2235] group-hover:text-[#6366f1] transition-colors">Badges</h3>
+            <p className="text-xs text-[#8b8fa6] mt-1">Earn achievements</p>
           </Link>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-xl p-1 mb-8 max-w-md mx-auto">
+        <div className="flex gap-1 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl p-1 mb-8 max-w-md mx-auto">
           {[
             { key: 'feed', label: 'Activity', icon: '📡' },
             { key: 'leaderboard', label: 'Leaders', icon: '🏆' },
@@ -196,8 +196,8 @@ export default function CommunityPage() {
               onClick={() => setTab(t.key as typeof tab)}
               className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                 tab === t.key
-                  ? 'bg-amber-500 text-[var(--warm-900)]'
-                  : 'text-[var(--warm-300)] hover:text-[var(--foreground)]'
+                  ? 'bg-[#6366f1] text-[#1e2235]'
+                  : 'text-[#5c6078] hover:text-[#1e2235]'
               }`}
             >
               <span className="mr-1.5">{t.icon}</span>
@@ -210,20 +210,20 @@ export default function CommunityPage() {
         {loading ? (
           <div className="text-center py-16">
             <div className="text-4xl mb-4 animate-pulse">⏳</div>
-            <p className="text-[var(--warm-400)]">Loading...</p>
+            <p className="text-[#8b8fa6]">Loading...</p>
           </div>
         ) : tab === 'feed' ? (
           /* Activity Feed */
           activities.length === 0 ? (
             <div className="text-center py-16">
               <div className="text-5xl mb-4">📡</div>
-              <p className="text-[var(--warm-300)] text-lg mb-2">No activity yet</p>
-              <p className="text-[var(--warm-400)] text-sm mb-6">
+              <p className="text-[#5c6078] text-lg mb-2">No activity yet</p>
+              <p className="text-[#8b8fa6] text-sm mb-6">
                 Be the first! Start adding cards to your collection.
               </p>
               <Link
                 href="/search"
-                className="inline-block px-6 py-3 bg-amber-500 text-[var(--warm-900)] font-bold rounded-xl hover:bg-amber-400 transition-all"
+                className="inline-block px-6 py-3 bg-[#6366f1] text-[#1e2235] font-bold rounded-xl hover:bg-[#4f46e5] transition-all"
               >
                 Search Cards →
               </Link>
@@ -233,10 +233,10 @@ export default function CommunityPage() {
               {activities.map(a => (
                 <div
                   key={a.id}
-                  className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4 flex items-start gap-3 card-hover"
+                  className="bg-white border border-[#e8eaf0] rounded-xl p-4 flex items-start gap-3 card-hover"
                 >
                   {/* Avatar */}
-                  <div className="w-10 h-10 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-full flex items-center justify-center text-lg flex-shrink-0">
+                  <div className="w-10 h-10 bg-[#f5f6fa] border border-[#e8eaf0] rounded-full flex items-center justify-center text-lg flex-shrink-0">
                     {a.profiles?.avatar_url ? (
                       <img src={a.profiles.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
                     ) : (
@@ -247,16 +247,16 @@ export default function CommunityPage() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-bold text-[var(--foreground)]">
+                      <span className="text-sm font-bold text-[#1e2235]">
                         {a.profiles?.display_name || a.profiles?.username || 'Collector'}
                       </span>
-                      <span className="text-xs text-[var(--warm-400)]">
+                      <span className="text-xs text-[#8b8fa6]">
                         {ACTION_LABELS[a.action] || a.action}
                       </span>
                       {a.card_id && a.game && (
                         <Link
                           href={getCardLink(a.card_id, a.game)}
-                          className="text-xs text-amber-400 hover:underline"
+                          className="text-xs text-[#6366f1] hover:underline"
                         >
                           {a.card_id.slice(0, 20)}...
                         </Link>
@@ -267,7 +267,7 @@ export default function CommunityPage() {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-[var(--warm-500)] mt-1">{timeAgo(a.created_at)}</p>
+                    <p className="text-xs text-[#b5b8c8] mt-1">{timeAgo(a.created_at)}</p>
                   </div>
                 </div>
               ))}
@@ -278,13 +278,13 @@ export default function CommunityPage() {
           leaderboard.length === 0 ? (
             <div className="text-center py-16">
               <div className="text-5xl mb-4">🏆</div>
-              <p className="text-[var(--warm-300)] text-lg mb-2">No collectors on the board yet</p>
-              <p className="text-[var(--warm-400)] text-sm mb-6">
+              <p className="text-[#5c6078] text-lg mb-2">No collectors on the board yet</p>
+              <p className="text-[#8b8fa6] text-sm mb-6">
                 Make your collection public to appear on the leaderboard!
               </p>
               <Link
                 href="/collection"
-                className="inline-block px-6 py-3 bg-amber-500 text-[var(--warm-900)] font-bold rounded-xl hover:bg-amber-400 transition-all"
+                className="inline-block px-6 py-3 bg-[#6366f1] text-[#1e2235] font-bold rounded-xl hover:bg-[#4f46e5] transition-all"
               >
                 My Collection →
               </Link>
@@ -294,26 +294,26 @@ export default function CommunityPage() {
               {leaderboard.map((entry, i) => (
                 <div
                   key={entry.user_id}
-                  className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4 flex items-center gap-4 card-hover"
+                  className="bg-white border border-[#e8eaf0] rounded-xl p-4 flex items-center gap-4 card-hover"
                 >
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
-                    i === 0 ? 'bg-amber-500/20 text-amber-400 border-2 border-amber-500' :
-                    i === 1 ? 'bg-gray-400/20 text-gray-300 border border-gray-500' :
+                    i === 0 ? 'bg-[#6366f1]/20 text-[#6366f1] border-2 border-amber-500' :
+                    i === 1 ? 'bg-gray-400/20 text-[#3b3f56] border border-gray-500' :
                     i === 2 ? 'bg-orange-500/20 text-orange-400 border border-orange-500' :
-                    'bg-[var(--surface-1)] text-[var(--warm-400)] border border-[var(--card-border)]'
+                    'bg-[#f5f6fa] text-[#8b8fa6] border border-[#e8eaf0]'
                   }`}>
                     {i < 3 ? ['🥇', '🥈', '🥉'][i] : i + 1}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-[var(--foreground)] truncate">
+                    <p className="font-bold text-[#1e2235] truncate">
                       {entry.display_name || entry.username || 'Collector'}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-bold text-amber-400">
+                    <p className="text-sm font-bold text-[#6366f1]">
                       {entry.total_cards || 0} cards
                     </p>
-                    <p className="text-xs text-[var(--warm-400)]">
+                    <p className="text-xs text-[#8b8fa6]">
                       ${entry.total_value?.toFixed(2) || '0.00'}
                     </p>
                   </div>
@@ -326,13 +326,13 @@ export default function CommunityPage() {
           trending.length === 0 ? (
             <div className="text-center py-16">
               <div className="text-5xl mb-4">🔥</div>
-              <p className="text-[var(--warm-300)] text-lg mb-2">No trending cards yet</p>
-              <p className="text-[var(--warm-400)] text-sm mb-6">
+              <p className="text-[#5c6078] text-lg mb-2">No trending cards yet</p>
+              <p className="text-[#8b8fa6] text-sm mb-6">
                 Start adding cards to see what&apos;s popular!
               </p>
               <Link
                 href="/search"
-                className="inline-block px-6 py-3 bg-amber-500 text-[var(--warm-900)] font-bold rounded-xl hover:bg-amber-400 transition-all"
+                className="inline-block px-6 py-3 bg-[#6366f1] text-[#1e2235] font-bold rounded-xl hover:bg-[#4f46e5] transition-all"
               >
                 Search Cards →
               </Link>
@@ -343,18 +343,18 @@ export default function CommunityPage() {
                 <Link
                   key={`${card.card_id}_${card.game}`}
                   href={getCardLink(card.card_id, card.game)}
-                  className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-5 card-hover group"
+                  className="bg-white border border-[#e8eaf0] rounded-xl p-5 card-hover group"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className={`text-xs px-2 py-0.5 rounded border ${GAME_COLORS[card.game] || ''}`}>
                       {card.game}
                     </span>
-                    <span className="text-2xl font-extrabold text-amber-400">#{i + 1}</span>
+                    <span className="text-2xl font-extrabold text-[#6366f1]">#{i + 1}</span>
                   </div>
-                  <p className="text-sm text-[var(--foreground)] truncate group-hover:text-amber-400 transition-colors">
+                  <p className="text-sm text-[#1e2235] truncate group-hover:text-[#6366f1] transition-colors">
                     {card.card_id}
                   </p>
-                  <p className="text-xs text-[var(--warm-400)] mt-1">
+                  <p className="text-xs text-[#8b8fa6] mt-1">
                     {card.count} collector{card.count > 1 ? 's' : ''}
                   </p>
                 </Link>
@@ -365,16 +365,16 @@ export default function CommunityPage() {
 
         {/* CTA for logged out users */}
         <div className="mt-12 text-center">
-          <div className="bg-[var(--surface-1)] border border-[var(--card-border)] rounded-2xl p-8 max-w-lg mx-auto">
-            <h3 className="text-xl font-bold text-[var(--foreground)] mb-2">
+          <div className="bg-[#f5f6fa] border border-[#e8eaf0] rounded-2xl p-8 max-w-lg mx-auto">
+            <h3 className="text-xl font-bold text-[#1e2235] mb-2">
               Join the community
             </h3>
-            <p className="text-[var(--warm-400)] text-sm mb-6">
+            <p className="text-[#8b8fa6] text-sm mb-6">
               Create an account to add cards, leave comments, and see your collection on the leaderboard.
             </p>
             <Link
               href="/login"
-              className="inline-block px-6 py-3 bg-amber-500 text-[var(--warm-900)] font-bold rounded-xl hover:bg-amber-400 transition-all"
+              className="inline-block px-6 py-3 bg-[#6366f1] text-[#1e2235] font-bold rounded-xl hover:bg-[#4f46e5] transition-all"
             >
               Get Started →
             </Link>

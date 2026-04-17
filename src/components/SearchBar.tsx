@@ -92,13 +92,13 @@ function FilterSelect({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <label className="text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
+      <label className="text-xs font-medium text-[#3b3f56] uppercase tracking-wider whitespace-nowrap">
         {label}
       </label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="bg-[var(--surface-1)] border border-[var(--card-border)] text-gray-200 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all cursor-pointer hover:border-gray-500 appearance-none min-w-[120px]"
+        className="bg-[#f5f6fa] border border-[#e8eaf0] text-gray-200 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all cursor-pointer hover:border-gray-500 appearance-none min-w-[120px]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E")`,
           backgroundRepeat: 'no-repeat',
@@ -128,7 +128,7 @@ function LangToggle({
   const labels = options || { en: 'EN', jp: 'JP' }
   return (
     <div className="flex items-center gap-2">
-      <label className="text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
+      <label className="text-xs font-medium text-[#3b3f56] uppercase tracking-wider whitespace-nowrap">
         Lang
       </label>
       <div className="flex gap-1">
@@ -139,8 +139,8 @@ function LangToggle({
             onClick={() => onChange(lang)}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
               value === lang
-                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                : 'bg-[var(--surface-1)] text-gray-400 hover:text-gray-200 border border-[var(--card-border)]'
+                ? 'bg-[#6366f1]/20 text-[#6366f1] border border-amber-500/30'
+                : 'bg-[#f5f6fa] text-[#5c6078] hover:text-gray-200 border border-[#e8eaf0]'
             }`}
           >
             {label}
@@ -233,9 +233,9 @@ export default function SearchBar() {
             className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
               game === g
                 ? g === 'pokemon'
-                  ? 'bg-gradient-to-r from-yellow-500 to-red-500 text-white shadow-lg shadow-amber-500/25'
-                  : 'bg-gradient-to-r from-red-500 to-amber-500 text-white shadow-lg shadow-red-500/25'
-                : 'bg-[var(--surface-1)] text-gray-400 hover:text-gray-200 border border-[var(--card-border)] hover:border-gray-500'
+                  ? 'bg-gradient-to-r from-yellow-500 to-red-500 text-[#1e2235] shadow-lg shadow-amber-500/25'
+                  : 'bg-gradient-to-r from-red-500 to-amber-500 text-[#1e2235] shadow-lg shadow-red-500/25'
+                : 'bg-[#f5f6fa] text-[#5c6078] hover:text-gray-200 border border-[#e8eaf0] hover:border-gray-500'
             }`}
           >
             {GAME_LABELS[g]}
@@ -245,7 +245,7 @@ export default function SearchBar() {
 
       {/* Pokemon filters */}
       {game === 'pokemon' && (
-        <div className="flex flex-wrap items-center gap-3 bg-[var(--surface-1)]/50 border border-[var(--card-border)] rounded-xl px-4 py-3">
+        <div className="flex flex-wrap items-center gap-3 bg-[#f5f6fa]/50 border border-[#e8eaf0] rounded-xl px-4 py-3">
           <LangToggle value={pokeLang} onChange={setPokeLang} options={{ en: 'EN Cards', jp: 'JP Cards' }} />
           {pokeLang === 'en' ? (
             <>
@@ -265,7 +265,7 @@ export default function SearchBar() {
             <button
               type="button"
               onClick={clearFilters}
-              className="text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors"
+              className="text-xs text-[#6366f1] hover:text-amber-300 font-medium transition-colors"
             >
               Clear all
             </button>
@@ -275,7 +275,7 @@ export default function SearchBar() {
 
       {/* One Piece filters */}
       {game === 'onepiece' && (
-        <div className="flex flex-wrap items-center gap-3 bg-[var(--surface-1)]/50 border border-[var(--card-border)] rounded-xl px-4 py-3">
+        <div className="flex flex-wrap items-center gap-3 bg-[#f5f6fa]/50 border border-[#e8eaf0] rounded-xl px-4 py-3">
           <LangToggle value={opLang} onChange={setOpLang} />
           <FilterSelect label="Type" value={opType} onChange={setOpType} options={OP_CARD_TYPES} />
           <FilterSelect label="Rarity" value={opRarity} onChange={setOpRarity} options={OP_RARITIES} />
@@ -283,7 +283,7 @@ export default function SearchBar() {
             <button
               type="button"
               onClick={clearFilters}
-              className="text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors"
+              className="text-xs text-[#6366f1] hover:text-amber-300 font-medium transition-colors"
             >
               Clear all
             </button>
@@ -294,7 +294,7 @@ export default function SearchBar() {
       {/* Search input */}
       <div className="flex-1 relative">
         <svg
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8b8fa6]"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -306,11 +306,11 @@ export default function SearchBar() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={game === 'pokemon' ? (pokeLang === 'jp' ? 'Pokemon (JP card art)...' : 'Pokemon cards...') : 'One Piece cards...'}
-          className="w-full pl-12 pr-24 py-3.5 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 transition-all"
+          className="w-full pl-12 pr-24 py-3.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 transition-all"
         />
         <button
           type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2 bg-amber-500 text-black rounded-lg text-sm font-bold hover:bg-amber-400 transition-all shadow-sm shadow-amber-500/20"
+          className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2 bg-[#6366f1] text-black rounded-lg text-sm font-bold hover:bg-[#4f46e5] transition-all shadow-sm shadow-[#6366f1]/20"
         >
           Search
         </button>

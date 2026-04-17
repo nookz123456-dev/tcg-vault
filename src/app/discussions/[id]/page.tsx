@@ -108,8 +108,8 @@ export default function ThreadPage() {
         <Navbar />
         <div className="max-w-3xl mx-auto px-4 py-20 text-center">
           <div className="text-5xl mb-4 opacity-50">🔍</div>
-          <h1 className="text-xl font-bold text-[var(--foreground)] mb-2">Thread not found</h1>
-          <button onClick={() => router.push('/discussions')} className="text-amber-400 hover:text-amber-300 text-sm font-semibold">
+          <h1 className="text-xl font-bold text-[#1e2235] mb-2">Thread not found</h1>
+          <button onClick={() => router.push('/discussions')} className="text-[#6366f1] hover:text-amber-300 text-sm font-semibold">
             ← Back to Discussions
           </button>
         </div>
@@ -122,8 +122,8 @@ export default function ThreadPage() {
       <Navbar />
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-[var(--warm-400)] mb-4">
-          <button onClick={() => router.push('/discussions')} className="hover:text-amber-400 transition-colors">
+        <div className="flex items-center gap-2 text-xs text-[#8b8fa6] mb-4">
+          <button onClick={() => router.push('/discussions')} className="hover:text-[#6366f1] transition-colors">
             Discussions
           </button>
           <span>/</span>
@@ -131,18 +131,18 @@ export default function ThreadPage() {
         </div>
 
         {/* Thread Header */}
-        <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-5 mb-6">
+        <div className="bg-white border border-[#e8eaf0] rounded-2xl p-5 mb-6">
           <div className="flex items-center gap-2 mb-3">
-            {thread.is_pinned && <span className="text-amber-400">📌</span>}
+            {thread.is_pinned && <span className="text-[#6366f1]">📌</span>}
             {thread.is_locked && <span className="text-red-400">🔒</span>}
-            <h1 className="text-xl font-extrabold text-[var(--foreground)]">{thread.title}</h1>
+            <h1 className="text-xl font-extrabold text-[#1e2235]">{thread.title}</h1>
           </div>
-          <div className="flex items-center gap-3 text-xs text-[var(--warm-400)]">
+          <div className="flex items-center gap-3 text-xs text-[#8b8fa6]">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center text-[10px] font-bold text-amber-400">
+              <div className="w-6 h-6 rounded-full bg-[#6366f1]/20 flex items-center justify-center text-[10px] font-bold text-[#6366f1]">
                 {thread.profiles?.username?.charAt(0).toUpperCase() || '?'}
               </div>
-              <a href={`/u/${thread.profiles?.username || ''}`} className="font-semibold text-amber-400 hover:text-amber-300">
+              <a href={`/u/${thread.profiles?.username || ''}`} className="font-semibold text-[#6366f1] hover:text-amber-300">
                 {thread.profiles?.username || 'Unknown'}
               </a>
             </div>
@@ -152,13 +152,13 @@ export default function ThreadPage() {
         </div>
 
         {/* Thread Content (styled as first post) */}
-        <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-5 mb-6">
+        <div className="bg-white border border-[#e8eaf0] rounded-2xl p-5 mb-6">
           <div className="text-sm text-[var(--warm-200)] leading-relaxed whitespace-pre-wrap">{thread.content}</div>
         </div>
 
         {/* Replies */}
         <div className="mb-4">
-          <h2 className="text-lg font-bold text-[var(--foreground)]">
+          <h2 className="text-lg font-bold text-[#1e2235]">
             Replies ({replies.length})
           </h2>
         </div>
@@ -166,22 +166,22 @@ export default function ThreadPage() {
         {replies.length > 0 && (
           <div className="space-y-3 mb-6">
             {replies.map((reply, index) => (
-              <div key={reply.id} className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-4">
+              <div key={reply.id} className="bg-white border border-[#e8eaf0] rounded-2xl p-4">
                 <div className="flex items-center gap-2.5 mb-3">
-                  <div className="w-7 h-7 rounded-full bg-amber-500/20 flex items-center justify-center text-[10px] font-bold text-amber-400 flex-shrink-0 overflow-hidden">
+                  <div className="w-7 h-7 rounded-full bg-[#6366f1]/20 flex items-center justify-center text-[10px] font-bold text-[#6366f1] flex-shrink-0 overflow-hidden">
                     {reply.profiles?.avatar_url ? (
                       <img src={reply.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
                       reply.profiles?.username?.charAt(0).toUpperCase() || '?'
                     )}
                   </div>
-                  <a href={`/u/${reply.profiles?.username || ''}`} className="text-sm font-semibold text-amber-400 hover:text-amber-300">
+                  <a href={`/u/${reply.profiles?.username || ''}`} className="text-sm font-semibold text-[#6366f1] hover:text-amber-300">
                     {reply.profiles?.username || 'Unknown'}
                   </a>
-                  <span className="text-[10px] text-[var(--warm-500)]">{timeAgo(reply.created_at)}</span>
-                  <span className="text-[10px] text-[var(--warm-500)] ml-auto">#{index + 1}</span>
+                  <span className="text-[10px] text-[#b5b8c8]">{timeAgo(reply.created_at)}</span>
+                  <span className="text-[10px] text-[#b5b8c8] ml-auto">#{index + 1}</span>
                 </div>
-                <div className="text-sm text-[var(--warm-300)] leading-relaxed whitespace-pre-wrap pl-9">{reply.content}</div>
+                <div className="text-sm text-[#5c6078] leading-relaxed whitespace-pre-wrap pl-9">{reply.content}</div>
               </div>
             ))}
           </div>
@@ -190,37 +190,37 @@ export default function ThreadPage() {
         {/* Reply Form */}
         {!thread.is_locked ? (
           user ? (
-            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-5">
-              <h3 className="text-sm font-bold text-[var(--foreground)] mb-3">Post a Reply</h3>
+            <div className="bg-white border border-[#e8eaf0] rounded-2xl p-5">
+              <h3 className="text-sm font-bold text-[#1e2235] mb-3">Post a Reply</h3>
               <textarea
                 value={newReply}
                 onChange={e => setNewReply(e.target.value)}
                 placeholder="Write your reply..."
                 maxLength={3000}
                 rows={3}
-                className="w-full px-4 py-2.5 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-xl text-[var(--foreground)] placeholder:text-[var(--warm-500)] focus:outline-none focus:border-amber-500/50 resize-none text-sm"
+                className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-amber-500/50 resize-none text-sm"
               />
               <div className="flex justify-between items-center mt-2">
-                <span className="text-xs text-[var(--warm-500)]">{newReply.length}/3000</span>
+                <span className="text-xs text-[#b5b8c8]">{newReply.length}/3000</span>
                 <button
                   onClick={handleReply}
                   disabled={submitting || !newReply.trim()}
-                  className="px-5 py-2 bg-amber-500 text-[var(--warm-900)] rounded-xl text-xs font-bold hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  className="px-5 py-2 bg-[#6366f1] text-[#1e2235] rounded-xl text-xs font-bold hover:bg-[#4f46e5] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 >
                   {submitting ? 'Posting...' : 'Reply'}
                 </button>
               </div>
             </div>
           ) : (
-            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-6 text-center">
-              <p className="text-sm text-[var(--warm-400)]">Sign in to join the discussion</p>
-              <a href="/login" className="inline-block mt-3 px-5 py-2 bg-amber-500 text-[var(--warm-900)] rounded-xl text-xs font-bold hover:bg-amber-400 transition-all">
+            <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6 text-center">
+              <p className="text-sm text-[#8b8fa6]">Sign in to join the discussion</p>
+              <a href="/login" className="inline-block mt-3 px-5 py-2 bg-[#6366f1] text-[#1e2235] rounded-xl text-xs font-bold hover:bg-[#4f46e5] transition-all">
                 Sign In
               </a>
             </div>
           )
         ) : (
-          <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-6 text-center">
+          <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6 text-center">
             <p className="text-sm text-red-400">🔒 This thread is locked</p>
           </div>
         )}

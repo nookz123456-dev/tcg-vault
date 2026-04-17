@@ -62,10 +62,10 @@ export default function BadgesPage() {
       <Navbar />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-extrabold text-[var(--foreground)] tracking-tight mb-3">
+          <h1 className="text-3xl font-extrabold text-[#1e2235] tracking-tight mb-3">
             🏅 Badges
           </h1>
-          <p className="text-[var(--warm-300)]">
+          <p className="text-[#5c6078]">
             Earn badges by collecting, trading, and participating in the community
           </p>
         </div>
@@ -75,7 +75,7 @@ export default function BadgesPage() {
             <div key={category}>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-xl">{CATEGORY_ICONS[category] || '🏅'}</span>
-                <h2 className="text-lg font-bold text-amber-400 uppercase tracking-wider">
+                <h2 className="text-lg font-bold text-[#6366f1] uppercase tracking-wider">
                   {CATEGORY_LABELS[category] || category}
                 </h2>
               </div>
@@ -83,13 +83,13 @@ export default function BadgesPage() {
                 {catBadges.map(badge => (
                   <div
                     key={badge.id}
-                    className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-5 text-center card-hover"
+                    className="bg-white border border-[#e8eaf0] rounded-2xl p-5 text-center card-hover"
                   >
                     <div className="text-4xl mb-3">{badge.icon}</div>
-                    <p className="text-sm font-bold text-[var(--foreground)]">{badge.name}</p>
-                    <p className="text-xs text-[var(--warm-400)] mt-1.5 leading-relaxed">{badge.description}</p>
+                    <p className="text-sm font-bold text-[#1e2235]">{badge.name}</p>
+                    <p className="text-xs text-[#8b8fa6] mt-1.5 leading-relaxed">{badge.description}</p>
                     {badge.threshold > 0 && (
-                      <p className="text-[10px] text-[var(--warm-500)] mt-2">
+                      <p className="text-[10px] text-[#b5b8c8] mt-2">
                         Reach {badge.threshold} to unlock
                       </p>
                     )}
