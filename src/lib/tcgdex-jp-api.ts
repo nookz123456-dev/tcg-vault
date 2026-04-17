@@ -193,7 +193,7 @@ function convertENtoJPId(enId: string): string | null {
 /**
  * Search TCGdex JP API directly
  */
-async function searchTCGdexJP(keyword: string): Promise<TCGdexJPCard[]> {
+export async function searchTCGdexJP(keyword: string): Promise<TCGdexJPCard[]> {
   const url = `${TCGDEX_JP}/cards?name=${encodeURIComponent(keyword)}`
   
   try {

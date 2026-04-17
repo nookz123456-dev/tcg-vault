@@ -24,8 +24,17 @@ export async function GET(request: NextRequest) {
       })
       const testData = await testRes.json()
       
-      // Also test the search function
-      const searchResult = await searchPokemonJPCardsTCGdex(keyword, page)
+      // Test searchTCGdexJP directly
+      const { searchTCGdexJP } = await import('@/lib/tcgdex-jp-api')
+      let directSearchResult: any = null
+      let directSearchError: string | null = null
+      try {
+        directSearchResult = await searchTCGdexJP(keyword)
+        console.log(`[Pokemon JP API] Debug: searchTCGdexJP returned ${directSearchResult?.length ?? 'null'} results`)
+      } catch (e: any) {
+        directSearchError = String(e)
+        console.error(`[Pokemon JP API] Debug: searchTCGdexJP error:`, e)
+      }
       
       return NextResponse.json({
         debug: true,
@@ -37,9 +46,10 @@ export async function GET(request: NextRequest) {
           resultCount: Array.isArray(testData) ? testData.length : 'NOT_ARRAY',
           sample: Array.isArray(testData) && testData.length > 0 ? { id: testData[0].id, name: testData[0].name } : null,
         },
-        searchFunction: {
-          cardsFound: searchResult.data.length,
-          totalCount: searchResult.totalCount,
+        directSearch: {
+          resultCount: directSearchResult?.length ?? null,
+          error: directSearchError,
+          sampleId: Array.isArray(directSearchResult) && directSearchResult.length > 0 ? directSearchResult[0].id : null,
         },
       })
     } catch (err: any) {
