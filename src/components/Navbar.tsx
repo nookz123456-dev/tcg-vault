@@ -11,6 +11,8 @@ export default function Navbar() {
   const pathname = usePathname()
   const { user, isGuest, isAuthenticated, logout } = useAuth()
   const t = useT()
+  const { locale } = useLocale()
+  const isThai = locale === 'th'
   const [unreadCount, setUnreadCount] = useState(0)
   const [isAdmin, setIsAdmin] = useState(false)
 
@@ -102,6 +104,14 @@ export default function Navbar() {
                         <span className="text-lg">🛡️</span>
                       </Link>
                     )}
+                    {/* Become a Seller */}
+                    <Link
+                      href="/seller/apply"
+                      className="p-2 rounded-lg hover:bg-[#6366f1]/5 transition-colors"
+                      title={isThai ? 'สมัครเป็นผู้ขาย' : 'Become a Seller'}
+                    >
+                      <span className="text-lg">🏪</span>
+                    </Link>
                     <Link
                       href="/notifications"
                       className="relative p-2 rounded-lg hover:bg-[#6366f1]/5 transition-colors"

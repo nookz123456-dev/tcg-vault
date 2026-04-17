@@ -22,6 +22,15 @@ interface User {
   created_at: string
 }
 
+interface SellerApp {
+  id: string
+  real_name: string
+  status: string
+  shop_name: string | null
+  created_at: string
+  profiles: { id: string; username: string; display_name: string }[]
+}
+
 interface Thread {
   id: string
   title: string
@@ -43,7 +52,8 @@ export default function AdminPage() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [recentUsers, setRecentUsers] = useState<User[]>([])
   const [recentThreads, setRecentThreads] = useState<Thread[]>([])
-  const [tab, setTab] = useState<'overview' | 'users' | 'threads'>('overview')
+  const [sellerApps, setSellerApps] = useState<SellerApp[]>([])
+  const [tab, setTab] = useState<'overview' | 'users' | 'threads' | 'sellers'>('overview')
   const [actionLoading, setActionLoading] = useState(false)
 
   useEffect(() => {
@@ -67,6 +77,17 @@ export default function AdminPage() {
       })
       .catch(() => setLoading(false))
   }, [user])
+
+  useEffect(() => {
+    if (tab === 'sellers' && user) {
+      fetch('/api/seller?action=pending', {
+        headers: { 'Authorization': `Bearer ${user.access_token}` },
+      })
+        .then(r => r.json())
+        .then(data => setSellerApps(data.sellers || []))
+        .catch(() => {})
+    }
+  }, [tab, user])
 
   const updateRole = async (userId: string, role: string) => {
     if (!user) return
@@ -109,6 +130,20 @@ export default function AdminPage() {
         body: JSON.stringify({ action: 'deleteThread', threadId }),
       })
       setRecentThreads(prev => prev.filter(th => th.id !== threadId))
+    } catch { /* ignore */ }
+    setActionLoading(false)
+  }
+
+  const handleSellerAction = async (sellerId: string, action: 'approve' | 'reject', reason?: string) => {
+    if (!user) return
+    setActionLoading(true)
+    try {
+      await fetch('/api/seller', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.access_token}` },
+        body: JSON.stringify({ sellerId, action, rejectionReason: reason }),
+      })
+      setSellerApps(prev => prev.filter(s => s.id !== sellerId))
     } catch { /* ignore */ }
     setActionLoading(false)
   }
@@ -200,11 +235,12 @@ export default function AdminPage() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl p-1 mb-6 max-w-md">
-          {(['overview', 'users', 'threads'] as const).map(tb => {
+        <div className="flex gap-1 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl p-1 mb-6">
+          {(['overview', 'users', 'threads', 'sellers'] as const).map(tb => {
             const label = tb === 'overview' ? (isThai ? 'ภาพรวม' : 'Overview')
               : tb === 'users' ? (isThai ? 'ผู้ใช้' : 'Users')
-              : (isThai ? 'กระทู้' : 'Threads')
+              : tb === 'threads' ? (isThai ? 'กระทู้' : 'Threads')
+              : (isThai ? 'ผู้ขาย' : 'Sellers')
             return (
               <button
                 key={tb}
@@ -338,6 +374,51 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <p className="text-xs text-[#8b8fa6]">ID: {th.id.slice(0, 12)}... · {new Date(th.created_at).toLocaleDateString()}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Sellers */}
+        {tab === 'sellers' && (
+          <div className="space-y-2">
+            {sellerApps.length === 0 ? (
+              <div className="bg-white border border-[#e8eaf0] rounded-2xl p-12 text-center">
+                <div className="text-5xl mb-4 opacity-50">🏪</div>
+                <h3 className="text-lg font-bold text-[#1e2235] mb-2">{isThai ? 'ไม่มีคำขอรอตรวจสอบ' : 'No pending applications'}</h3>
+                <p className="text-[#8b8fa6] text-sm">{isThai ? 'ทุกคำขอได้รับการตรวจสอบแล้ว' : 'All applications have been reviewed'}</p>
+              </div>
+            ) : sellerApps.map(app => (
+              <div key={app.id} className="bg-white border border-[#e8eaf0] rounded-xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1e2235]">{app.real_name}</h3>
+                    <p className="text-xs text-[#8b8fa6]">@{app.profiles?.[0]?.username || 'Unknown'}{app.shop_name ? ` · ${app.shop_name}` : ''}</p>
+                  </div>
+                  <span className="text-xs px-2 py-1 rounded-lg font-semibold bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                    {isThai ? 'รอตรวจสอบ' : 'Pending'}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleSellerAction(app.id, 'approve')}
+                    className="px-4 py-2 text-xs rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors font-semibold"
+                    disabled={actionLoading}
+                  >
+                    ✅ {isThai ? 'อนุมัติ' : 'Approve'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const reason = prompt(isThai ? 'เหตุผลที่ปฏิเสธ:' : 'Rejection reason:')
+                      if (reason) handleSellerAction(app.id, 'reject', reason)
+                    }}
+                    className="px-4 py-2 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors font-semibold"
+                    disabled={actionLoading}
+                  >
+                    ❌ {isThai ? 'ปฏิเสธ' : 'Reject'}
+                  </button>
+                </div>
+                <p className="text-[10px] text-[#b5b8c8] mt-2">{app.id.slice(0, 12)}... · {new Date(app.created_at).toLocaleDateString()}</p>
               </div>
             ))}
           </div>
