@@ -11,10 +11,10 @@
  * API: https://api.tcgdex.net/v2/ja/
  * Assets: https://assets.tcgdex.net/ja/{set}/{localId}/high.webp
  * 
- * Search strategy: TCGdex JP only accepts Japanese names,
- * so we use PokeAPI to translate English → Japanese first,
- * then search TCGdex. If the keyword is already Japanese,
- * we search TCGdex directly.
+ * Search strategy:
+ * 1. If Japanese keyword → search TCGdex JP directly
+ * 2. If English keyword → translate via PokeAPI to JP name → search TCGdex JP
+ * 3. Also try searching TCGdex JP with English keyword (catches some cards)
  */
 
 import { getJapanesePokemonName } from './pokemon-jp-names'
@@ -69,7 +69,7 @@ export interface TCGdexJPCard {
   updated?: string
 }
 
-const TCGDEX_BASE = 'https://api.tcgdex.net/v2/ja'
+const TCGDEX_JP = 'https://api.tcgdex.net/v2/ja'
 
 /**
  * Get the full image URL for a card
@@ -82,7 +82,6 @@ export function getJPImageUrl(baseImageUrl: string, quality: 'high' | 'low' = 'h
  * Check if a string contains Japanese characters
  */
 function isJapanese(text: string): boolean {
-  // Check for hiragana, katakana, or kanji ranges
   return /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/.test(text)
 }
 
@@ -100,143 +99,95 @@ export async function searchPokemonJPCardsTCGdex(
   const allCards: TCGdexJPCard[] = []
   const seenIds = new Set<string>()
 
-  // Strategy 1: If keyword is Japanese, search TCGdex directly
   if (isJapanese(keyword)) {
-    const jpResults = await searchTCGdex(keyword)
-    for (const card of jpResults) {
+    // Strategy 1: Japanese keyword — search TCGdex JP directly
+    const results = await searchTCGdexJP(keyword)
+    for (const card of results) {
       if (!seenIds.has(card.id)) {
         seenIds.add(card.id)
         allCards.push(card)
       }
     }
   } else {
-    // Strategy 2: English keyword — translate to Japanese via PokeAPI, then search both
-    const jpName = await getJapanesePokemonName(keyword)
-    
-    if (jpName) {
-      // Search with Japanese name (primary)
-      const jpResults = await searchTCGdex(jpName)
-      for (const card of jpResults) {
-        if (!seenIds.has(card.id)) {
-          seenIds.add(card.id)
-          allCards.push(card)
+    // Strategy 2: English keyword
+    // Step A: Translate to Japanese via PokeAPI, then search
+    try {
+      const jpName = await getJapanesePokemonName(keyword)
+      console.log(`[TCGdex JP] PokeAPI translation: "${keyword}" → "${jpName}"`)
+      
+      if (jpName) {
+        const jpResults = await searchTCGdexJP(jpName)
+        for (const card of jpResults) {
+          if (!seenIds.has(card.id)) {
+            seenIds.add(card.id)
+            allCards.push(card)
+          }
         }
       }
+    } catch (e) {
+      console.error('[TCGdex JP] PokeAPI translation failed:', e)
     }
 
-    // Also search TCGdex EN API and cross-reference
-    // This helps find cards when PokeAPI doesn't have the name
-    const enResults = await searchTCGdexEN(keyword)
-    for (const card of enResults) {
+    // Step B: Also try searching TCGdex JP directly with English keyword
+    // This catches some cards that have English names in the JP database
+    const directResults = await searchTCGdexJP(keyword)
+    for (const card of directResults) {
       if (!seenIds.has(card.id)) {
         seenIds.add(card.id)
         allCards.push(card)
       }
+    }
+
+    // Step C: Try searching TCGdex EN, then look up JP equivalents by ID
+    try {
+      const enResults = await searchTCGdexEN(keyword)
+      // EN search results don't include set.id, so we parse the card ID
+      // EN card IDs look like: "sv1-1", "basep-1", etc.
+      // JP card IDs look like: "SV1-001", "E1-016", etc.
+      // We can try to look up JP versions by converting the ID format
+      for (const enCard of enResults.slice(0, 5)) {
+        const jpId = convertENtoJPId(enCard.id)
+        if (jpId) {
+          const jpCard = await getPokemonJPCardTCGdex(jpId)
+          if (jpCard && !seenIds.has(jpCard.id)) {
+            seenIds.add(jpCard.id)
+            allCards.push(jpCard)
+          }
+        }
+      }
+    } catch (e) {
+      console.error('[TCGdex JP] EN cross-reference failed:', e)
     }
   }
 
   // Filter to only Pokemon category
   const pokemonCards = allCards.filter(c => c.category === 'Pokemon')
 
-  console.log(`[TCGdex JP] Search "${keyword}" → found ${pokemonCards.length} Pokemon cards`)
+  console.log(`[TCGdex JP] Search "${keyword}" → found ${pokemonCards.length} Pokemon cards (total candidates: ${allCards.length})`)
   return { data: pokemonCards, totalCount: pokemonCards.length, page }
+}
+
+/**
+ * Convert EN card ID to potential JP card ID
+ * EN: "sv1-1" → JP: "SV1-001"
+ * EN: "sv2d-17" → JP: "SV2D-017"
+ * Note: Not all EN cards have JP equivalents and ID formats don't always match
+ */
+function convertENtoJPId(enId: string): string | null {
+  const match = enId.match(/^([a-z]+?)(\d+[a-z]?)-(\d+)$/i)
+  if (!match) return null
+  
+  const setPrefix = match[1].toUpperCase()
+  const cardNum = match[3].padStart(3, '0')
+  
+  return `${setPrefix}-${cardNum}`
 }
 
 /**
  * Search TCGdex JP API directly
  */
-async function searchTCGdex(keyword: string): Promise<TCGdexJPCard[]> {
-  const url = `${TCGDEX_BASE}/cards?name=${encodeURIComponent(keyword)}`
-  
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'TCGVault/1.0',
-        'Accept': 'application/json',
-      },
-      next: { revalidate: 3600 },
-    })
-
-    if (!response.ok) return []
-    return await response.json()
-  } catch (error) {
-    console.error('[TCGdex JP] Search error:', error)
-    return []
-  }
-}
-
-/**
- * Search TCGdex EN API and return JP-matched cards
- * This helps when user searches in English — we find the card in EN,
- * then look up the same card in JP database
- */
-async function searchTCGdexEN(keyword: string): Promise<TCGdexJPCard[]> {
-  const enBase = 'https://api.tcgdex.net/v2/en'
-  const url = `${enBase}/cards?name=${encodeURIComponent(keyword)}`
-  
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'TCGVault/1.0',
-        'Accept': 'application/json',
-      },
-      next: { revalidate: 3600 },
-    })
-
-    if (!response.ok) return []
-    
-    const enCards: any[] = await response.json()
-    
-    // For each EN card found, try to look up its JP equivalent
-    // EN cards have IDs like "sv1-1" — JP cards have IDs like "SV1-001"
-    // We need to find the JP version by matching set + localId
-    const jpCards: TCGdexJPCard[] = []
-    
-    // Take top 10 unique set IDs from EN results
-    const seenSetIds = new Set<string>()
-    const topEnCards = enCards
-      .filter(c => c.category === 'Pokemon')
-      .slice(0, 20)
-    
-    for (const enCard of topEnCards) {
-      // Parse the EN card's set to find JP equivalent
-      // EN format: "sv1-1" → set="sv1", localId="1"  
-      // JP format: "SV1-001" → we need to search the JP set
-      const setId = enCard.set?.id
-      if (!setId || seenSetIds.has(setId)) continue
-      seenSetIds.add(setId)
-      
-      // Search JP set for this card by localId
-      const jpCard = await fetchJPCardBySetAndLocalId(setId.toUpperCase(), enCard.localId)
-      if (jpCard && !jpCards.find(c => c.id === jpCard.id)) {
-        jpCards.push(jpCard)
-      }
-    }
-    
-    return jpCards
-  } catch (error) {
-    console.error('[TCGdex EN] Search error:', error)
-    return []
-  }
-}
-
-/**
- * Fetch a JP card by set ID and local card number
- */
-async function fetchJPCardBySetAndLocalId(setId: string, localId: string): Promise<TCGdexJPCard | null> {
-  // TCGdex JP uses uppercase set IDs like "SV1", "SV2D", etc.
-  // localId in EN is like "1" but in JP it's like "001"
-  const paddedLocalId = localId.padStart(3, '0')
-  const cardId = `${setId}-${paddedLocalId}`
-  
-  return getPokemonJPCardTCGdex(cardId)
-}
-
-/**
- * Get a specific Japanese Pokemon card by ID
- */
-export async function getPokemonJPCardTCGdex(cardId: string): Promise<TCGdexJPCard | null> {
-  const url = `${TCGDEX_BASE}/cards/${cardId}`
+async function searchTCGdexJP(keyword: string): Promise<TCGdexJPCard[]> {
+  const url = `${TCGDEX_JP}/cards?name=${encodeURIComponent(keyword)}`
   
   try {
     const response = await fetch(url, {
@@ -248,7 +199,61 @@ export async function getPokemonJPCardTCGdex(cardId: string): Promise<TCGdexJPCa
     })
 
     if (!response.ok) {
-      console.error(`[TCGdex JP] Card ${cardId} not found (${response.status})`)
+      console.error(`[TCGdex JP] Search HTTP ${response.status} for: ${keyword}`)
+      return []
+    }
+
+    const data = await response.json()
+    if (!Array.isArray(data)) return []
+    return data
+  } catch (error) {
+    console.error('[TCGdex JP] Search error:', error)
+    return []
+  }
+}
+
+/**
+ * Search TCGdex EN API (returns raw results for cross-referencing)
+ */
+async function searchTCGdexEN(keyword: string): Promise<any[]> {
+  const url = `https://api.tcgdex.net/v2/en/cards?name=${encodeURIComponent(keyword)}`
+  
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'TCGVault/1.0',
+        'Accept': 'application/json',
+      },
+      next: { revalidate: 3600 },
+    })
+
+    if (!response.ok) return []
+    
+    const data = await response.json()
+    if (!Array.isArray(data)) return []
+    return data.filter((c: any) => c.category === 'Pokemon')
+  } catch (error) {
+    console.error('[TCGdex EN] Search error:', error)
+    return []
+  }
+}
+
+/**
+ * Get a specific Japanese Pokemon card by ID
+ */
+export async function getPokemonJPCardTCGdex(cardId: string): Promise<TCGdexJPCard | null> {
+  const url = `${TCGDEX_JP}/cards/${cardId}`
+  
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'TCGVault/1.0',
+        'Accept': 'application/json',
+      },
+      next: { revalidate: 3600 },
+    })
+
+    if (!response.ok) {
       return null
     }
 
@@ -263,7 +268,7 @@ export async function getPokemonJPCardTCGdex(cardId: string): Promise<TCGdexJPCa
  * Get all Japanese sets
  */
 export async function getJPSets(): Promise<any[]> {
-  const url = `${TCGDEX_BASE}/sets`
+  const url = `${TCGDEX_JP}/sets`
   
   try {
     const response = await fetch(url, {
