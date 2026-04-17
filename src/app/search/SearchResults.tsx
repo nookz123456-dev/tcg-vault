@@ -641,7 +641,7 @@ function CardDetailModal({
             <a
               href={card.game === 'pokemon'
                 ? (window?.location?.search?.includes('pokeLang=jp')
-                  ? `/card/pokemon-jp/${encodeURIComponent(card.name)}`
+                  ? `/card/pokemon-jp/${card.id}`
                   : `/card/pokemon/${card.id}`)
                 : `/card/onepiece/${encodeURIComponent(card.name)}`}
               className="block w-full py-2.5 text-center text-sm text-[#5c6078] hover:text-[#6366f1] transition-colors font-medium"

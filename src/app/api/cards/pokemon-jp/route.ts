@@ -1,19 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { searchPokemonJPCards } from '@/lib/pokemon-jp-api'
+import { searchPokemonJPCardsTCGdex, getJPImageUrl } from '@/lib/tcgdex-jp-api'
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const keyword = searchParams.get('q') || ''
   const page = parseInt(searchParams.get('page') || '1', 10)
-  const lang = (searchParams.get('lang') || 'jp') as 'en' | 'jp'
 
   if (!keyword.trim()) {
     return NextResponse.json({ data: [], totalCount: 0, page: 1 })
   }
 
   try {
-    const result = await searchPokemonJPCards(keyword, page, lang)
-    return NextResponse.json(result)
+    const result = await searchPokemonJPCardsTCGdex(keyword, page)
+    
+    // Transform for display
+    const data = result.data.map(card => ({
+      id: card.id,
+      name: card.name, // Japanese name
+      nameEN: null, // Could fetch from EN API if needed
+      image: card.image ? getJPImageUrl(card.image, 'high') : null,
+      setName: card.set?.name || '',
+      rarity: card.rarity || null,
+      hp: card.hp?.toString() || null,
+      types: card.types?.map(t => t) || [],
+      supertype: card.category === 'Pokemon' ? 'Pokemon' : card.category,
+      evolution: card.stage || null,
+      number: card.localId || '',
+      skills: card.attacks?.map(a => ({
+        name: a.name, // Japanese attack name
+        cost: a.cost?.join(', ') || '',
+        damage: a.damage || '',
+      })) || [],
+      keywords: buildKeywords(card),
+      game: 'pokemon',
+    }))
+
+    return NextResponse.json({ data, totalCount: result.totalCount, page: result.page })
   } catch (error) {
     console.error('Pokemon JP search error:', error)
     return NextResponse.json(
@@ -21,4 +43,49 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+function buildKeywords(card: any): string[] {
+  const keywords = new Set<string>()
+  
+  // Japanese name keywords
+  if (card.name) {
+    card.name.split(/[\s\u3000]+/).forEach((w: string) => {
+      if (w.length >= 2) keywords.add(w)
+    })
+  }
+  
+  // Type keywords
+  if (card.types) {
+    card.types.forEach((t: string) => keywords.add(t.toLowerCase()))
+  }
+  
+  // Rarity keywords
+  if (card.rarity) {
+    card.rarity.toLowerCase().split(/\s+/).forEach((w: string) => {
+      if (w.length >= 2) keywords.add(w)
+    })
+  }
+  
+  // Stage keywords
+  if (card.stage) {
+    keywords.add(card.stage.toLowerCase())
+  }
+  
+  // Attack name keywords
+  if (card.attacks) {
+    card.attacks.forEach((a: any) => {
+      if (a.name) {
+        a.name.split(/[\s\u3000]+/).forEach((w: string) => {
+          if (w.length >= 2) keywords.add(w)
+        })
+      }
+    })
+  }
+  
+  keywords.add('pokemon')
+  keywords.add('card')
+  keywords.add('jp')
+  
+  return Array.from(keywords)
 }

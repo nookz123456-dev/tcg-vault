@@ -20,7 +20,7 @@ interface CardPriceData {
   id: string
   tcgplayerId?: string | null
   name: string
-  nameJP?: string | null  // Japanese name from pokemon-card.com
+  nameJP?: string | null
   number: string
   rarity: string | null
   variant: string | null
@@ -28,12 +28,22 @@ interface CardPriceData {
   setName: string
   setSlug: string
   game: string
-  // JP-specific fields from pokemon-card.com
+  // JP-specific fields from TCGdex
   hp?: string | null
   types?: string[] | null
   evolution?: string | null
   skills?: { name: string; cost: string; damage: string }[] | null
   supertype?: string | null
+  weakness?: string[] | null
+  resistance?: string[] | null
+  retreat?: number | null
+  description?: string | null
+  illustrator?: string | null
+  dexId?: number | null
+  regulationMark?: string | null
+  variants?: { firstEdition: boolean; holo: boolean; normal: boolean; reverse: boolean; wPromo: boolean } | null
+  // CardMarket pricing from TCGdex
+  cardMarket?: { trend: number; avg: number; low: number; avg7: number; avg30: number; unit: string } | null
   prices: {
     nearMint: PriceCondition | null
     lightlyPlayed: PriceCondition | null
@@ -250,6 +260,93 @@ export default function PokemonJPCardPage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Card Details — weakness, resistance, retreat, description */}
+            {((card.weakness && card.weakness.length > 0) || (card.resistance && card.resistance.length > 0) || card.retreat != null || card.description || card.illustrator) && (
+              <div className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
+                <h2 className="text-base font-semibold text-[#1e2235] mb-3">Card Details</h2>
+                <div className="space-y-2.5">
+                  {card.weakness && card.weakness.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-[#5c6078] w-24">Weakness</span>
+                      <span className="text-sm text-[#1e2235]">{card.weakness.join(', ')}</span>
+                    </div>
+                  )}
+                  {card.resistance && card.resistance.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-[#5c6078] w-24">Resistance</span>
+                      <span className="text-sm text-[#1e2235]">{card.resistance.join(', ')}</span>
+                    </div>
+                  )}
+                  {card.retreat != null && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-[#5c6078] w-24">Retreat</span>
+                      <span className="text-sm text-[#1e2235]">{card.retreat}</span>
+                    </div>
+                  )}
+                  {card.regulationMark && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-[#5c6078] w-24">Reg Mark</span>
+                      <span className="text-sm text-[#1e2235] font-bold">{card.regulationMark}</span>
+                    </div>
+                  )}
+                  {card.illustrator && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-[#5c6078] w-24">Illustrator</span>
+                      <span className="text-sm text-[#1e2235]">{card.illustrator}</span>
+                    </div>
+                  )}
+                  {card.description && (
+                    <div className="mt-2 pt-2 border-t border-[#e8eaf0]">
+                      <p className="text-xs font-medium text-[#5c6078] mb-1">Description</p>
+                      <p className="text-sm text-[#1e2235] leading-relaxed">{card.description}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* CardMarket pricing from TCGdex */}
+            {card.cardMarket && (
+              <div className="bg-white border border-[#e8eaf0] rounded-xl overflow-hidden shadow-sm">
+                <div className="px-5 py-4 border-b border-[#e8eaf0] bg-gray-50/50">
+                  <h2 className="text-base font-semibold text-[#1e2235]">CardMarket Price Trend</h2>
+                  <p className="text-xs text-[#8b8fa6] mt-0.5">European market · Prices in {card.cardMarket.unit}</p>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-gray-50/50">
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Period</th>
+                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-t border-[#e8eaf0]">
+                        <td className="px-5 py-3.5 text-[#1e2235] font-medium">Trend</td>
+                        <td className="text-right px-5 py-3.5 text-[#6366f1] font-bold">{fmtPrice(card.cardMarket.trend)}</td>
+                      </tr>
+                      <tr className="border-t border-[#e8eaf0]">
+                        <td className="px-5 py-3.5 text-[#1e2235] font-medium">7-Day Avg</td>
+                        <td className="text-right px-5 py-3.5 text-[#5c6078]">{fmtPrice(card.cardMarket.avg7)}</td>
+                      </tr>
+                      <tr className="border-t border-[#e8eaf0]">
+                        <td className="px-5 py-3.5 text-[#1e2235] font-medium">30-Day Avg</td>
+                        <td className="text-right px-5 py-3.5 text-[#5c6078]">{fmtPrice(card.cardMarket.avg30)}</td>
+                      </tr>
+                      <tr className="border-t border-[#e8eaf0]">
+                        <td className="px-5 py-3.5 text-[#1e2235] font-medium">Average</td>
+                        <td className="text-right px-5 py-3.5 text-[#5c6078]">{fmtPrice(card.cardMarket.avg)}</td>
+                      </tr>
+                      <tr className="border-t border-[#e8eaf0]">
+                        <td className="px-5 py-3.5 text-[#1e2235] font-medium">Low</td>
+                        <td className="text-right px-5 py-3.5 text-[#5c6078]">{fmtPrice(card.cardMarket.low)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}

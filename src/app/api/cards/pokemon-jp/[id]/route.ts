@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { searchPokemonJPCards } from '@/lib/pokemon-jp-api'
+import { getPokemonJPCardTCGdex, getJPImageUrl, mapType } from '@/lib/tcgdex-jp-api'
 import { getJapanesePokemonName } from '@/lib/pokemon-jp-names'
 
 const TCG_API_BASE = 'https://api.tcgpricelookup.com/v1'
@@ -13,28 +13,40 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: cardId } = await params
-  const apiKey = getApiKey()
+  
+  // cardId from URL is the TCGdex card ID (e.g., "SV2D-017")
+  // Or it could be a card name from old URLs
 
   try {
-    // Step 1: Fetch card details from Pokemon JP search API
-    // cardId from URL is the card name (English) from search results
-    const searchResult = await searchPokemonJPCards(cardId, 1, 'jp')
-
-    let cardData: any = null
-
-    if (searchResult.data && searchResult.data.length > 0) {
-      // Find best match by name
-      cardData = searchResult.data.find((c: any) =>
-        c.name?.toLowerCase() === cardId.toLowerCase()
-      ) || searchResult.data[0]
+    // Step 1: Fetch card details from TCGdex JP API
+    let cardData = await getPokemonJPCardTCGdex(cardId)
+    
+    // If not found by ID, it might be a name-based URL (old format)
+    // Try to search by name instead
+    if (!cardData) {
+      const { searchPokemonJPCardsTCGdex } = await import('@/lib/tcgdex-jp-api')
+      const searchResult = await searchPokemonJPCardsTCGdex(cardId)
+      if (searchResult.data.length > 0) {
+        cardData = searchResult.data[0]
+      }
     }
 
-    // Step 2: Fetch price data from TCG Price Lookup API
+    if (!cardData) {
+      return NextResponse.json({ error: 'Card not found' }, { status: 404 })
+    }
+
+    // Step 2: Get English name from PokeAPI for reference
+    const englishName = await getJapanesePokemonName
+      ? null // We'll use the dexId to get English name if needed
+      : null
+
+    // Step 3: Fetch price data from TCG Price Lookup API
     let priceData: any = null
-    if (apiKey) {
+    const apiKey = getApiKey()
+    if (apiKey && cardData.dexId) {
       try {
-        // Search using English name + "Japanese" or the card name directly
-        const searchQuery = `${cardId} japanese`
+        // Search by Pokedex number / name
+        const searchQuery = `${cardId}`
         const priceRes = await fetch(
           `${TCG_API_BASE}/cards/search?q=${encodeURIComponent(searchQuery)}&game=pokemon-jp&pageSize=5`,
           {
@@ -46,13 +58,8 @@ export async function GET(
         if (priceRes.ok) {
           const priceJson = await priceRes.json()
           const priceCards = priceJson.data || []
-
           if (priceCards.length > 0) {
-            // Try to find exact match
-            const exactMatch = priceCards.find((c: any) =>
-              c.name?.toLowerCase() === cardId.toLowerCase()
-            )
-            priceData = exactMatch || priceCards[0]
+            priceData = priceCards[0]
           }
         }
       } catch (e) {
@@ -60,82 +67,59 @@ export async function GET(
       }
     }
 
-    // If no card data from JP search, try to construct from price data
-    if (!cardData && priceData) {
-      return NextResponse.json({
-        id: priceData.id || cardId,
-        tcgplayerId: priceData.tcgplayer_id,
-        name: priceData.name || cardId,
-        nameJP: await getJapanesePokemonName(priceData.name || cardId).catch(() => null),
-        number: priceData.number || '',
-        rarity: priceData.rarity || null,
-        variant: priceData.variant || null,
-        imageUrl: priceData.image_url || null,
-        setName: typeof priceData.set === 'object' ? priceData.set.name : (priceData.setName || ''),
-        setSlug: typeof priceData.set === 'object' ? (priceData.set as any).slug || '' : '',
-        game: 'pokemon-jp',
-        prices: {
-          nearMint: priceData.prices?.raw?.near_mint?.tcgplayer || null,
-          lightlyPlayed: priceData.prices?.raw?.lightly_played?.tcgplayer || null,
-          moderatelyPlayed: priceData.prices?.raw?.moderately_played?.tcgplayer || null,
-          heavilyPlayed: priceData.prices?.raw?.heavily_played?.tcgplayer || null,
-          damaged: priceData.prices?.raw?.damaged?.tcgplayer || null,
-        },
-        graded: priceData.prices?.graded || null,
-        lastPriceUpdate: priceData.last_price_update,
-        // JP-specific fields from search
-        hp: null,
-        types: [],
-        evolution: null,
-        skills: [],
-        supertype: null,
-      })
-    }
+    // Step 4: Build CardMarket pricing from TCGdex data
+    const cm = cardData.pricing?.cardmarket
+    const cmPrices = cm ? {
+      trend: cm.trend,
+      avg: cm.avg,
+      low: cm.low,
+      avg7: cm.avg7,
+      avg30: cm.avg30,
+      unit: cm.unit, // EUR
+    } : null
 
-    if (!cardData) {
-      return NextResponse.json({ error: 'Card not found' }, { status: 404 })
-    }
-
-    // Step 3: Fetch Japanese name from PokeAPI if not already available
-    const englishName = cardData.name || cardId
-    const nameJP = cardData.nameJP || await getJapanesePokemonName(englishName).catch(() => null)
-
-    // Merge card data with price data
+    // Build response
     const result: any = {
-      id: cardData.id || cardId,
-      tcgplayerId: priceData?.tcgplayer_id || null,
-      name: englishName,
-      nameJP: nameJP, // Japanese name from PokeAPI
-      number: cardData.number || '',
-      rarity: cardData.rarity || (priceData?.rarity || null),
-      variant: priceData?.variant || null,
-      imageUrl: cardData.image || (priceData?.image_url || null),
-      setName: cardData.setName || (typeof priceData?.set === 'object' ? priceData.set.name : '') || '',
-      setSlug: typeof priceData?.set === 'object' ? (priceData.set as any).slug || '' : '',
+      id: cardData.id,
+      name: cardData.name, // Japanese name (ピカチュウ)
+      nameJP: cardData.name, // Same as name for JP cards
+      number: cardData.localId,
+      rarity: cardData.rarity || null,
+      variant: null,
+      imageUrl: cardData.image ? getJPImageUrl(cardData.image, 'high') : null,
+      setName: cardData.set?.name || '',
+      setSlug: cardData.set?.id || '',
       game: 'pokemon-jp',
-      // JP-specific fields from pokemon-card.com
-      hp: cardData.hp || null,
+      // JP-specific fields
+      hp: cardData.hp?.toString() || null,
       types: cardData.types || [],
-      evolution: cardData.evolution || null,
-      skills: cardData.skills || [],
-      supertype: cardData.supertype || null,
-    }
-
-    // Add price data if available
-    if (priceData) {
-      result.prices = {
-        nearMint: priceData.prices?.raw?.near_mint?.tcgplayer || null,
-        lightlyPlayed: priceData.prices?.raw?.lightly_played?.tcgplayer || null,
-        moderatelyPlayed: priceData.prices?.raw?.moderately_played?.tcgplayer || null,
-        heavilyPlayed: priceData.prices?.raw?.heavily_played?.tcgplayer || null,
-        damaged: priceData.prices?.raw?.damaged?.tcgplayer || null,
-      }
-      result.graded = priceData.prices?.graded || null
-      result.lastPriceUpdate = priceData.last_price_update
-    } else {
-      result.prices = { nearMint: null, lightlyPlayed: null, moderatelyPlayed: null, heavilyPlayed: null, damaged: null }
-      result.graded = null
-      result.lastPriceUpdate = null
+      evolution: cardData.stage || null,
+      skills: cardData.attacks?.map(a => ({
+        name: a.name, // Japanese attack name
+        cost: a.cost?.join(', ') || '',
+        damage: a.damage || '',
+      })) || [],
+      supertype: cardData.category || null,
+      weakness: cardData.weaknesses?.map(w => `${mapType(w.type)} ${w.value}`) || [],
+      resistance: cardData.resistances?.map(r => `${mapType(r.type)} ${r.value}`) || [],
+      retreat: cardData.retreat || null,
+      description: cardData.description || null,
+      illustrator: cardData.illustrator || null,
+      dexId: cardData.dexId?.[0] || null,
+      regulationMark: cardData.regulationMark || null,
+      legal: cardData.legal || null,
+      variants: cardData.variants || null,
+      // Pricing
+      cardMarket: cmPrices,
+      prices: {
+        nearMint: priceData?.prices?.raw?.near_mint?.tcgplayer || null,
+        lightlyPlayed: priceData?.prices?.raw?.lightly_played?.tcgplayer || null,
+        moderatelyPlayed: priceData?.prices?.raw?.moderately_played?.tcgplayer || null,
+        heavilyPlayed: priceData?.prices?.raw?.heavily_played?.tcgplayer || null,
+        damaged: priceData?.prices?.raw?.damaged?.tcgplayer || null,
+      },
+      graded: priceData?.prices?.graded || null,
+      lastPriceUpdate: priceData?.last_price_update || cardData.updated || null,
     }
 
     return NextResponse.json(result)
