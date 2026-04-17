@@ -7,6 +7,7 @@ import { useExchangeRates } from '@/lib/useExchangeRates'
 import { useWishlist } from '@/lib/useWishlist'
 import { useComments } from '@/lib/useComments'
 import { useAuth } from '@/lib/useAuth'
+import PriceHistoryChart from '@/components/PriceHistoryChart'
 
 interface PriceCondition {
   market: number | null
@@ -40,12 +41,21 @@ interface CardPriceData {
   lastPriceUpdate: string | null
 }
 
+const CONDITION_CONFIG = [
+  { key: 'nearMint', label: 'Near Mint', color: '#10b981' },
+  { key: 'lightlyPlayed', label: 'Lightly Played', color: '#84cc16' },
+  { key: 'moderatelyPlayed', label: 'Moderately Played', color: '#eab308' },
+  { key: 'heavilyPlayed', label: 'Heavily Played', color: '#f97316' },
+  { key: 'damaged', label: 'Damaged', color: '#ef4444' },
+] as const
+
 export default function PokemonJPCardPage() {
   const params = useParams()
   const router = useRouter()
   const cardName = decodeURIComponent(params.id as string)
   const [card, setCard] = useState<CardPriceData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [imgLoaded, setImgLoaded] = useState(false)
   const [showTHB, setShowTHB] = useState(false)
   const { formatUSD, formatTHB, toTHB } = useExchangeRates()
   const { user } = useAuth()
@@ -54,12 +64,10 @@ export default function PokemonJPCardPage() {
   const [newComment, setNewComment] = useState('')
   const [wishlistLoading, setWishlistLoading] = useState(false)
 
-  // Card identifier for wishlist/comments
   const cardId = cardName
   const cardGame = 'pokemon-jp'
   const wishlisted = isInWishlist(cardId, cardGame)
 
-  // Fetch comments on mount
   useEffect(() => {
     fetchComments(cardId, cardGame)
   }, [cardId, cardGame, fetchComments])
@@ -75,18 +83,35 @@ export default function PokemonJPCardPage() {
   }, [cardName])
 
   const fmtPrice = (amount: number | null | undefined): string => {
-    if (amount === null || amount === undefined || amount === 0) return '—'
+    if (amount === null || amount === undefined || amount === 0) return '\u2014'
     if (showTHB) return formatTHB(toTHB(amount))
     return formatUSD(amount)
   }
 
+  const getConditionData = (key: string) => {
+    if (!card?.prices) return null
+    return card.prices[key as keyof typeof card.prices] || null
+  }
+
+  const hasAnyConditionPrices = () => {
+    if (!card?.prices) return false
+    return CONDITION_CONFIG.some(c => getConditionData(c.key) !== null)
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen" style={{ background: 'var(--background)' }}>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="w-10 h-10 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-[#8b8fa6] mt-4 text-sm">Loading card details...</p>
+      <div className="min-h-screen" style={{ background: '#f5f6fa' }}>
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex-shrink-0">
+              <div className="w-[320px] h-[448px] bg-gray-200 rounded-xl animate-pulse" />
+            </div>
+            <div className="flex-1 space-y-4">
+              <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
+              <div className="h-10 w-64 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
+            </div>
           </div>
         </div>
       </div>
@@ -95,35 +120,35 @@ export default function PokemonJPCardPage() {
 
   if (!card) {
     return (
-      <div className="min-h-screen" style={{ background: 'var(--background)' }}>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="text-5xl mb-4">🤷</div>
-            <p className="text-[#5c6078] font-medium">Card not found</p>
-            <button onClick={() => router.back()} className="mt-4 px-6 py-2 bg-[#f5f6fa] text-[#5c6078] rounded-xl hover:text-[#6366f1] transition-colors">Go Back</button>
-          </div>
+      <div className="min-h-screen" style={{ background: '#f5f6fa' }}>
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+          <div className="text-6xl mb-4">😕</div>
+          <p className="text-[#5c6078] text-lg font-medium">Card not found</p>
+          <button onClick={() => router.back()} className="mt-4 text-[#6366f1] hover:text-[#4f46e5] text-sm font-medium">
+            ← Go back
+          </button>
         </div>
       </div>
     )
   }
 
-  const hasPrices = card.prices.nearMint?.market || card.prices.lightlyPlayed?.market ||
-    card.prices.moderatelyPlayed?.market || card.prices.heavilyPlayed?.market || card.prices.damaged?.market
   const hasGraded = card.graded && Object.keys(card.graded).length > 0
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
+    <div className="min-h-screen" style={{ background: '#f5f6fa', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <Navbar />
-      <div className="max-w-5xl mx-auto px-4 py-8">
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back button + Currency toggle */}
         <div className="flex items-center justify-between mb-6">
-          <button onClick={() => router.back()} className="flex items-center gap-2 text-[#8b8fa6] hover:text-[#6366f1] transition-colors text-sm">
+          <button onClick={() => router.back()} className="text-[#8b8fa6] hover:text-[#1e2235] text-sm flex items-center gap-1.5 transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
             Back to search
           </button>
           <button
             onClick={() => setShowTHB(!showTHB)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-lg text-xs font-semibold transition-all hover:border-[#6366f1]/30"
+            className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#e8eaf0] rounded-lg text-xs font-semibold transition-all hover:border-[#6366f1]/30 shadow-sm"
           >
             <span className={showTHB ? 'text-[#8b8fa6]' : 'text-[#6366f1]'}>$ USD</span>
             <span className="text-[#b5b8c8]">/</span>
@@ -131,235 +156,259 @@ export default function PokemonJPCardPage() {
           </button>
         </div>
 
-        <div className="grid md:grid-cols-[320px_1fr] gap-8">
-          {/* Card Image */}
-          <div className="bg-white border border-[#e8eaf0] rounded-2xl p-4 flex items-center justify-center">
-            {card.imageUrl ? (
-              <img src={card.imageUrl} alt={card.name} className="w-full max-w-[280px] rounded-xl" />
-            ) : (
-              <div className="w-full aspect-[2.5/3.5] bg-[#f5f6fa] rounded-xl flex items-center justify-center text-[#b5b8c8]">No Image</div>
-            )}
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Card image */}
+          <div className="flex-shrink-0">
+            <div className="sticky top-24">
+              <div className="relative w-[320px] mx-auto lg:mx-0">
+                {!imgLoaded && <div className="w-[320px] h-[447px] bg-gray-200 rounded-xl animate-pulse" />}
+                {card.imageUrl ? (
+                  <img
+                    src={card.imageUrl}
+                    alt={card.name}
+                    className={`w-full rounded-xl shadow-lg transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.12)' }}
+                    onLoad={() => setImgLoaded(true)}
+                  />
+                ) : (
+                  <div className="w-full aspect-[2.5/3.5] bg-[#f5f6fa] rounded-xl flex items-center justify-center text-[#b5b8c8]">No Image</div>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Card Info */}
-          <div className="space-y-6">
+          {/* Card info */}
+          <div className="flex-1 min-w-0 space-y-6">
             {/* Header */}
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="px-3 py-1 bg-yellow-500/15 text-yellow-400 rounded-lg text-xs font-bold uppercase tracking-wider">Pokemon JP</span>
-                {card.rarity && <span className="px-3 py-1 bg-[#6366f1]/15 text-[#6366f1] rounded-lg text-xs font-bold">{card.rarity}</span>}
-                {card.variant && <span className="px-3 py-1 bg-purple-500/15 text-purple-400 rounded-lg text-xs font-medium">{card.variant}</span>}
+              <div className="flex items-center gap-2 mb-3">
+                <span className="px-3 py-1 bg-[#6366f1] text-white rounded-lg text-xs font-semibold">Pokémon JP</span>
+                {card.rarity && (
+                  <span className="px-3 py-1 bg-white border border-[#e8eaf0] text-[#5c6078] rounded-lg text-xs font-medium">
+                    {card.rarity}
+                  </span>
+                )}
+                {card.variant && (
+                  <span className="px-3 py-1 bg-white border border-[#e8eaf0] text-[#8b8fa6] rounded-lg text-xs font-medium">
+                    {card.variant}
+                  </span>
+                )}
               </div>
-              <h1 className="text-3xl font-extrabold text-[#1e2235]">{card.name}</h1>
-              <p className="text-[#8b8fa6] mt-1">{card.setName} &middot; #{card.number}</p>
+              <h1 className="text-3xl font-bold text-[#1e2235] mb-2">{card.name}</h1>
+              <p className="text-[#5c6078] text-sm">{card.setName} &middot; #{card.number}</p>
             </div>
 
-            {/* No prices */}
-            {!hasPrices && !hasGraded && (
-              <div className="bg-white border border-[#e8eaf0] rounded-2xl p-8 text-center">
-                <div className="text-4xl mb-3 opacity-50">📊</div>
-                <p className="text-[#5c6078] font-medium">No price data available</p>
-                <p className="text-[#8b8fa6] text-sm mt-1">This card doesn&apos;t have market prices yet</p>
-              </div>
-            )}
-
-            {/* Condition Prices */}
-            {hasPrices && (
-              <div className="bg-white border border-[#e8eaf0] rounded-2xl overflow-hidden">
-                <div className="px-5 py-4 border-b border-[#e8eaf0]">
-                  <h2 className="text-lg font-bold text-[#1e2235]">Price Guide</h2>
-                  <p className="text-xs text-[#8b8fa6] mt-0.5">TCGplayer market prices by condition</p>
+            {/* ========== CONDITION PRICES TABLE ========== */}
+            {hasAnyConditionPrices() && (
+              <div className="bg-white border border-[#e8eaf0] rounded-xl overflow-hidden shadow-sm">
+                <div className="px-5 py-4 border-b border-[#e8eaf0] bg-gray-50/50">
+                  <h2 className="text-base font-semibold text-[#1e2235]">Price by Condition</h2>
+                  <p className="text-xs text-[#8b8fa6] mt-0.5">TCGplayer market prices</p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="text-xs text-[#8b8fa6] uppercase tracking-wider">
-                        <th className="text-left px-5 py-3 font-medium">Condition</th>
-                        <th className="text-right px-4 py-3 font-medium">Market</th>
-                        <th className="text-right px-4 py-3 font-medium">Low</th>
-                        <th className="text-right px-4 py-3 font-medium">Mid</th>
-                        <th className="text-right px-5 py-3 font-medium">High</th>
+                      <tr className="bg-gray-50/50">
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Condition</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">Market</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Low</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Mid</th>
+                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">High</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {[
-                        { label: 'Near Mint', data: card.prices.nearMint, color: 'text-emerald-500' },
-                        { label: 'Lightly Played', data: card.prices.lightlyPlayed, color: 'text-lime-400' },
-                        { label: 'Moderately Played', data: card.prices.moderatelyPlayed, color: 'text-yellow-400' },
-                        { label: 'Heavily Played', data: card.prices.heavilyPlayed, color: 'text-orange-400' },
-                        { label: 'Damaged', data: card.prices.damaged, color: 'text-red-400' },
-                      ].map((row, i) => row.data ? (
-                        <tr key={row.label} className={i % 2 === 0 ? 'bg-[#f5f6fa]/30' : ''}>
-                          <td className="px-5 py-3 text-[var(--warm-200)] font-medium">
-                            <span className={row.color}>&bull;</span> {row.label}
-                          </td>
-                          <td className={`text-right px-4 py-3 font-bold ${row.data.market ? row.color : 'text-[#b5b8c8]'}`}>
-                            {fmtPrice(row.data.market)}
-                          </td>
-                          <td className="text-right px-4 py-3 text-[var(--warm-200)]">{fmtPrice(row.data.low)}</td>
-                          <td className="text-right px-4 py-3 text-[var(--warm-200)]">{fmtPrice(row.data.mid)}</td>
-                          <td className="text-right px-5 py-3 text-[var(--warm-200)]">{fmtPrice(row.data.high)}</td>
-                        </tr>
-                      ) : null)}
+                      {CONDITION_CONFIG.map((condition, i) => {
+                        const data = getConditionData(condition.key)
+                        if (!data) return null
+                        return (
+                          <tr key={condition.key} className="border-t border-[#e8eaf0] hover:bg-gray-50/50 transition-colors">
+                            <td className="px-5 py-3.5">
+                              <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: condition.color }} />
+                                <span className="text-[#1e2235] font-medium">{condition.label}</span>
+                              </div>
+                            </td>
+                            <td className="text-right px-4 py-3.5">
+                              <span className="text-[#6366f1] font-bold text-base">{fmtPrice(data.market)}</span>
+                            </td>
+                            <td className="text-right px-4 py-3.5 text-[#5c6078]">{fmtPrice(data.low)}</td>
+                            <td className="text-right px-4 py-3.5 text-[#5c6078]">{fmtPrice(data.mid)}</td>
+                            <td className="text-right px-5 py-3.5 text-[#5c6078]">{fmtPrice(data.high)}</td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
-                {card.lastPriceUpdate && (
-                  <div className="px-5 py-3 border-t border-[#e8eaf0] text-xs text-[#8b8fa6]">
-                    Last updated: {new Date(card.lastPriceUpdate).toLocaleDateString()}
+                {card.tcgplayerId && (
+                  <div className="px-5 py-3 border-t border-[#e8eaf0] bg-gray-50/30">
+                    <a
+                      href={`https://www.tcgplayer.com/product/${card.tcgplayerId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-[#6366f1] hover:text-[#4f46e5] font-medium flex items-center gap-1"
+                    >
+                      View on TCGplayer →
+                    </a>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Graded Prices */}
+            {/* ========== GRADED PRICES TABLE ========== */}
             {hasGraded && (
-              <div className="bg-white border border-[#e8eaf0] rounded-2xl overflow-hidden">
-                <div className="px-5 py-4 border-b border-[#e8eaf0]">
-                  <h2 className="text-lg font-bold text-[#1e2235]">Graded Prices</h2>
-                  <p className="text-xs text-[#8b8fa6] mt-0.5">PSA / BGS / CGC slab values</p>
+              <div className="bg-white border border-[#e8eaf0] rounded-xl overflow-hidden shadow-sm">
+                <div className="px-5 py-4 border-b border-[#e8eaf0] bg-gray-50/50">
+                  <h2 className="text-base font-semibold text-[#1e2235]">Graded Prices</h2>
+                  <p className="text-xs text-[#8b8fa6] mt-0.5">PSA, CGC, BGS slab values</p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="text-xs text-[#8b8fa6] uppercase tracking-wider">
-                        <th className="text-left px-5 py-3 font-medium">Grade</th>
-                        <th className="text-right px-4 py-3 font-medium">eBay 7d Avg</th>
-                        <th className="text-right px-4 py-3 font-medium">eBay 30d Avg</th>
-                        <th className="text-right px-5 py-3 font-medium">TCGplayer</th>
+                      <tr className="bg-gray-50/50">
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Grade</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">eBay 7d Avg</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">eBay 30d Avg</th>
+                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">TCGplayer</th>
                       </tr>
                     </thead>
                     <tbody>
                       {Object.entries(card.graded!)
                         .sort(([a], [b]) => parseInt(b) - parseInt(a))
-                        .map(([grade, data], i) => (
-                          <tr key={grade} className={i % 2 === 0 ? 'bg-[#f5f6fa]/30' : ''}>
-                            <td className="px-5 py-3">
-                              <span className={`font-bold ${parseInt(grade) >= 9 ? 'text-[#6366f1]' : parseInt(grade) >= 7 ? 'text-[var(--warm-200)]' : 'text-[#8b8fa6]'}`}>
-                                {grade}
-                              </span>
-                            </td>
-                            <td className="text-right px-4 py-3 text-[var(--warm-200)]">{fmtPrice(data.ebay?.avg_7d)}</td>
-                            <td className="text-right px-4 py-3 text-[var(--warm-200)]">{fmtPrice(data.ebay?.avg_30d)}</td>
-                            <td className="text-right px-5 py-3 text-[var(--warm-200)]">{fmtPrice(data.tcgplayer?.market)}</td>
-                          </tr>
-                        ))}
+                        .map(([grade, data], i) => {
+                          const isHighGrade = parseInt(grade) >= 9
+                          return (
+                            <tr key={grade} className="border-t border-[#e8eaf0] hover:bg-gray-50/50 transition-colors">
+                              <td className="px-5 py-3.5">
+                                <span className={`font-semibold ${isHighGrade ? 'text-[#6366f1]' : 'text-[#1e2235]'}`}>
+                                  {grade}
+                                </span>
+                              </td>
+                              <td className="text-right px-4 py-3.5 text-[#5c6078]">{fmtPrice(data.ebay?.avg_7d)}</td>
+                              <td className="text-right px-4 py-3.5 text-[#5c6078]">{fmtPrice(data.ebay?.avg_30d)}</td>
+                              <td className="text-right px-5 py-3.5">
+                                <span className={`font-bold ${isHighGrade ? 'text-[#6366f1]' : 'text-[#1e2235]'}`}>
+                                  {fmtPrice(data.tcgplayer?.market)}
+                                </span>
+                              </td>
+                            </tr>
+                          )
+                        })}
                     </tbody>
                   </table>
                 </div>
               </div>
             )}
 
-            {/* Wishlist + Community */}
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={async () => {
-                    if (!user) { window.location.href = '/login'; return }
-                    setWishlistLoading(true)
-                    await toggleWishlist(cardId, cardGame)
-                    setWishlistLoading(false)
-                  }}
-                  disabled={wishlistLoading}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
-                    wishlisted
-                      ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30 hover:bg-rose-500/25'
-                      : 'bg-[#6366f1] text-[#1e2235] hover:bg-[#4f46e5] shadow-sm'
-                  }`}
-                >
-                  {wishlisted ? '♥ In Wishlist' : '+ Add to Wishlist'}
-                </button>
-                <button
-                  onClick={() => {
-                    const section = document.getElementById('comments')
-                    section?.scrollIntoView({ behavior: 'smooth' })
-                  }}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] text-[#5c6078] rounded-xl font-semibold text-sm hover:text-[#6366f1] hover:border-[#6366f1]/30 transition-all"
-                >
-                  Comments ({comments.length})
-                </button>
+            {/* Price History Chart */}
+            <PriceHistoryChart cardId={cardId} game="pokemon-jp" height={280} />
+
+            {/* No prices message */}
+            {!hasAnyConditionPrices() && !hasGraded && (
+              <div className="bg-white border border-[#e8eaf0] rounded-xl p-8 text-center shadow-sm">
+                <div className="text-4xl mb-3">📊</div>
+                <p className="text-[#5c6078] font-medium">No price data available</p>
+                <p className="text-[#8b8fa6] text-sm mt-1">This card doesn&apos;t have market prices yet</p>
               </div>
+            )}
 
-              <div id="comments" className="bg-white border border-[#e8eaf0] rounded-2xl p-5">
-                <h2 className="text-lg font-bold text-[#1e2235] mb-4">Community Discussion</h2>
-
-                {user ? (
-                  <div className="flex gap-3 mb-4">
-                    <div className="flex-1">
-                      <textarea
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Share your thoughts about this card..."
-                        maxLength={1000}
-                        rows={2}
-                        className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-amber-500/50 resize-none text-sm"
-                      />
-                      <div className="flex justify-between mt-1.5">
-                        <span className="text-xs text-[#b5b8c8]">{newComment.length}/1000</span>
-                        <button
-                          onClick={async () => {
-                            if (!newComment.trim()) return
-                            await addComment(cardId, cardGame, newComment.trim())
-                            setNewComment('')
-                          }}
-                          disabled={!newComment.trim()}
-                          className="px-4 py-1.5 bg-[#6366f1] text-[#1e2235] rounded-lg text-xs font-semibold hover:bg-[#4f46e5] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                        >
-                          Post
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-[#f5f6fa] rounded-xl p-4 mb-4 text-center">
-                    <p className="text-sm text-[#8b8fa6]">Sign in to join the discussion</p>
-                    <a href="/login" className="inline-block mt-2 px-4 py-1.5 bg-[#6366f1] text-[#1e2235] rounded-lg text-xs font-semibold hover:bg-[#4f46e5] transition-all">Sign In</a>
-                  </div>
-                )}
-
-                {commentsLoading ? (
-                  <div className="text-center py-6 text-[#8b8fa6] text-sm">Loading comments...</div>
-                ) : comments.length === 0 ? (
-                  <div className="text-center py-6">
-                    <div className="text-3xl mb-2 opacity-40">💬</div>
-                    <p className="text-[#8b8fa6] text-sm">No comments yet. Be the first!</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {comments.map((comment) => (
-                      <div key={comment.id} className="bg-[#f5f6fa] rounded-xl p-3.5">
-                        <div className="flex items-center gap-2.5 mb-2">
-                          <div className="w-7 h-7 rounded-full bg-[#6366f1]/20 flex items-center justify-center text-xs font-bold text-[#6366f1]">
-                            {comment.profiles?.username?.charAt(0).toUpperCase() || '?'}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <a href={`/u/${comment.profiles?.username || ''}`} className="text-sm font-semibold text-[#6366f1] hover:text-amber-300">
-                              {comment.profiles?.username || 'Unknown'}
-                            </a>
-                            <span className="text-xs text-[#b5b8c8] ml-2">
-                              {new Date(comment.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                            </span>
-                          </div>
-                        </div>
-                        <p className="text-sm text-[#5c6078] leading-relaxed pl-9">{comment.content}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+            {/* ========== WISHLIST + COMMUNITY ========== */}
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={async () => {
+                  if (!user) { window.location.href = '/login'; return }
+                  setWishlistLoading(true)
+                  await toggleWishlist(cardId, cardGame)
+                  setWishlistLoading(false)
+                }}
+                disabled={wishlistLoading}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                  wishlisted
+                    ? 'bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100'
+                    : 'bg-[#6366f1] text-white hover:bg-[#4f46e5] shadow-sm'
+                }`}
+              >
+                {wishlisted ? '♥ In Wishlist' : '+ Add to Wishlist'}
+              </button>
+              <button
+                onClick={() => {
+                  const section = document.getElementById('comments')
+                  section?.scrollIntoView({ behavior: 'smooth' })
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#e8eaf0] text-[#5c6078] rounded-xl font-semibold text-sm hover:text-[#6366f1] hover:border-[#6366f1]/30 transition-all shadow-sm"
+              >
+                Comments ({comments.length})
+              </button>
             </div>
 
-            {/* TCGplayer link */}
-            {card.tcgplayerId && (
-              <a
-                href={`https://www.tcgplayer.com/product/${card.tcgplayerId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-[#6366f1] text-[#1e2235] rounded-xl transition-colors font-medium text-sm"
-              >
-                View on TCGplayer &rarr;
-              </a>
-            )}
+            {/* Comments Section */}
+            <div id="comments" className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-[#1e2235] mb-4">Community Discussion</h2>
+
+              {user ? (
+                <div className="mb-4">
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Share your thoughts about this card..."
+                    maxLength={1000}
+                    rows={3}
+                    className="w-full px-4 py-3 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-[#6366f1]/50 resize-none text-sm transition-colors"
+                  />
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs text-[#b5b8c8]">{newComment.length}/1000</span>
+                    <button
+                      onClick={async () => {
+                        if (!newComment.trim()) return
+                        await addComment(cardId, cardGame, newComment.trim())
+                        setNewComment('')
+                      }}
+                      disabled={!newComment.trim()}
+                      className="px-5 py-2 bg-[#6366f1] text-white rounded-lg text-sm font-semibold hover:bg-[#4f46e5] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      Post Comment
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-[#f5f6fa] rounded-xl p-4 mb-4 text-center">
+                  <p className="text-sm text-[#8b8fa6]">Sign in to join the discussion</p>
+                  <a href="/login" className="inline-block mt-2 px-5 py-2 bg-[#6366f1] text-white rounded-lg text-sm font-semibold hover:bg-[#4f46e5] transition-all">
+                    Sign In
+                  </a>
+                </div>
+              )}
+
+              {commentsLoading ? (
+                <div className="text-center py-6 text-[#8b8fa6] text-sm">Loading comments...</div>
+              ) : comments.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-3xl mb-2 opacity-40">💬</div>
+                  <p className="text-[#8b8fa6] text-sm">No comments yet. Be the first!</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {comments.map((comment) => (
+                    <div key={comment.id} className="bg-[#f5f6fa] rounded-xl p-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 rounded-full bg-[#6366f1]/10 flex items-center justify-center text-sm font-bold text-[#6366f1]">
+                          {comment.profiles?.username?.charAt(0).toUpperCase() || '?'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <a href={`/u/${comment.profiles?.username || ''}`} className="text-sm font-semibold text-[#6366f1] hover:text-[#4f46e5]">
+                            {comment.profiles?.username || 'Unknown'}
+                          </a>
+                          <span className="text-xs text-[#b5b8c8] ml-2">
+                            {new Date(comment.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-sm text-[#5c6078] leading-relaxed pl-11">{comment.content}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
