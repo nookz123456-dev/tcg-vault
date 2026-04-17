@@ -5,13 +5,53 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const keyword = searchParams.get('q') || ''
   const page = parseInt(searchParams.get('page') || '1', 10)
+  const debug = searchParams.get('debug') === '1'
+
+  console.log(`[Pokemon JP API] Search request: q="${keyword}", page=${page}`)
 
   if (!keyword.trim()) {
     return NextResponse.json({ data: [], totalCount: 0, page: 1 })
   }
 
+  // Debug mode: test direct TCGdex API call
+  if (debug) {
+    try {
+      const testUrl = `https://api.tcgdex.net/v2/ja/cards?name=${encodeURIComponent(keyword)}`
+      console.log(`[Pokemon JP API] Debug: fetching ${testUrl}`)
+      const testRes = await fetch(testUrl, {
+        headers: { 'User-Agent': 'TCGVault/1.0', 'Accept': 'application/json' },
+        cache: 'no-store'
+      })
+      const testData = await testRes.json()
+      return NextResponse.json({
+        debug: true,
+        keyword,
+        status: testRes.status,
+        resultCount: Array.isArray(testData) ? testData.length : 'NOT_ARRAY',
+        sample: Array.isArray(testData) && testData.length > 0 ? { id: testData[0].id, name: testData[0].name } : null,
+      })
+    } catch (err: any) {
+      return NextResponse.json({ debug: true, error: String(err), keyword })
+    }
+  }
+
   try {
     const result = await searchPokemonJPCardsTCGdex(keyword, page)
+    console.log(`[Pokemon JP API] Search result: ${result.data.length} cards found for "${keyword}"`)
+    
+    // Debug: if empty, return debug info
+    if (result.data.length === 0) {
+      return NextResponse.json({ 
+        data: [], 
+        totalCount: 0, 
+        page: result.page,
+        debug: {
+          keyword,
+          isJapanese: /[぀-ゟ゠-ヿ一-鿿]/.test(keyword),
+          timestamp: new Date().toISOString()
+        }
+      })
+    }
     
     // Transform for display
     const data = result.data.map(card => ({
@@ -39,7 +79,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Pokemon JP search error:', error)
     return NextResponse.json(
-      { data: [], totalCount: 0, page, error: 'Failed to fetch cards' },
+      { data: [], totalCount: 0, page, error: 'Failed to fetch cards', detail: String(error) },
       { status: 500 }
     )
   }
