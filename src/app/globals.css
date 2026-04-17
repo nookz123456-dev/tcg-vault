@@ -2,28 +2,28 @@
 @import "tailwindcss";
 
 :root {
-  /* Warm dark surfaces — tinted toward amber/amber-brown, not cool blue-gray */
-  --background: #0f0e0c;
-  --foreground: #ede8df;
-  --card-bg: #1a1815;
-  --card-border: #2e2a24;
+  /* Light & Bright — clean white/gray base with vibrant accents */
+  --background: #f8f9fb;
+  --foreground: #1a1d2e;
+  --card-bg: #ffffff;
+  --card-border: #e5e7ef;
   --accent: #f59e0b;
   --accent-hover: #d97706;
-  --accent-soft: #f59e0b15;
+  --accent-soft: #f59e0b10;
   --pokemon-gradient: linear-gradient(135deg, #f59e0b, #ef4444);
   --onepiece-gradient: linear-gradient(135deg, #ef4444, #f59e0b);
-  --surface-1: #1f1c18;
-  --surface-2: #292520;
-  /* Warm neutrals */
-  --warm-100: #ede8df;
-  --warm-200: #d4cec3;
-  --warm-300: #b0a899;
-  --warm-400: #8c8474;
-  --warm-500: #6b6355;
-  --warm-600: #4d473c;
-  --warm-700: #2e2a24;
-  --warm-800: #1a1815;
-  --warm-900: #0f0e0c;
+  --surface-1: #ffffff;
+  --surface-2: #f1f3f8;
+  /* Light neutrals */
+  --warm-100: #1a1d2e;
+  --warm-200: #3a3f54;
+  --warm-300: #5c6178;
+  --warm-400: #8b8fa6;
+  --warm-500: #b0b4c8;
+  --warm-600: #d1d5e4;
+  --warm-700: #e5e7ef;
+  --warm-800: #f1f3f8;
+  --warm-900: #f8f9fb;
 }
 
 * {
@@ -38,13 +38,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Card hover effect — showcase lift */
+/* Card hover effect — bright lift */
 .card-hover {
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .card-hover:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 20px 50px rgba(245, 158, 11, 0.12), 0 0 0 1px rgba(245, 158, 11, 0.15);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(245, 158, 11, 0.2);
 }
 
 /* Shimmer animation for loading */
@@ -54,18 +54,18 @@ body {
 }
 
 .shimmer {
-  background: linear-gradient(90deg, var(--surface-1) 25%, var(--surface-2) 50%, var(--surface-1) 75%);
+  background: linear-gradient(90deg, var(--surface-2) 25%, #e8eaf2 50%, var(--surface-2) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
 
-/* Solid accent color for text (no gradient) */
+/* Solid accent color for text */
 .gradient-text {
   color: var(--accent);
   -webkit-text-fill-color: var(--accent);
 }
 
-/* Scrollbar — warm tinted */
+/* Scrollbar — light tinted */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -75,7 +75,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--card-border);
+  background: var(--warm-600);
   border-radius: 4px;
 }
 

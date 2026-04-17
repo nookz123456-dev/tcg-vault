@@ -87,7 +87,6 @@ export default function LoginPage() {
 
     try {
       if (isLogin) {
-        // Login
         const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
           method: 'POST',
           headers: {
@@ -105,7 +104,6 @@ export default function LoginPage() {
         setSuccess('Logged in! Redirecting...')
         setTimeout(() => { window.location.href = '/collection' }, 500)
       } else {
-        // Signup
         const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
           method: 'POST',
           headers: {
@@ -120,12 +118,10 @@ export default function LoginPage() {
           return
         }
 
-        // Auto-confirm the user
         if (data.id) {
           await autoConfirmUser(data.id)
         }
 
-        // Try to login right away
         const loginRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
           method: 'POST',
           headers: {
@@ -153,57 +149,57 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--background)' }}>
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#f8f9fb]">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🃏</div>
-          <h1 className="text-3xl font-extrabold text-amber-400 tracking-tight">
+          <h1 className="text-3xl font-extrabold text-amber-500 tracking-tight">
             TCG Vault
           </h1>
-          <p className="text-[var(--warm-300)] mt-2">Your card collection, tracked.</p>
+          <p className="text-[#5c6178] mt-2">Your card collection, tracked.</p>
         </div>
 
         {/* Form */}
-        <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-6">
-          <h2 className="text-xl font-bold text-[var(--foreground)] mb-6">
+        <div className="bg-white border border-[#e5e7ef] rounded-2xl p-6 shadow-sm">
+          <h2 className="text-xl font-bold text-[#1a1d2e] mb-6">
             {isLogin ? 'Welcome back' : 'Create account'}
           </h2>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-500 text-sm">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm">
+            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-600 text-sm">
               {success}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-[var(--warm-300)] mb-1">Email</label>
+              <label className="block text-sm text-[#5c6178] mb-1">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-xl text-[var(--foreground)] placeholder-[var(--warm-500)] focus:border-amber-500 focus:outline-none"
+                className="w-full px-4 py-3 bg-[#f8f9fb] border border-[#e5e7ef] rounded-xl text-[#1a1d2e] placeholder-[#b0b4c8] focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-100"
                 placeholder="your@email.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-[var(--warm-300)] mb-1">Password</label>
+              <label className="block text-sm text-[#5c6178] mb-1">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-4 py-3 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-xl text-[var(--foreground)] placeholder-[var(--warm-500)] focus:border-amber-500 focus:outline-none"
+                className="w-full px-4 py-3 bg-[#f8f9fb] border border-[#e5e7ef] rounded-xl text-[#1a1d2e] placeholder-[#b0b4c8] focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-100"
                 placeholder="Min 6 characters"
               />
             </div>
@@ -221,7 +217,7 @@ export default function LoginPage() {
             )}
 
             {captchaError && !isLogin && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center">
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-500 text-sm text-center">
                 {captchaError}
               </div>
             )}
@@ -229,7 +225,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || (!isLogin && !!TURNSTILE_SITE_KEY && !captchaToken)}
-              className="w-full py-3 bg-amber-500 text-[var(--warm-900)] font-bold rounded-xl hover:bg-amber-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-amber-500/25"
             >
               {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
             </button>
@@ -238,26 +234,26 @@ export default function LoginPage() {
           <div className="mt-4 text-center">
             <button
               onClick={() => { setIsLogin(!isLogin); setError(''); setSuccess('') }}
-              className="text-sm text-[var(--warm-300)] hover:text-amber-400 transition-colors"
+              className="text-sm text-[#5c6178] hover:text-amber-500 transition-colors"
             >
               {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
             </button>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-[var(--card-border)]">
+          <div className="mt-4 pt-4 border-t border-[#e5e7ef]">
             <button
               onClick={() => {
                 localStorage.setItem('tcg-vault-guest', 'true')
                 window.location.href = '/collection'
               }}
-              className="w-full py-2 text-[var(--warm-400)] hover:text-[var(--foreground)] transition-colors text-sm"
+              className="w-full py-2 text-[#8b8fa6] hover:text-[#1a1d2e] transition-colors text-sm"
             >
               Continue as Guest (saved locally only)
             </button>
           </div>
         </div>
 
-        <p className="text-center text-xs text-[var(--warm-500)] mt-4">
+        <p className="text-center text-xs text-[#8b8fa6] mt-4">
           Data stored securely on Supabase · Guest mode uses local storage
         </p>
       </div>

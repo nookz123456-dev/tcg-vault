@@ -15,27 +15,27 @@ export default function CollectionPage() {
 
   if (authLoading || !isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
-        <div className="text-[var(--warm-400)]">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fb]">
+        <div className="text-[#8b8fa6]">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
+    <div className="min-h-screen bg-[#f8f9fb]">
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h1 className="text-2xl font-extrabold text-[var(--foreground)] tracking-tight">My Collection</h1>
+            <h1 className="text-2xl font-extrabold text-[#1a1d2e] tracking-tight">My Collection</h1>
             {user && (
-              <a href={`/u/${user.email?.split('@')[0] || ''}`} className="text-xs text-amber-400 hover:text-amber-300 font-medium">View Profile →</a>
+              <a href={`/u/${user.email?.split('@')[0] || ''}`} className="text-xs text-amber-500 hover:text-amber-600 font-medium">View Profile →</a>
             )}
           </div>
           <div className="flex items-center gap-3">
             {isGuest && (
-              <span className="text-xs px-2.5 py-1 bg-amber-500/10 text-amber-400 rounded-lg font-semibold">
+              <span className="text-xs px-2.5 py-1 bg-amber-50 text-amber-600 rounded-lg font-semibold">
                 Guest Mode
               </span>
             )}
@@ -56,14 +56,14 @@ export default function CollectionPage() {
                     }
                   } catch { /* ignore */ }
                 }}
-                className="text-xs px-3 py-1.5 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-lg text-[var(--warm-300)] hover:text-amber-400 hover:border-amber-500/30 transition-all font-medium"
+                className="text-xs px-3 py-1.5 bg-white border border-[#e5e7ef] rounded-lg text-[#5c6178] hover:text-amber-500 hover:border-amber-300 transition-all font-medium"
               >
                 Make Public
               </button>
             )}
           </div>
         </div>
-        <p className="text-sm text-[var(--warm-400)] mb-8">
+        <p className="text-sm text-[#8b8fa6] mb-8">
           {isGuest
             ? 'Data saved locally on this device. Sign in to sync across devices.'
             : 'Track and manage your card portfolio'}
@@ -71,21 +71,21 @@ export default function CollectionPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4">
-            <p className="text-xs text-[var(--warm-400)] mb-1">Total Cards</p>
-            <p className="text-2xl font-extrabold text-[var(--foreground)]">{totalCards}</p>
+          <div className="bg-white border border-[#e5e7ef] rounded-xl p-4 shadow-sm">
+            <p className="text-xs text-[#8b8fa6] mb-1">Total Cards</p>
+            <p className="text-2xl font-extrabold text-[#1a1d2e]">{totalCards}</p>
           </div>
-          <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4">
-            <p className="text-xs text-[var(--warm-400)] mb-1">Collection Value</p>
-            <p className="text-2xl font-extrabold text-amber-400">${totalValue.toFixed(2)}</p>
+          <div className="bg-white border border-[#e5e7ef] rounded-xl p-4 shadow-sm">
+            <p className="text-xs text-[#8b8fa6] mb-1">Collection Value</p>
+            <p className="text-2xl font-extrabold text-amber-500">${totalValue.toFixed(2)}</p>
           </div>
-          <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4">
-            <p className="text-xs text-[var(--warm-400)] mb-1">Total Invested</p>
-            <p className="text-2xl font-extrabold text-[var(--warm-200)]">${totalInvested.toFixed(2)}</p>
+          <div className="bg-white border border-[#e5e7ef] rounded-xl p-4 shadow-sm">
+            <p className="text-xs text-[#8b8fa6] mb-1">Total Invested</p>
+            <p className="text-2xl font-extrabold text-[#3a3f54]">${totalInvested.toFixed(2)}</p>
           </div>
-          <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4">
-            <p className="text-xs text-[var(--warm-400)] mb-1">Profit/Loss</p>
-            <p className={`text-2xl font-extrabold ${profitLoss >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+          <div className="bg-white border border-[#e5e7ef] rounded-xl p-4 shadow-sm">
+            <p className="text-xs text-[#8b8fa6] mb-1">Profit/Loss</p>
+            <p className={`text-2xl font-extrabold ${profitLoss >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
               {profitLoss >= 0 ? '+' : ''}{profitLoss.toFixed(2)}
               {totalInvested > 0 && (
                 <span className="text-sm ml-1">({profitPct >= 0 ? '+' : ''}{profitPct.toFixed(1)}%)</span>
@@ -98,11 +98,11 @@ export default function CollectionPage() {
         {cards.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-5xl mb-4">📦</div>
-            <p className="text-[var(--foreground)] text-lg font-bold mb-2">Your collection is empty</p>
-            <p className="text-[var(--warm-400)] text-sm mb-6">Start by searching for cards and adding them</p>
+            <p className="text-[#1a1d2e] text-lg font-bold mb-2">Your collection is empty</p>
+            <p className="text-[#8b8fa6] text-sm mb-6">Start by searching for cards and adding them</p>
             <Link
               href="/search"
-              className="inline-block px-6 py-3 bg-amber-500 text-[var(--warm-900)] font-bold rounded-xl hover:bg-amber-400 transition-all"
+              className="inline-block px-6 py-3 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-400 transition-all shadow-sm shadow-amber-500/25"
             >
               Search Cards →
             </Link>
@@ -112,7 +112,7 @@ export default function CollectionPage() {
             {cards.map((card) => (
               <div
                 key={card.id}
-                className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4 flex items-center gap-4 card-hover"
+                className="bg-white border border-[#e5e7ef] rounded-xl p-4 flex items-center gap-4 card-hover shadow-sm"
               >
                 <img
                   src={card.imageUrl}
@@ -122,41 +122,41 @@ export default function CollectionPage() {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-[var(--foreground)] truncate">{card.name}</h3>
+                    <h3 className="text-sm font-bold text-[#1a1d2e] truncate">{card.name}</h3>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
                       card.game === 'pokemon'
-                        ? 'bg-yellow-500/10 text-yellow-400'
-                        : 'bg-red-500/10 text-red-400'
+                        ? 'bg-amber-50 text-amber-600'
+                        : 'bg-red-50 text-red-500'
                     }`}>
                       {GAME_LABELS[card.game as keyof typeof GAME_LABELS]}
                     </span>
                   </div>
-                  <p className="text-xs text-[var(--warm-400)] truncate">{card.setName}</p>
+                  <p className="text-xs text-[#8b8fa6] truncate">{card.setName}</p>
                   {card.rarity && (
-                    <p className="text-xs text-amber-400 font-medium">{card.rarity}</p>
+                    <p className="text-xs text-amber-500 font-medium">{card.rarity}</p>
                   )}
                 </div>
 
                 <div className="text-center hidden sm:block">
-                  <p className="text-[10px] text-[var(--warm-500)]">Condition</p>
-                  <p className="text-xs text-[var(--warm-200)]">
+                  <p className="text-[10px] text-[#b0b4c8]">Condition</p>
+                  <p className="text-xs text-[#3a3f54]">
                     {CONDITION_LABELS[card.condition] || card.condition}
                   </p>
                 </div>
 
                 <div className="text-center">
-                  <p className="text-[10px] text-[var(--warm-500)]">Qty</p>
+                  <p className="text-[10px] text-[#b0b4c8]">Qty</p>
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => card.quantity > 1 && updateCard(card.id, { quantity: card.quantity - 1 })}
-                      className="w-6 h-6 bg-[var(--surface-1)] rounded text-[var(--warm-400)] hover:text-[var(--foreground)] text-xs border border-[var(--card-border)]"
+                      className="w-6 h-6 bg-[#f8f9fb] rounded text-[#8b8fa6] hover:text-[#1a1d2e] text-xs border border-[#e5e7ef]"
                     >
                       -
                     </button>
-                    <span className="text-sm text-[var(--foreground)] font-bold w-6 text-center">{card.quantity}</span>
+                    <span className="text-sm text-[#1a1d2e] font-bold w-6 text-center">{card.quantity}</span>
                     <button
                       onClick={() => updateCard(card.id, { quantity: card.quantity + 1 })}
-                      className="w-6 h-6 bg-[var(--surface-1)] rounded text-[var(--warm-400)] hover:text-[var(--foreground)] text-xs border border-[var(--card-border)]"
+                      className="w-6 h-6 bg-[#f8f9fb] rounded text-[#8b8fa6] hover:text-[#1a1d2e] text-xs border border-[#e5e7ef]"
                     >
                       +
                     </button>
@@ -166,21 +166,21 @@ export default function CollectionPage() {
                 <div className="text-right hidden sm:block">
                   {card.marketPrice && (
                     <>
-                      <p className="text-[10px] text-[var(--warm-500)]">Market</p>
-                      <p className="text-sm font-extrabold text-amber-400">${card.marketPrice.toFixed(2)}</p>
+                      <p className="text-[10px] text-[#b0b4c8]">Market</p>
+                      <p className="text-sm font-extrabold text-amber-500">${card.marketPrice.toFixed(2)}</p>
                     </>
                   )}
                   {card.purchasePrice && (
                     <>
-                      <p className="text-[10px] text-[var(--warm-500)]">Paid</p>
-                      <p className="text-xs text-[var(--warm-400)]">${card.purchasePrice.toFixed(2)}</p>
+                      <p className="text-[10px] text-[#b0b4c8]">Paid</p>
+                      <p className="text-xs text-[#8b8fa6]">${card.purchasePrice.toFixed(2)}</p>
                     </>
                   )}
                 </div>
 
                 <div className="text-right">
-                  <p className="text-[10px] text-[var(--warm-500)]">Total</p>
-                  <p className="text-sm font-extrabold text-[var(--foreground)]">
+                  <p className="text-[10px] text-[#b0b4c8]">Total</p>
+                  <p className="text-sm font-extrabold text-[#1a1d2e]">
                     ${((card.marketPrice || card.purchasePrice || 0) * card.quantity).toFixed(2)}
                   </p>
                 </div>
@@ -189,7 +189,7 @@ export default function CollectionPage() {
                   onClick={() => {
                     if (confirm('Remove this card?')) removeCard(card.id)
                   }}
-                  className="w-8 h-8 flex items-center justify-center text-[var(--warm-500)] hover:text-red-400 transition-colors"
+                  className="w-8 h-8 flex items-center justify-center text-[#b0b4c8] hover:text-red-500 transition-colors"
                 >
                   ✕
                 </button>
@@ -202,7 +202,7 @@ export default function CollectionPage() {
           <div className="mt-8 text-center">
             <Link
               href="/search"
-              className="inline-block px-6 py-3 bg-[var(--surface-1)] border border-[var(--card-border)] text-[var(--warm-300)] font-semibold rounded-xl hover:text-amber-400 hover:border-amber-500/30 transition-colors mr-4"
+              className="inline-block px-6 py-3 bg-white border border-[#e5e7ef] text-[#5c6178] font-semibold rounded-xl hover:text-amber-500 hover:border-amber-300 transition-colors mr-4"
             >
               + Add More Cards
             </Link>
