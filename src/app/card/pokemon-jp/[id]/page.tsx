@@ -27,6 +27,12 @@ interface CardPriceData {
   setName: string
   setSlug: string
   game: string
+  // JP-specific fields from pokemon-card.com
+  hp?: string | null
+  types?: string[] | null
+  evolution?: string | null
+  skills?: { name: string; cost: string; damage: string }[] | null
+  supertype?: string | null
   prices: {
     nearMint: PriceCondition | null
     lightlyPlayed: PriceCondition | null
@@ -197,6 +203,52 @@ export default function PokemonJPCardPage() {
               <h1 className="text-3xl font-bold text-[#1e2235] mb-2">{card.name}</h1>
               <p className="text-[#5c6078] text-sm">{card.setName} &middot; #{card.number}</p>
             </div>
+
+            {/* JP-specific stats */}
+            {(card.hp || (card.types && card.types.length > 0) || card.evolution) && (
+              <div className="flex flex-wrap gap-2">
+                {card.hp && (
+                  <span className="px-3 py-1.5 bg-red-50 text-red-600 border border-red-100 rounded-lg text-sm font-medium">
+                    HP {card.hp}
+                  </span>
+                )}
+                {card.types?.map(t => (
+                  <span key={t} className="px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-sm font-medium">
+                    {t}
+                  </span>
+                ))}
+                {card.evolution && (
+                  <span className="px-3 py-1.5 bg-purple-50 text-purple-600 border border-purple-100 rounded-lg text-sm font-medium">
+                    {card.evolution}
+                  </span>
+                )}
+                {card.supertype && card.supertype !== 'Pokemon' && (
+                  <span className="px-3 py-1.5 bg-gray-100 text-gray-700 border border-gray-200 rounded-lg text-sm font-medium">
+                    {card.supertype}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Skills/Attacks */}
+            {card.skills && card.skills.length > 0 && (
+              <div className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
+                <h2 className="text-base font-semibold text-[#1e2235] mb-3">Attacks</h2>
+                <div className="space-y-3">
+                  {card.skills.map((skill, i) => (
+                    <div key={i} className="flex items-start gap-3 pb-3 border-b border-[#e8eaf0] last:border-0 last:pb-0">
+                      <div className="flex-shrink-0">
+                        <span className="text-sm font-bold text-[#1e2235]">{skill.damage}</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-[#1e2235]">{skill.name}</p>
+                        {skill.cost && <p className="text-xs text-[#8b8fa6] mt-0.5">Cost: {skill.cost}</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* ========== CONDITION PRICES TABLE ========== */}
             {hasAnyConditionPrices() && (
