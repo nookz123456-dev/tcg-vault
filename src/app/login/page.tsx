@@ -13,14 +13,34 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
+  // Auto-confirm user after signup
+  async function autoConfirmUser(userId: string) {
+    try {
+      await fetch('/api/auth/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      })
+    } catch {
+      // Silent fail — user can still confirm via email
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
     setSuccess('')
 
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      setError('Configuration error. Please try again later.')
+      setLoading(false)
+      return
+    }
+
     try {
       if (isLogin) {
+        // Login
         const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
           method: 'POST',
           headers: {
@@ -30,14 +50,15 @@ export default function LoginPage() {
           body: JSON.stringify({ email, password }),
         })
         const data = await res.json()
-        if (data.error) {
-          setError(data.error_description || data.error_description || data.msg || 'Login failed')
-        } else {
-          localStorage.setItem('tcg-vault-session', JSON.stringify(data))
-          setSuccess('Logged in!')
-          window.location.href = '/collection'
+        if (!res.ok || data.error) {
+          setError(data.error_description || data.msg || data.error || 'Login failed. Check your email and password.')
+          return
         }
+        localStorage.setItem('tcg-vault-session', JSON.stringify(data))
+        setSuccess('Logged in! Redirecting...')
+        setTimeout(() => { window.location.href = '/collection' }, 500)
       } else {
+        // Signup
         const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
           method: 'POST',
           headers: {
@@ -47,34 +68,38 @@ export default function LoginPage() {
           body: JSON.stringify({ email, password }),
         })
         const data = await res.json()
-        if (data.error) {
-          setError(data.msg || data.error_description || 'Signup failed')
+        if (!res.ok || data.error) {
+          setError(data.msg || data.error_description || data.error || 'Signup failed. Please try again.')
+          return
+        }
+
+        // Auto-confirm the user
+        if (data.id) {
+          await autoConfirmUser(data.id)
+        }
+
+        // Try to login right away
+        const loginRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        })
+        const loginData = await loginRes.json()
+        if (loginData.access_token) {
+          localStorage.setItem('tcg-vault-session', JSON.stringify(loginData))
+          setSuccess('Account created! Redirecting...')
+          setTimeout(() => { window.location.href = '/collection' }, 500)
         } else {
-          if (data.id && !data.confirmed_at) {
-            setSuccess('Account created! Checking if we can log you in...')
-            const loginRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-              method: 'POST',
-              headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ email, password }),
-            })
-            const loginData = await loginRes.json()
-            if (loginData.access_token) {
-              localStorage.setItem('tcg-vault-session', JSON.stringify(loginData))
-              window.location.href = '/collection'
-            } else {
-              setSuccess('Account created! Please check your email to confirm, then log in.')
-            }
-          } else {
-            localStorage.setItem('tcg-vault-session', JSON.stringify(data))
-            window.location.href = '/collection'
-          }
+          setSuccess('Account created! You can now log in.')
+          setIsLogin(true)
         }
       }
     } catch (err) {
-      setError('Connection error. Please try again.')
+      console.error('Auth error:', err)
+      setError('Network error. Please check your connection and try again.')
     } finally {
       setLoading(false)
     }
