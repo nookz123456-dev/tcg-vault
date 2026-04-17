@@ -148,23 +148,6 @@ export async function searchPokemonJPCardsTCGdex(
 
     // Wait for both searches to complete (parallel)
     await Promise.all(searchPromises)
-
-    // Step C: Try EN→JP ID conversion (only top 3, sequential to avoid timeout)
-    try {
-      const enResults = await searchTCGdexEN(keyword)
-      for (const enCard of enResults.slice(0, 3)) {
-        const jpId = convertENtoJPId(enCard.id)
-        if (jpId) {
-          const jpCard = await getPokemonJPCardTCGdex(jpId)
-          if (jpCard && !seenIds.has(jpCard.id)) {
-            seenIds.add(jpCard.id)
-            allCards.push(jpCard)
-          }
-        }
-      }
-    } catch (e) {
-      console.error('[TCGdex JP] EN cross-reference failed:', e)
-    }
   }
 
   // Filter to only Pokemon category
