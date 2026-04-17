@@ -59,7 +59,15 @@ export default function Navbar() {
                   </Link>
                 ) : (
                   <>
-                    <span className="text-xs text-[var(--warm-400)] hidden sm:block">{user?.email}</span>
+                    <Link
+                      href={`/u/${user?.email?.split('@')[0] || ''}`}
+                      className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-amber-500/10 transition-colors"
+                    >
+                      <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center text-xs font-bold text-amber-400">
+                        {user?.email?.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-xs text-[var(--warm-300)] hidden sm:block">{user?.email?.split('@')[0]}</span>
+                    </Link>
                     <button
                       onClick={logout}
                       className="text-xs px-3 py-1.5 bg-[var(--surface-1)] text-[var(--warm-300)] rounded-lg hover:text-[var(--foreground)] transition-colors border border-[var(--card-border)]"

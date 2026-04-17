@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import { useExchangeRates } from '@/lib/useExchangeRates'
+import { useWishlist } from '@/lib/useWishlist'
+import { useComments } from '@/lib/useComments'
+import { useAuth } from '@/lib/useAuth'
 
 interface PriceCondition {
   market: number | null
@@ -45,6 +48,21 @@ export default function PokemonJPCardPage() {
   const [loading, setLoading] = useState(true)
   const [showTHB, setShowTHB] = useState(false)
   const { formatUSD, formatTHB, toTHB } = useExchangeRates()
+  const { user } = useAuth()
+  const { isInWishlist, toggleWishlist } = useWishlist()
+  const { comments, loading: commentsLoading, fetchComments, addComment } = useComments()
+  const [newComment, setNewComment] = useState('')
+  const [wishlistLoading, setWishlistLoading] = useState(false)
+
+  // Card identifier for wishlist/comments
+  const cardId = cardName
+  const cardGame = 'pokemon-jp'
+  const wishlisted = isInWishlist(cardId, cardGame)
+
+  // Fetch comments on mount
+  useEffect(() => {
+    fetchComments(cardId, cardGame)
+  }, [cardId, cardGame, fetchComments])
 
   useEffect(() => {
     fetch(`/api/cards/pokemon-jp/${encodeURIComponent(cardName)}`)
@@ -231,6 +249,105 @@ export default function PokemonJPCardPage() {
                 </div>
               </div>
             )}
+
+            {/* Wishlist + Community */}
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={async () => {
+                    if (!user) { window.location.href = '/login'; return }
+                    setWishlistLoading(true)
+                    await toggleWishlist(cardId, cardGame)
+                    setWishlistLoading(false)
+                  }}
+                  disabled={wishlistLoading}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                    wishlisted
+                      ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30 hover:bg-rose-500/25'
+                      : 'bg-amber-500 text-[var(--warm-900)] hover:bg-amber-400 shadow-sm'
+                  }`}
+                >
+                  {wishlisted ? '♥ In Wishlist' : '+ Add to Wishlist'}
+                </button>
+                <button
+                  onClick={() => {
+                    const section = document.getElementById('comments')
+                    section?.scrollIntoView({ behavior: 'smooth' })
+                  }}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-[var(--surface-1)] border border-[var(--card-border)] text-[var(--warm-300)] rounded-xl font-semibold text-sm hover:text-amber-400 hover:border-amber-500/30 transition-all"
+                >
+                  Comments ({comments.length})
+                </button>
+              </div>
+
+              <div id="comments" className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-5">
+                <h2 className="text-lg font-bold text-[var(--foreground)] mb-4">Community Discussion</h2>
+
+                {user ? (
+                  <div className="flex gap-3 mb-4">
+                    <div className="flex-1">
+                      <textarea
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Share your thoughts about this card..."
+                        maxLength={1000}
+                        rows={2}
+                        className="w-full px-4 py-2.5 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-xl text-[var(--foreground)] placeholder:text-[var(--warm-500)] focus:outline-none focus:border-amber-500/50 resize-none text-sm"
+                      />
+                      <div className="flex justify-between mt-1.5">
+                        <span className="text-xs text-[var(--warm-500)]">{newComment.length}/1000</span>
+                        <button
+                          onClick={async () => {
+                            if (!newComment.trim()) return
+                            await addComment(cardId, cardGame, newComment.trim())
+                            setNewComment('')
+                          }}
+                          disabled={!newComment.trim()}
+                          className="px-4 py-1.5 bg-amber-500 text-[var(--warm-900)] rounded-lg text-xs font-semibold hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                        >
+                          Post
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-[var(--surface-1)] rounded-xl p-4 mb-4 text-center">
+                    <p className="text-sm text-[var(--warm-400)]">Sign in to join the discussion</p>
+                    <a href="/login" className="inline-block mt-2 px-4 py-1.5 bg-amber-500 text-[var(--warm-900)] rounded-lg text-xs font-semibold hover:bg-amber-400 transition-all">Sign In</a>
+                  </div>
+                )}
+
+                {commentsLoading ? (
+                  <div className="text-center py-6 text-[var(--warm-400)] text-sm">Loading comments...</div>
+                ) : comments.length === 0 ? (
+                  <div className="text-center py-6">
+                    <div className="text-3xl mb-2 opacity-40">💬</div>
+                    <p className="text-[var(--warm-400)] text-sm">No comments yet. Be the first!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {comments.map((comment) => (
+                      <div key={comment.id} className="bg-[var(--surface-1)] rounded-xl p-3.5">
+                        <div className="flex items-center gap-2.5 mb-2">
+                          <div className="w-7 h-7 rounded-full bg-amber-500/20 flex items-center justify-center text-xs font-bold text-amber-400">
+                            {comment.profiles?.username?.charAt(0).toUpperCase() || '?'}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <a href={`/u/${comment.profiles?.username || ''}`} className="text-sm font-semibold text-amber-400 hover:text-amber-300">
+                              {comment.profiles?.username || 'Unknown'}
+                            </a>
+                            <span className="text-xs text-[var(--warm-500)] ml-2">
+                              {new Date(comment.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-sm text-[var(--warm-300)] leading-relaxed pl-9">{comment.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* TCGplayer link */}
             {card.tcgplayerId && (

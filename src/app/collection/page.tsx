@@ -27,12 +27,41 @@ export default function CollectionPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl font-extrabold text-[var(--foreground)] tracking-tight">My Collection</h1>
-          {isGuest && (
-            <span className="text-xs px-2.5 py-1 bg-amber-500/10 text-amber-400 rounded-lg font-semibold">
-              Guest Mode
-            </span>
-          )}
+          <div>
+            <h1 className="text-2xl font-extrabold text-[var(--foreground)] tracking-tight">My Collection</h1>
+            {user && (
+              <a href={`/u/${user.email?.split('@')[0] || ''}`} className="text-xs text-amber-400 hover:text-amber-300 font-medium">View Profile →</a>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            {isGuest && (
+              <span className="text-xs px-2.5 py-1 bg-amber-500/10 text-amber-400 rounded-lg font-semibold">
+                Guest Mode
+              </span>
+            )}
+            {user && (
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/profiles', {
+                      method: 'PATCH',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user.access_token}`,
+                      },
+                      body: JSON.stringify({ collection_public: true }),
+                    })
+                    if (res.ok) {
+                      alert('Collection is now public!')
+                    }
+                  } catch { /* ignore */ }
+                }}
+                className="text-xs px-3 py-1.5 bg-[var(--surface-1)] border border-[var(--card-border)] rounded-lg text-[var(--warm-300)] hover:text-amber-400 hover:border-amber-500/30 transition-all font-medium"
+              >
+                Make Public
+              </button>
+            )}
+          </div>
         </div>
         <p className="text-sm text-[var(--warm-400)] mb-8">
           {isGuest
