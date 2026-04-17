@@ -134,6 +134,49 @@ const translations = {
   'login.hasAccount': { th: 'มีบัญชีอยู่แล้ว?', en: 'Already have an account?' },
   'login.guest': { th: 'ใช้แบบไม่เข้าระบบ', en: 'Continue as Guest' },
 
+  // Discussions
+  'discuss.title': { th: 'กระดานสนทนา', en: 'Discussion Boards' },
+  'discuss.subtitle': { th: 'พูดคุยกับนักสะสมคนอื่น', en: 'Chat with fellow collectors' },
+  'discuss.allThreads': { th: 'ทุกกระทู้', en: 'All Threads' },
+  'discuss.newThread': { th: '+ ตั้งกระทู้ใหม่', en: '+ New Thread' },
+  'discuss.noThreads': { th: 'ยังไม่มีกระทู้', en: 'No threads yet' },
+  'discuss.startConv': { th: 'เริ่มการสนทนา — ตั้งกระทู้แรก!', en: 'Start the conversation — create the first thread!' },
+  'discuss.signInToPost': { th: 'เข้าสู่ระบบเพื่อตั้งกระทู้', en: 'Sign in to start a discussion' },
+
+  // Trades
+  'trades.title': { th: 'ศูนย์แลกเปลี่ยน', en: 'Trade Center' },
+  'trades.subtitle': { th: 'จัดการข้อเสนอแลกเปลี่ยน', en: 'Manage your trade offers' },
+  'trades.noTrades': { th: 'ยังไม่มีข้อเสนอแลกเปลี่ยน', en: 'No trades yet' },
+  'trades.noTradesDesc': { th: 'เมื่อคุณส่งหรือรับข้อเสนอแลกเปลี่ยน จะแสดงที่นี่', en: 'When you send or receive trade offers, they will appear here' },
+  'trades.offered': { th: 'เสนอ', en: 'Offered' },
+  'trades.requested': { th: 'ขอแลก', en: 'Requested' },
+  'trades.accept': { th: 'ยอมรับ', en: 'Accept' },
+  'trades.reject': { th: 'ปฏิเสธ', en: 'Reject' },
+  'trades.cancelOffer': { th: 'ยกเลิกข้อเสนอ', en: 'Cancel Offer' },
+  'trades.markCompleted': { th: 'ทำเครื่องหมายว่าเสร็จสมบูรณ์', en: 'Mark Completed' },
+  'trades.signIn': { th: 'เข้าสู่ระบบเพื่อใช้งานแลกเปลี่ยน', en: 'Sign in to access trades' },
+
+  // Notifications
+  'notif.title': { th: 'การแจ้งเตือน', en: 'Notifications' },
+  'notif.unread': { th: 'ยังไม่อ่าน', en: 'unread' },
+  'notif.markAllRead': { th: 'อ่านทั้งหมดแล้ว', en: 'Mark all read' },
+  'notif.none': { th: 'ยังไม่มีการแจ้งเตือน', en: 'No notifications yet' },
+  'notif.noneDesc': { th: 'เมื่อมีคนติดตาม ตอบกลับ หรือส่งข้อเสนอแลกเปลี่ยน จะแจ้งที่นี่', en: 'When someone follows you, replies, or sends a trade offer, you will see it here' },
+  'notif.signIn': { th: 'เข้าสู่ระบบเพื่อดูการแจ้งเตือน', en: 'Sign in to see notifications' },
+
+  // Badges
+  'badges.title': { th: 'เหรียญตรา', en: 'Badges' },
+  'badges.subtitle': { th: 'สะสมเหรียญตราจากการสะสม แลกเปลี่ยน และมีส่วนร่วม', en: 'Earn badges by collecting, trading, and participating in the community' },
+  'badges.unlock': { th: 'บรรลุเพื่อปลดล็อก', en: 'Reach to unlock' },
+
+  // Profile
+  'profile.followers': { th: 'ผู้ติดตาม', en: 'Followers' },
+  'profile.following': { th: 'กำลังติดตาม', en: 'Following' },
+  'profile.follow': { th: 'ติดตาม', en: 'Follow' },
+  'profile.unfollow': { th: 'เลิกติดตาม', en: 'Following' },
+  'profile.notFound': { th: 'ไม่พบผู้ใช้', en: 'User not found' },
+  'profile.comingSoon': { th: 'เร็วๆ นี้', en: 'Coming soon' },
+
   // Common
   'common.loading': { th: 'กำลังโหลด...', en: 'Loading...' },
   'common.noImage': { th: 'ไม่มีรูป', en: 'No image' },
@@ -141,6 +184,14 @@ const translations = {
   'common.save': { th: 'บันทึก', en: 'Save' },
   'common.cancel': { th: 'ยกเลิก', en: 'Cancel' },
   'common.delete': { th: 'ลบ', en: 'Delete' },
+  'common.edit': { th: 'แก้ไข', en: 'Edit' },
+  'common.search': { th: 'ค้นหา', en: 'Search' },
+  'common.cards': { th: 'การ์ด', en: 'cards' },
+  'common.sets': { th: 'เซ็ต', en: 'sets' },
+  'common.signIn': { th: 'เข้าสู่ระบบ', en: 'Sign In' },
+  'common.signOut': { th: 'ออกจากระบบ', en: 'Sign Out' },
+  'common.guestMode': { th: 'โหมดผู้เยี่ยมชม', en: 'Guest Mode' },
+  'common.searchCards': { th: 'ค้นหาการ์ด →', en: 'Search Cards →' },
 } as const
 
 export type Locale = 'th' | 'en'
