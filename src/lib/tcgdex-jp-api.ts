@@ -146,7 +146,7 @@ export async function searchPokemonJPCardsTCGdex(
  * Search TCGdex JP API directly
  */
 async function searchTCGdex(keyword: string): Promise<TCGdexJPCard[]> {
-  const url = `${TCGDEX_BASE}/cards?name:${encodeURIComponent(keyword)}`
+  const url = `${TCGDEX_BASE}/cards?name=${encodeURIComponent(keyword)}`
   
   try {
     const response = await fetch(url, {
@@ -172,7 +172,7 @@ async function searchTCGdex(keyword: string): Promise<TCGdexJPCard[]> {
  */
 async function searchTCGdexEN(keyword: string): Promise<TCGdexJPCard[]> {
   const enBase = 'https://api.tcgdex.net/v2/en'
-  const url = `${enBase}/cards?name:${encodeURIComponent(keyword)}`
+  const url = `${enBase}/cards?name=${encodeURIComponent(keyword)}`
   
   try {
     const response = await fetch(url, {
