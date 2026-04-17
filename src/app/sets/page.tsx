@@ -11,11 +11,11 @@ interface SetInfo {
   name: string
   totalCards?: number
   cardCount?: number
-  releaseDate?: string
+  releaseDate?: string | null
   series?: string
   images?: { symbol?: string; logo?: string }
-  logo?: string
-  symbol?: string
+  logo?: string | null
+  symbol?: string | null
 }
 
 const GAME_CONFIG: Record<Game, { label: string; color: string; emoji: string }> = {
@@ -29,10 +29,9 @@ export default function SetsPage() {
   const [sets, setSets] = useState<SetInfo[]>([])
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
-  const [page, setPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
 
   useEffect(() => {
-    setPage(1)
     fetchSets()
   }, [game])
 
@@ -42,6 +41,7 @@ export default function SetsPage() {
       const res = await fetch(`/api/sets/${game}`)
       const data = await res.json()
       setSets(data.data || [])
+      setTotalCount(data.totalCount || 0)
     } catch (err) {
       console.error('Failed to fetch sets:', err)
       setSets([])
@@ -50,44 +50,47 @@ export default function SetsPage() {
   }
 
   const filtered = sets.filter(s =>
-    s.name.toLowerCase().includes(search.toLowerCase())
+    s.name.toLowerCase().includes(search.toLowerCase()) ||
+    s.id.toLowerCase().includes(search.toLowerCase())
   )
 
-  // Group by series/year
+  // Group sets
   const grouped = filtered.reduce((acc, set) => {
     let key: string
     if (game === 'pokemon') {
       key = set.series || 'Other'
     } else if (game === 'pokemon-jp') {
-      key = set.releaseDate?.substring(0, 4) || 'Unknown'
+      // Group by ID prefix (e.g. PMCG, SV, S, etc.)
+      const prefix = set.id.replace(/\d+.*$/, '')
+      key = prefix || 'Other'
     } else {
       const prefix = set.id.replace(/\d+$/, '')
-      key = prefix.startsWith('ST') ? 'Starter Decks' : prefix.startsWith('PRB') ? 'Premium Boosters' : prefix.startsWith('EB') ? 'Enhanced Boosters' : 'Main Sets'
+      if (prefix === 'ST') key = 'Starter Decks'
+      else if (prefix === 'PRB') key = 'Premium Boosters'
+      else if (prefix === 'EB') key = 'Enhanced Boosters'
+      else key = 'Main Sets'
     }
     if (!acc[key]) acc[key] = []
     acc[key].push(set)
     return acc
   }, {} as Record<string, SetInfo[]>)
 
-  // Sort groups
-  const sortedGroups = Object.entries(grouped).sort(([a], [b]) => {
-    if (game === 'pokemon') return b.localeCompare(a) // Series descending
-    return b.localeCompare(a) // Year descending
-  })
+  const sortedGroups = Object.entries(grouped).sort(([a], [b]) => b.localeCompare(a))
 
   return (
     <div className="min-h-screen bg-[#f5f6fa]">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#1e2235]">Card Sets</h1>
+          <h1 className={'text-3xl font-bold text-[#1e2235]'}>Card Sets</h1>
           <p className="text-[#5c6078] mt-1">Browse all sets — every card in existence</p>
+          <p className="text-[#8b8fa6] text-sm mt-1">{totalCount.toLocaleString()} sets in {GAME_CONFIG[game].label}</p>
         </div>
 
         {/* Game Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 flex-wrap">
           {(Object.keys(GAME_CONFIG) as Game[]).map(g => (
             <button
               key={g}
@@ -122,7 +125,7 @@ export default function SetsPage() {
           </div>
         )}
 
-        {/* Sets Grid */}
+        {/* Sets Grid by Group */}
         {!loading && sortedGroups.map(([group, groupSets]) => (
           <div key={group} className="mb-10">
             <h2 className="text-xl font-bold text-[#1e2235] mb-4 flex items-center gap-2">
@@ -132,7 +135,7 @@ export default function SetsPage() {
                 ({groupSets.length} sets)
               </span>
             </h2>
-            
+
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {groupSets.map(set => (
                 <Link
@@ -147,6 +150,7 @@ export default function SetsPage() {
                         src={set.images?.logo || set.logo || ''}
                         alt={set.name}
                         className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform"
+                        loading="lazy"
                       />
                     ) : (
                       <span className="text-4xl">
@@ -154,9 +158,9 @@ export default function SetsPage() {
                       </span>
                     )}
                   </div>
-                  
+
                   {/* Set Info */}
-                  <h3 className="font-semibold text-[#1e2235] text-sm leading-tight line-clamp-2 group-hover:text-indigo-600 transition-colors">
+                  <h3 className="font-semibold text-sm text-[#1e2235] leading-tight line-clamp-2 group-hover:text-indigo-600 transition-colors">
                     {set.name}
                   </h3>
                   <div className="mt-1.5 flex items-center gap-2 text-xs text-[#8b8fa6]">
@@ -168,6 +172,7 @@ export default function SetsPage() {
                       </>
                     )}
                   </div>
+                  <div className="mt-1 text-[10px] text-[#8b8fa6] font-mono">{set.id}</div>
                 </Link>
               ))}
             </div>
