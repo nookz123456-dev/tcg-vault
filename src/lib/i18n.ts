@@ -193,6 +193,8 @@ const translations = {
   'discuss.replies': { th: 'คำตอบ', en: 'replies' },
   'discuss.threadTitle': { th: 'หัวข้อกระทู้...', en: 'Thread title...' },
   'discuss.threadContent': { th: 'แชร์ความคิดเห็นของคุณ...', en: 'Share your thoughts...' },
+  'discuss.selectBoard': { th: 'เลือกบอร์ด', en: 'Select Board' },
+  'discuss.selectBoardHint': { th: 'กรุณาเลือกบอร์ดก่อนตั้งกระทู้', en: 'Please select a board before posting' },
 
   // Profile
   'profile.followers': { th: 'ผู้ติดตาม', en: 'Followers' },

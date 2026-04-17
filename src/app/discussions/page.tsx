@@ -103,13 +103,20 @@ export default function DiscussionsPage() {
             <h1 className="text-2xl font-extrabold text-[#1e2235]">{t('discuss.title')}</h1>
             <p className="text-sm text-[#8b8fa6] mt-1">{t('discuss.subtitle')}</p>
           </div>
-          {user && selectedBoard && (
+          {user ? (
             <button
               onClick={() => setShowNewThread(true)}
               className="px-5 py-2.5 bg-[#6366f1] text-[#1e2235] font-bold rounded-xl hover:bg-[#4f46e5] transition-all text-sm"
             >
               {t('discuss.newThread')}
             </button>
+          ) : (
+            <a
+              href="/login"
+              className="px-5 py-2.5 bg-[#6366f1] text-[#1e2235] font-bold rounded-xl hover:bg-[#4f46e5] transition-all text-sm"
+            >
+              {t('common.signIn')}
+            </a>
           )}
         </div>
 
@@ -155,23 +162,51 @@ export default function DiscussionsPage() {
               >
                 All
               </button>
-              {boards.map(board => (
-                <button
-                  key={board.id}
-                  onClick={() => setSelectedBoard(board.id)}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    selectedBoard === board.id ? 'bg-[#6366f1] text-[#1e2235]' : 'bg-[#f5f6fa] text-[#5c6078] border border-[#e8eaf0]'
-                  }`}
-                >
-                  {board.icon} {board.name}
-                </button>
-              ))}
+              {boards.map(board => {
+                const label = board.icon + ' ' + board.name
+                return (
+                  <button
+                    key={board.id}
+                    onClick={() => setSelectedBoard(board.id)}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      selectedBoard === board.id ? 'bg-[#6366f1] text-[#1e2235]' : 'bg-[#f5f6fa] text-[#5c6078] border border-[#e8eaf0]'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
             </div>
 
             {/* New Thread Form */}
             {showNewThread && (
               <div className="bg-white border border-[#6366f1]/30 rounded-2xl p-5 mb-4">
                 <h3 className="text-lg font-bold text-[#1e2235] mb-3">{t('discuss.newThread')}</h3>
+                {/* Board selector */}
+                <div className="mb-3">
+                  <label className="text-xs font-semibold text-[#5c6078] mb-1.5 block">{t('discuss.selectBoard') || 'Board'}</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {boards.map(board => {
+                      const label = board.icon + ' ' + board.name
+                      return (
+                        <button
+                          key={board.id}
+                          onClick={() => setSelectedBoard(board.id)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                            selectedBoard === board.id
+                              ? 'bg-[#6366f1] text-[#1e2235]'
+                              : 'bg-[#f5f6fa] text-[#5c6078] border border-[#e8eaf0] hover:text-[#1e2235]'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {!selectedBoard && (
+                    <p className="text-xs text-red-400 mt-1">{t('discuss.selectBoardHint') || 'Please select a board'}</p>
+                  )}
+                </div>
                 <input
                   value={newTitle}
                   onChange={e => setNewTitle(e.target.value)}
@@ -198,7 +233,7 @@ export default function DiscussionsPage() {
                     </button>
                     <button
                       onClick={handleNewThread}
-                      disabled={submitting || !newTitle.trim() || !newContent.trim()}
+                      disabled={submitting || !newTitle.trim() || !newContent.trim() || !selectedBoard}
                       className="px-5 py-2 bg-[#6366f1] text-[#1e2235] rounded-lg text-xs font-bold hover:bg-[#4f46e5] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     >
                       {submitting ? t('discuss.posting') : t('discuss.postThread')}
