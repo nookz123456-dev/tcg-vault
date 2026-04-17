@@ -36,6 +36,23 @@ export async function GET(request: NextRequest) {
         console.error(`[Pokemon JP API] Debug: searchTCGdexJP error:`, e)
       }
       
+      // Check categories
+      const categories = Array.isArray(testData) 
+        ? [...new Set(testData.map((c: any) => c.category))] 
+        : []
+      const categoriesInDirectSearch = Array.isArray(directSearchResult) 
+        ? [...new Set(directSearchResult.map((c: any) => c.category))] 
+        : []
+      
+      // Also test the full search function
+      const { searchPokemonJPCardsTCGdex } = await import('@/lib/tcgdex-jp-api')
+      let fullSearchResult: any = null
+      try {
+        fullSearchResult = await searchPokemonJPCardsTCGdex(keyword, page)
+      } catch (e: any) {
+        console.error('[Pokemon JP API] Debug: full search error:', e)
+      }
+      
       return NextResponse.json({
         debug: true,
         keyword,
@@ -44,12 +61,18 @@ export async function GET(request: NextRequest) {
         directApi: {
           status: testRes.status,
           resultCount: Array.isArray(testData) ? testData.length : 'NOT_ARRAY',
-          sample: Array.isArray(testData) && testData.length > 0 ? { id: testData[0].id, name: testData[0].name } : null,
+          categories,
+          sample: Array.isArray(testData) && testData.length > 0 ? { id: testData[0].id, name: testData[0].name, category: testData[0].category } : null,
         },
         directSearch: {
           resultCount: directSearchResult?.length ?? null,
+          categories: categoriesInDirectSearch,
           error: directSearchError,
           sampleId: Array.isArray(directSearchResult) && directSearchResult.length > 0 ? directSearchResult[0].id : null,
+        },
+        fullSearch: {
+          dataLength: fullSearchResult?.data?.length ?? null,
+          totalCount: fullSearchResult?.totalCount ?? null,
         },
       })
     } catch (err: any) {
