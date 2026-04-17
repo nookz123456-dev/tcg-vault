@@ -169,6 +169,31 @@ const translations = {
   'badges.subtitle': { th: 'สะสมเหรียญตราจากการสะสม แลกเปลี่ยน และมีส่วนร่วม', en: 'Earn badges by collecting, trading, and participating in the community' },
   'badges.unlock': { th: 'บรรลุเพื่อปลดล็อก', en: 'Reach to unlock' },
 
+  // Community extras
+  'community.noActivity': { th: 'ยังไม่มีกิจกรรม', en: 'No activity yet' },
+  'community.noActivityDesc': { th: 'เป็นคนแรก! เริ่มเพิ่มการ์ดเข้าคอลเลกชัน', en: 'Be the first! Start adding cards to your collection.' },
+  'community.noLeaders': { th: 'ยังไม่มีนักสะสมบนกระดาน', en: 'No collectors on the board yet' },
+  'community.noLeadersDesc': { th: 'ตั้งค่าคอลเลกชันเป็นสาธารณะเพื่อขึ้นอันดับ!', en: 'Make your collection public to appear on the leaderboard!' },
+  'community.noTrending': { th: 'ยังไม่มีการ์ดยอดนิยม', en: 'No trending cards yet' },
+  'community.noTrendingDesc': { th: 'เริ่มเพิ่มการ์ดเพื่อดูว่าอะไรกำลังฮิต!', en: 'Start adding cards to see what\'s popular!' },
+  'community.joinCta': { th: 'เข้าร่วมชุมชน', en: 'Join the Community' },
+  'community.joinDesc': { th: 'สร้างบัญชีเพื่อเพิ่มการ์ด แสดงความคิดเห็น และขึ้นอันดับ', en: 'Create an account to add cards, comment, and see your collection on the leaderboard.' },
+  'community.getStarted': { th: 'เริ่มต้นใช้งาน', en: 'Get Started' },
+  'community.discussCta': { th: 'พูดคุยเรื่องการ์ด', en: 'Discussion Boards' },
+  'community.discussDesc': { th: 'พูดคุยกับนักสะสมคนอื่น', en: 'Chat with fellow collectors' },
+  'community.tradeCta': { th: 'แลกเปลี่ยนการ์ด', en: 'Trade Center' },
+  'community.tradeDesc': { th: 'หาคนแลกเปลี่ยน', en: 'Find trade partners' },
+  'community.badgeCta': { th: 'เหรียญตรา', en: 'Badges' },
+  'community.badgeDesc': { th: 'สะสมความสำเร็จ', en: 'Earn achievements' },
+
+  // Discussions
+  'discuss.pinned': { th: 'ปักหมุด', en: 'Pinned' },
+  'discuss.postThread': { th: 'ตั้งกระทู้', en: 'Post Thread' },
+  'discuss.posting': { th: 'กำลังตั้งกระทู้...', en: 'Posting...' },
+  'discuss.replies': { th: 'คำตอบ', en: 'replies' },
+  'discuss.threadTitle': { th: 'หัวข้อกระทู้...', en: 'Thread title...' },
+  'discuss.threadContent': { th: 'แชร์ความคิดเห็นของคุณ...', en: 'Share your thoughts...' },
+
   // Profile
   'profile.followers': { th: 'ผู้ติดตาม', en: 'Followers' },
   'profile.following': { th: 'กำลังติดตาม', en: 'Following' },
@@ -192,6 +217,9 @@ const translations = {
   'common.signOut': { th: 'ออกจากระบบ', en: 'Sign Out' },
   'common.guestMode': { th: 'โหมดผู้เยี่ยมชม', en: 'Guest Mode' },
   'common.searchCards': { th: 'ค้นหาการ์ด →', en: 'Search Cards →' },
+  'common.ago': { th: 'ที่แล้ว', en: 'ago' },
+  'common.from': { th: 'จาก', en: 'from' },
+  'common.to': { th: 'ถึง', en: 'to' },
 } as const
 
 export type Locale = 'th' | 'en'

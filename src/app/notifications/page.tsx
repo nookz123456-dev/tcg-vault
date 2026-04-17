@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import { useAuth } from '@/lib/useAuth'
+import { useT } from '@/lib/i18n'
 
 interface Notification {
   id: string
@@ -26,6 +27,7 @@ const TYPE_ICONS: Record<string, string> = {
 
 export default function NotificationsPage() {
   const { user } = useAuth()
+  const t = useT()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -58,11 +60,11 @@ export default function NotificationsPage() {
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime()
     const mins = Math.floor(diff / 60000)
-    if (mins < 60) return `${mins}m ago`
+    if (mins < 60) return `${mins}m ${t('common.ago')}`
     const hours = Math.floor(mins / 60)
-    if (hours < 24) return `${hours}h ago`
+    if (hours < 24) return `${hours}h ${t('common.ago')}`
     const days = Math.floor(hours / 24)
-    return `${days}d ago`
+    return `${days}d ${t('common.ago')}`
   }
 
   if (!user) {
@@ -70,8 +72,8 @@ export default function NotificationsPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
         <Navbar />
         <div className="text-center">
-          <p className="text-[#8b8fa6]">Sign in to see notifications</p>
-          <a href="/login" className="inline-block mt-3 px-5 py-2 bg-[#6366f1] text-[#1e2235] rounded-xl text-sm font-bold hover:bg-[#4f46e5]">Sign In</a>
+          <p className="text-[#8b8fa6]">{t('notif.signIn')}</p>
+          <a href="/login" className="inline-block mt-3 px-5 py-2 bg-[#6366f1] text-[#1e2235] rounded-xl text-sm font-bold hover:bg-[#4f46e5]">{t('common.signIn')}</a>
         </div>
       </div>
     )
@@ -83,17 +85,17 @@ export default function NotificationsPage() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-extrabold text-[#1e2235]">Notifications</h1>
+            <h1 className="text-2xl font-extrabold text-[#1e2235]">{t('notif.title')}</h1>
             {unreadCount > 0 && (
-              <p className="text-sm text-[#6366f1] mt-1">{unreadCount} unread</p>
+              <p className="text-sm text-[#6366f1] mt-1">{unreadCount} {t('notif.unread')}</p>
             )}
           </div>
           {unreadCount > 0 && (
             <button
               onClick={markAllRead}
-              className="px-4 py-2 text-xs font-semibold text-[#6366f1] hover:text-amber-300 transition-colors"
+              className="px-4 py-2 text-xs font-semibold text-[#6366f1] hover:text-[#4f46e5] transition-colors"
             >
-              Mark all read
+              {t('notif.markAllRead')}
             </button>
           )}
         </div>
@@ -103,8 +105,8 @@ export default function NotificationsPage() {
         ) : notifications.length === 0 ? (
           <div className="bg-white border border-[#e8eaf0] rounded-2xl p-12 text-center">
             <div className="text-5xl mb-4 opacity-50">🔔</div>
-            <p className="text-[#8b8fa6]">No notifications yet</p>
-            <p className="text-[#b5b8c8] text-xs mt-1">When someone follows you, replies to your thread, or sends a trade offer, you will see it here</p>
+            <p className="text-[#5c6078] text-lg mb-1">{t('notif.none')}</p>
+            <p className="text-[#b5b8c8] text-xs">{t('notif.noneDesc')}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -112,16 +114,14 @@ export default function NotificationsPage() {
               <div
                 key={n.id}
                 className={`flex items-start gap-3 p-4 rounded-2xl border transition-all ${
-                  n.is_read
-                    ? 'bg-white border-[#e8eaf0]'
-                    : 'bg-[#6366f1]/5 border-[#6366f1]/20'
+                  n.is_read ? 'bg-white border-[#e8eaf0]' : 'bg-[#6366f1]/5 border-[#6366f1]/20'
                 }`}
               >
                 <div className="text-xl flex-shrink-0 mt-0.5">{TYPE_ICONS[n.type] || '🔔'}</div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm leading-relaxed ${n.is_read ? 'text-[#5c6078]' : 'text-[#1e2235] font-medium'}`}>
                     {n.actor && (
-                      <a href={`/u/${n.actor.username || ''}`} className="text-[#6366f1] hover:text-amber-300 font-semibold">
+                      <a href={`/u/${n.actor.username || ''}`} className="text-[#6366f1] hover:text-[#4f46e5] font-semibold">
                         {n.actor.username}
                       </a>
                     )}{' '}

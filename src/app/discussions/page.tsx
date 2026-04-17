@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import { useAuth } from '@/lib/useAuth'
+import { useT } from '@/lib/i18n'
 
 interface Board {
   id: string
@@ -29,6 +30,7 @@ interface Thread {
 
 export default function DiscussionsPage() {
   const { user } = useAuth()
+  const t = useT()
   const [boards, setBoards] = useState<Board[]>([])
   const [threads, setThreads] = useState<Thread[]>([])
   const [selectedBoard, setSelectedBoard] = useState<string | null>(null)
@@ -75,7 +77,6 @@ export default function DiscussionsPage() {
         setNewTitle('')
         setNewContent('')
         setShowNewThread(false)
-        // Refresh threads
         const data = await fetch(`/api/discussions/threads?boardId=${selectedBoard}`).then(r => r.json())
         setThreads(data.threads || [])
       }
@@ -86,29 +87,28 @@ export default function DiscussionsPage() {
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime()
     const mins = Math.floor(diff / 60000)
-    if (mins < 60) return `${mins}m ago`
+    if (mins < 60) return `${mins}m ${t('common.ago')}`
     const hours = Math.floor(mins / 60)
-    if (hours < 24) return `${hours}h ago`
+    if (hours < 24) return `${hours}h ${t('common.ago')}`
     const days = Math.floor(hours / 24)
-    return `${days}d ago`
+    return `${days}d ${t('common.ago')}`
   }
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--background)' }}>
       <Navbar />
       <div className="max-w-5xl mx-auto px-4 py-8">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-extrabold text-[#1e2235]">Discussion Boards</h1>
-            <p className="text-sm text-[#8b8fa6] mt-1">Chat with fellow collectors</p>
+            <h1 className="text-2xl font-extrabold text-[#1e2235]">{t('discuss.title')}</h1>
+            <p className="text-sm text-[#8b8fa6] mt-1">{t('discuss.subtitle')}</p>
           </div>
           {user && selectedBoard && (
             <button
               onClick={() => setShowNewThread(true)}
               className="px-5 py-2.5 bg-[#6366f1] text-[#1e2235] font-bold rounded-xl hover:bg-[#4f46e5] transition-all text-sm"
             >
-              + New Thread
+              {t('discuss.newThread')}
             </button>
           )}
         </div>
@@ -120,21 +120,17 @@ export default function DiscussionsPage() {
               <button
                 onClick={() => setSelectedBoard(null)}
                 className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  !selectedBoard
-                    ? 'bg-[#6366f1]/15 text-[#6366f1]'
-                    : 'text-[#5c6078] hover:text-[#1e2235] hover:bg-[#e8eaf0]'
+                  !selectedBoard ? 'bg-[#6366f1]/15 text-[#6366f1]' : 'text-[#5c6078] hover:text-[#1e2235] hover:bg-[#e8eaf0]'
                 }`}
               >
-                All Threads
+                {t('discuss.allThreads')}
               </button>
               {boards.map(board => (
                 <button
                   key={board.id}
                   onClick={() => setSelectedBoard(board.id)}
                   className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${
-                    selectedBoard === board.id
-                      ? 'bg-[#6366f1]/15 text-[#6366f1]'
-                      : 'text-[#5c6078] hover:text-[#1e2235] hover:bg-[#e8eaf0]'
+                    selectedBoard === board.id ? 'bg-[#6366f1]/15 text-[#6366f1]' : 'text-[#5c6078] hover:text-[#1e2235] hover:bg-[#e8eaf0]'
                   }`}
                 >
                   <span>{board.icon}</span>
@@ -174,22 +170,22 @@ export default function DiscussionsPage() {
 
             {/* New Thread Form */}
             {showNewThread && (
-              <div className="bg-white border border-amber-500/30 rounded-2xl p-5 mb-4">
-                <h3 className="text-lg font-bold text-[#1e2235] mb-3">New Thread</h3>
+              <div className="bg-white border border-[#6366f1]/30 rounded-2xl p-5 mb-4">
+                <h3 className="text-lg font-bold text-[#1e2235] mb-3">{t('discuss.newThread')}</h3>
                 <input
                   value={newTitle}
                   onChange={e => setNewTitle(e.target.value)}
-                  placeholder="Thread title..."
+                  placeholder={t('discuss.threadTitle')}
                   maxLength={200}
-                  className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-amber-500/50 text-sm mb-3"
+                  className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-[#6366f1]/50 text-sm mb-3"
                 />
                 <textarea
                   value={newContent}
                   onChange={e => setNewContent(e.target.value)}
-                  placeholder="Share your thoughts..."
+                  placeholder={t('discuss.threadContent')}
                   maxLength={5000}
                   rows={4}
-                  className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-amber-500/50 resize-none text-sm"
+                  className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-[#6366f1]/50 resize-none text-sm"
                 />
                 <div className="flex justify-between items-center mt-3">
                   <span className="text-xs text-[#b5b8c8]">{newContent.length}/5000</span>
@@ -198,14 +194,14 @@ export default function DiscussionsPage() {
                       onClick={() => setShowNewThread(false)}
                       className="px-4 py-2 text-xs font-semibold text-[#8b8fa6] hover:text-[#1e2235] transition-colors"
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                     <button
                       onClick={handleNewThread}
                       disabled={submitting || !newTitle.trim() || !newContent.trim()}
                       className="px-5 py-2 bg-[#6366f1] text-[#1e2235] rounded-lg text-xs font-bold hover:bg-[#4f46e5] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     >
-                      {submitting ? 'Posting...' : 'Post Thread'}
+                      {submitting ? t('discuss.posting') : t('discuss.postThread')}
                     </button>
                   </div>
                 </div>
@@ -215,16 +211,14 @@ export default function DiscussionsPage() {
             {/* Threads */}
             {loading ? (
               <div className="space-y-3">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="shimmer h-20 rounded-2xl" />
-                ))}
+                {[1, 2, 3].map(i => <div key={i} className="shimmer h-20 rounded-2xl" />)}
               </div>
             ) : threads.length === 0 ? (
               <div className="bg-white border border-[#e8eaf0] rounded-2xl p-12 text-center">
                 <div className="text-5xl mb-4 opacity-50">💬</div>
-                <h3 className="text-lg font-bold text-[#1e2235] mb-2">No threads yet</h3>
+                <h3 className="text-lg font-bold text-[#1e2235] mb-2">{t('discuss.noThreads')}</h3>
                 <p className="text-[#8b8fa6] text-sm">
-                  {user ? 'Start the conversation — create the first thread!' : 'Sign in to start a discussion'}
+                  {user ? t('discuss.startConv') : t('discuss.signInToPost')}
                 </p>
               </div>
             ) : (
@@ -251,7 +245,7 @@ export default function DiscussionsPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          {thread.is_pinned && <span className="text-xs text-[#6366f1]">📌</span>}
+                          {thread.is_pinned && <span className="text-xs text-[#6366f1]">📌 {t('discuss.pinned')}</span>}
                           <h3 className="text-sm font-bold text-[#1e2235] group-hover:text-[#6366f1] transition-colors truncate">
                             {thread.title}
                           </h3>
@@ -262,7 +256,7 @@ export default function DiscussionsPage() {
                           <span>{thread.discussion_boards?.icon} {thread.discussion_boards?.name}</span>
                           <span>{timeAgo(thread.created_at)}</span>
                           <span>👁 {thread.views}</span>
-                          <span>💬 {thread.reply_count}</span>
+                          <span>💬 {thread.reply_count} {t('discuss.replies')}</span>
                         </div>
                       </div>
                     </div>

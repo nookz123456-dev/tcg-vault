@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
+import { useT } from '@/lib/i18n'
 
 interface BadgeDefinition {
   id: string
@@ -12,11 +13,11 @@ interface BadgeDefinition {
   threshold: number
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  collection: 'Collection',
-  social: 'Social',
-  trading: 'Trading',
-  special: 'Special',
+const CATEGORY_LABELS: Record<string, { th: string; en: string }> = {
+  collection: { th: 'คอลเลกชัน', en: 'Collection' },
+  social: { th: 'สังคม', en: 'Social' },
+  trading: { th: 'แลกเปลี่ยน', en: 'Trading' },
+  special: { th: 'พิเศษ', en: 'Special' },
 }
 
 const CATEGORY_ICONS: Record<string, string> = {
@@ -27,6 +28,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 }
 
 export default function BadgesPage() {
+  const t = useT()
   const [badges, setBadges] = useState<BadgeDefinition[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -37,6 +39,7 @@ export default function BadgesPage() {
     }).catch(() => setLoading(false))
   }, [])
 
+  const isThai = t('common.ago') === 'ที่แล้ว'
   const badgesByCategory = badges.reduce((acc, b) => {
     if (!acc[b.category]) acc[b.category] = []
     acc[b.category].push(b)
@@ -63,10 +66,10 @@ export default function BadgesPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-extrabold text-[#1e2235] tracking-tight mb-3">
-            🏅 Badges
+            🏅 {t('badges.title')}
           </h1>
           <p className="text-[#5c6078]">
-            Earn badges by collecting, trading, and participating in the community
+            {t('badges.subtitle')}
           </p>
         </div>
 
@@ -76,7 +79,7 @@ export default function BadgesPage() {
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-xl">{CATEGORY_ICONS[category] || '🏅'}</span>
                 <h2 className="text-lg font-bold text-[#6366f1] uppercase tracking-wider">
-                  {CATEGORY_LABELS[category] || category}
+                  {isThai ? CATEGORY_LABELS[category]?.th || category : CATEGORY_LABELS[category]?.en || category}
                 </h2>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -90,7 +93,7 @@ export default function BadgesPage() {
                     <p className="text-xs text-[#8b8fa6] mt-1.5 leading-relaxed">{badge.description}</p>
                     {badge.threshold > 0 && (
                       <p className="text-[10px] text-[#b5b8c8] mt-2">
-                        Reach {badge.threshold} to unlock
+                        {isThai ? `สะสม ${badge.threshold} เพื่อปลดล็อก` : `Reach ${badge.threshold} to unlock`}
                       </p>
                     )}
                   </div>
