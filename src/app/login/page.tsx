@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import Turnstile from '@/components/Turnstile'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -12,6 +14,22 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [captchaToken, setCaptchaToken] = useState('')
+  const [captchaError, setCaptchaError] = useState('')
+
+  const handleCaptchaVerify = useCallback((token: string) => {
+    setCaptchaToken(token)
+    setCaptchaError('')
+  }, [])
+
+  const handleCaptchaError = useCallback((err: string) => {
+    setCaptchaError('Captcha verification failed. Please try again.')
+    setCaptchaToken('')
+  }, [])
+
+  const handleCaptchaExpire = useCallback(() => {
+    setCaptchaToken('')
+  }, [])
 
   // Auto-confirm user after signup
   async function autoConfirmUser(userId: string) {
@@ -36,6 +54,35 @@ export default function LoginPage() {
       setError('Configuration error. Please try again later.')
       setLoading(false)
       return
+    }
+
+    // Require captcha for signup
+    if (!isLogin && TURNSTILE_SITE_KEY && !captchaToken) {
+      setError('Please complete the captcha verification.')
+      setLoading(false)
+      return
+    }
+
+    // Verify captcha server-side for signup
+    if (!isLogin && TURNSTILE_SITE_KEY && captchaToken) {
+      try {
+        const captchaRes = await fetch('/api/captcha', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: captchaToken }),
+        })
+        const captchaData = await captchaRes.json()
+        if (!captchaData.success) {
+          setError('Captcha verification failed. Please try again.')
+          setCaptchaToken('')
+          setLoading(false)
+          return
+        }
+      } catch {
+        setError('Captcha verification unavailable. Please try again later.')
+        setLoading(false)
+        return
+      }
     }
 
     try {
@@ -161,9 +208,27 @@ export default function LoginPage() {
               />
             </div>
 
+            {/* Captcha for signup only */}
+            {!isLogin && TURNSTILE_SITE_KEY && (
+              <div className="flex justify-center">
+                <Turnstile
+                  siteKey={TURNSTILE_SITE_KEY}
+                  onVerify={handleCaptchaVerify}
+                  onError={handleCaptchaError}
+                  onExpire={handleCaptchaExpire}
+                />
+              </div>
+            )}
+
+            {captchaError && !isLogin && (
+              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center">
+                {captchaError}
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (!isLogin && !!TURNSTILE_SITE_KEY && !captchaToken)}
               className="w-full py-3 bg-amber-500 text-[var(--warm-900)] font-bold rounded-xl hover:bg-amber-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
