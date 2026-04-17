@@ -99,9 +99,12 @@ export async function searchPokemonJPCardsTCGdex(
   const allCards: TCGdexJPCard[] = []
   const seenIds = new Set<string>()
 
+  console.log(`[TCGdex JP] Starting search for: "${keyword}" (isJapanese: ${isJapanese(keyword)})`)
+
   if (isJapanese(keyword)) {
     // Strategy 1: Japanese keyword — search TCGdex JP directly
     const results = await searchTCGdexJP(keyword)
+    console.log(`[TCGdex JP] Direct JP search returned ${results.length} results`)
     for (const card of results) {
       if (!seenIds.has(card.id)) {
         seenIds.add(card.id)
@@ -109,43 +112,47 @@ export async function searchPokemonJPCardsTCGdex(
       }
     }
   } else {
-    // Strategy 2: English keyword
-    // Step A: Translate to Japanese via PokeAPI, then search
-    try {
-      const jpName = await getJapanesePokemonName(keyword)
-      console.log(`[TCGdex JP] PokeAPI translation: "${keyword}" → "${jpName}"`)
-      
-      if (jpName) {
-        const jpResults = await searchTCGdexJP(jpName)
-        for (const card of jpResults) {
+    // Strategy 2: English keyword — run JP search + EN-to-JP translation in parallel
+    const searchPromises: Promise<void>[] = []
+
+    // Step A: Search TCGdex JP directly with English keyword
+    // (catches some cards that have English names in the JP database)
+    searchPromises.push(
+      searchTCGdexJP(keyword).then(results => {
+        console.log(`[TCGdex JP] Direct EN→JP search returned ${results.length} results`)
+        for (const card of results) {
           if (!seenIds.has(card.id)) {
             seenIds.add(card.id)
             allCards.push(card)
           }
         }
-      }
-    } catch (e) {
-      console.error('[TCGdex JP] PokeAPI translation failed:', e)
-    }
+      }).catch(e => console.error('[TCGdex JP] Direct search failed:', e))
+    )
 
-    // Step B: Also try searching TCGdex JP directly with English keyword
-    // This catches some cards that have English names in the JP database
-    const directResults = await searchTCGdexJP(keyword)
-    for (const card of directResults) {
-      if (!seenIds.has(card.id)) {
-        seenIds.add(card.id)
-        allCards.push(card)
-      }
-    }
+    // Step B: Translate to Japanese via PokeAPI, then search
+    searchPromises.push(
+      getJapanesePokemonName(keyword).then(async jpName => {
+        if (jpName && jpName !== keyword) {
+          console.log(`[TCGdex JP] PokeAPI translation: "${keyword}" → "${jpName}"`)
+          const jpResults = await searchTCGdexJP(jpName)
+          console.log(`[TCGdex JP] JP search for "${jpName}" returned ${jpResults.length} results`)
+          for (const card of jpResults) {
+            if (!seenIds.has(card.id)) {
+              seenIds.add(card.id)
+              allCards.push(card)
+            }
+          }
+        }
+      }).catch(e => console.error('[TCGdex JP] PokeAPI translation failed:', e))
+    )
 
-    // Step C: Try searching TCGdex EN, then look up JP equivalents by ID
+    // Wait for both searches to complete (parallel)
+    await Promise.all(searchPromises)
+
+    // Step C: Try EN→JP ID conversion (only top 3, sequential to avoid timeout)
     try {
       const enResults = await searchTCGdexEN(keyword)
-      // EN search results don't include set.id, so we parse the card ID
-      // EN card IDs look like: "sv1-1", "basep-1", etc.
-      // JP card IDs look like: "SV1-001", "E1-016", etc.
-      // We can try to look up JP versions by converting the ID format
-      for (const enCard of enResults.slice(0, 5)) {
+      for (const enCard of enResults.slice(0, 3)) {
         const jpId = convertENtoJPId(enCard.id)
         if (jpId) {
           const jpCard = await getPokemonJPCardTCGdex(jpId)
@@ -195,7 +202,7 @@ async function searchTCGdexJP(keyword: string): Promise<TCGdexJPCard[]> {
         'User-Agent': 'TCGVault/1.0',
         'Accept': 'application/json',
       },
-      next: { revalidate: 3600 },
+      cache: 'no-store',
     })
 
     if (!response.ok) {
@@ -224,7 +231,7 @@ async function searchTCGdexEN(keyword: string): Promise<any[]> {
         'User-Agent': 'TCGVault/1.0',
         'Accept': 'application/json',
       },
-      next: { revalidate: 3600 },
+      cache: 'no-store',
     })
 
     if (!response.ok) return []
@@ -250,7 +257,7 @@ export async function getPokemonJPCardTCGdex(cardId: string): Promise<TCGdexJPCa
         'User-Agent': 'TCGVault/1.0',
         'Accept': 'application/json',
       },
-      next: { revalidate: 3600 },
+      cache: 'no-store',
     })
 
     if (!response.ok) {
@@ -276,7 +283,7 @@ export async function getJPSets(): Promise<any[]> {
         'User-Agent': 'TCGVault/1.0',
         'Accept': 'application/json',
       },
-      next: { revalidate: 86400 },
+      next: { revalidate: 3600 }, // Sets rarely change, cache 1 hour
     })
 
     if (!response.ok) return []
