@@ -362,15 +362,10 @@ export default function SearchResults() {
           {cards.map((card) => {
             const isInCollection = addedCards.has(card.id)
             return (
-              <a
+              <div
                 key={card.id}
-                href={card.game === 'pokemon' 
-                  ? (pokeLang === 'jp' 
-                    ? `/card/pokemon-jp/${encodeURIComponent(card.name)}` 
-                    : `/card/pokemon/${card.id}`)
-                  : `/card/onepiece/${encodeURIComponent(card.name)}`
-                }
                 className="group bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden card-hover text-left cursor-pointer relative transition-all duration-300 hover:border-amber-500/40 hover:shadow-lg hover:shadow-amber-500/5 block"
+                onClick={() => setSelectedCard(card)}
               >
                 {isInCollection && (
                   <div className="absolute top-2.5 left-2.5 z-10 bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-lg font-bold shadow-sm">
@@ -422,7 +417,21 @@ export default function SearchResults() {
                     </p>
                   ) : null}
                 </div>
-              </a>
+                {/* Add to Collection button */}
+                <div className="p-3.5 pt-0">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleAddToCollection(card) }}
+                    disabled={isInCollection}
+                    className={`w-full py-2 rounded-lg font-semibold transition-all text-xs ${
+                      isInCollection
+                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 cursor-default'
+                        : 'bg-amber-500 text-[var(--warm-900)] hover:bg-amber-400 shadow-sm'
+                    }`}
+                  >
+                    {isInCollection ? 'Added' : '+ Add to Collection'}
+                  </button>
+                </div>
+              </div>
             )
           })}
         </div>
@@ -589,14 +598,25 @@ function CardDetailModal({
             <button
               onClick={onAdd}
               disabled={isInCollection}
-              className={`w-full py-3 rounded-xl font-semibold transition-all text-sm ${
+              className={`w-full py-3 rounded-xl font-bold transition-all text-sm ${
                 isInCollection
                   ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 cursor-default'
-                  : 'bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500 shadow-lg shadow-amber-500/20'
+                  : 'bg-amber-500 text-[var(--warm-900)] hover:bg-amber-400 shadow-lg shadow-amber-500/20'
               }`}
             >
-              {isInCollection ? 'In Collection' : '+ Add to Collection'}
+              {isInCollection ? 'Added' : '+ Add to Collection'}
             </button>
+
+            <a
+              href={card.game === 'pokemon'
+                ? (window?.location?.search?.includes('pokeLang=jp')
+                  ? `/card/pokemon-jp/${encodeURIComponent(card.name)}`
+                  : `/card/pokemon/${card.id}`)
+                : `/card/onepiece/${encodeURIComponent(card.name)}`}
+              className="block w-full py-2.5 text-center text-sm text-[var(--warm-300)] hover:text-amber-400 transition-colors font-medium"
+            >
+              View Full Details →
+            </a>
           </div>
         </div>
 
