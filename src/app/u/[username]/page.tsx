@@ -47,7 +47,7 @@ export default function ProfilePage() {
   const [savingBio, setSavingBio] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const fetchProfile = () => {
+  useEffect(() => {
     fetch(`/api/profiles?username=${encodeURIComponent(username)}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
@@ -60,11 +60,8 @@ export default function ProfilePage() {
         setLoading(false)
       })
       .catch(() => setLoading(false))
-  }
+  }, [username])
 
-  useEffect(() => { fetchProfile() }, [username])
-
-  // Check if following
   useEffect(() => {
     if (user && profile && user.id !== profile.id) {
       fetch(`/api/follows?follower_id=${user.id}&following_id=${profile.id}`, {
@@ -104,8 +101,7 @@ export default function ProfilePage() {
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!user || !e.target.files?.[0]) return
     const file = e.target.files[0]
-    
-    // Validate
+
     if (file.size > 2 * 1024 * 1024) {
       alert(t('profile.fileTooLarge') || 'File too large (max 2MB)')
       return
@@ -117,9 +113,7 @@ export default function ProfilePage() {
 
     setUploading(true)
     try {
-      // Resize to 200x200 for avatar
       const resizedBlob = await resizeImage(file, 200, 200)
-      
       const formData = new FormData()
       formData.append('file', resizedBlob, `avatar-${Date.now()}.webp`)
       formData.append('folder', 'avatars')
@@ -129,11 +123,9 @@ export default function ProfilePage() {
         headers: { 'Authorization': `Bearer ${user.access_token}` },
         body: formData,
       })
-
       if (!uploadRes.ok) throw new Error('Upload failed')
       const { url } = await uploadRes.json()
 
-      // Update profile with new avatar URL
       const updateRes = await fetch('/api/profiles', {
         method: 'PATCH',
         headers: {
@@ -142,10 +134,8 @@ export default function ProfilePage() {
         },
         body: JSON.stringify({ avatar_url: url }),
       })
-
       if (!updateRes.ok) throw new Error('Update failed')
       const { profile: updated } = await updateRes.json()
-      
       setProfile(p => p ? { ...p, avatar_url: updated?.avatar_url || url } : p)
     } catch (err) {
       console.error('Avatar upload error:', err)
@@ -241,8 +231,9 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Profile Header */}
         <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6 mb-6 shadow-sm">
-          <div className="flex items-start gap-6">
-            {/* Avatar with upload overlay */}
+          {/* Row 1: Avatar + Name + Follow button */}
+          <div className="flex items-center gap-6">
+            {/* Avatar */}
             <div className="relative group flex-shrink-0">
               <div className="w-20 h-20 rounded-full bg-[#f5f6fa] border-2 border-[#6366f1]/20 flex items-center justify-center text-3xl font-bold text-[#6366f1] overflow-hidden">
                 {profile.avatar_url ? (
@@ -251,7 +242,6 @@ export default function ProfilePage() {
                   profile.username?.charAt(0).toUpperCase() || '?'
                 )}
               </div>
-              {/* Upload overlay - only on own profile */}
               {isOwnProfile && (
                 <button
                   onClick={() => fileInputRef.current?.click()}
@@ -278,6 +268,7 @@ export default function ProfilePage() {
               />
             </div>
 
+            {/* Name + badges */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 flex-wrap">
                 <h1 className="text-2xl font-extrabold text-[#1e2235]">{profile.username}</h1>
@@ -287,78 +278,9 @@ export default function ProfilePage() {
                   </span>
                 ))}
               </div>
-
-              {/* Bio with edit */}
-              {isOwnProfile && !editBio && (
-                <div className="flex items-start gap-2 mt-2">
-                  {profile.bio ? (
-                    <p className="text-[#5c6078] text-sm leading-relaxed">{profile.bio}</p>
-                  ) : (
-                    <p className="text-[#b5b8c8] text-sm italic">{t('profile.addBio') || 'Add a bio...'}</p>
-                  )}
-                  <button
-                    onClick={() => { setEditBio(true); setBioText(profile.bio || '') }}
-                    className="text-[#b5b8c8] hover:text-[#6366f1] transition-colors flex-shrink-0"
-                    title={t('common.edit') || 'Edit'}
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                  </button>
-                </div>
-              )}
-              {isOwnProfile && editBio && (
-                <div className="mt-2">
-                  <textarea
-                    value={bioText}
-                    onChange={(e) => setBioText(e.target.value)}
-                    maxLength={160}
-                    rows={2}
-                    className="w-full px-3 py-2 bg-[#f5f6fa] border border-[#e8eaf0] rounded-lg text-sm text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-[#6366f1]/50 resize-none"
-                    placeholder={t('profile.bioPlaceholder') || 'Tell us about yourself...'}
-                  />
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <button
-                      onClick={handleSaveBio}
-                      disabled={savingBio || !bioText.trim()}
-                      className="px-4 py-1.5 bg-[#6366f1] text-white text-xs font-semibold rounded-lg hover:bg-[#4f46e5] disabled:opacity-40 transition-all"
-                    >
-                      {savingBio ? '...' : (t('common.save') || 'Save')}
-                    </button>
-                    <button
-                      onClick={() => setEditBio(false)}
-                      className="px-4 py-1.5 text-xs text-[#8b8fa6] hover:text-[#1e2235] transition-colors"
-                    >
-                      {t('common.cancel') || 'Cancel'}
-                    </button>
-                    <span className="text-[10px] text-[#b5b8c8] ml-auto">{bioText.length}/160</span>
-                  </div>
-                </div>
-              )}
-              {!isOwnProfile && profile.bio && (
-                <p className="text-[#5c6078] mt-2 text-sm leading-relaxed">{profile.bio}</p>
-              )}
-
-              <div className="flex gap-6 mt-4">
-                <div className="text-center">
-                  <p className="text-xl font-bold text-[#1e2235]">{profile.collections_count}</p>
-                  <p className="text-xs text-[#8b8fa6]">{t('card.comments') || 'Collections'}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xl font-bold text-[#1e2235]">{profile.followers_count}</p>
-                  <p className="text-xs text-[#8b8fa6]">{t('profile.followers') || 'Followers'}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xl font-bold text-[#1e2235]">{profile.following_count}</p>
-                  <p className="text-xs text-[#8b8fa6]">{t('profile.following') || 'Following'}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xl font-bold text-[#1e2235]">{badges.length}</p>
-                  <p className="text-xs text-[#8b8fa6]">{t('badges.title') || 'Badges'}</p>
-                </div>
-              </div>
             </div>
 
+            {/* Follow button */}
             {!isOwnProfile && user && (
               <button
                 onClick={handleFollow}
@@ -372,6 +294,80 @@ export default function ProfilePage() {
                 {followLoading ? '...' : isFollowing ? (t('profile.unfollow') || 'Following') : (t('profile.follow') || 'Follow')}
               </button>
             )}
+          </div>
+
+          {/* Row 2: Bio */}
+          <div className="mt-4 ml-[5.5rem]">
+            {isOwnProfile && !editBio && (
+              <div className="flex items-start gap-2">
+                {profile.bio ? (
+                  <p className="text-[#5c6078] text-sm leading-relaxed">{profile.bio}</p>
+                ) : (
+                  <p className="text-[#b5b8c8] text-sm italic cursor-pointer" onClick={() => { setEditBio(true); setBioText('') }}>
+                    {t('profile.addBio') || 'Add a bio...'}
+                  </p>
+                )}
+                <button
+                  onClick={() => { setEditBio(true); setBioText(profile.bio || '') }}
+                  className="text-[#b5b8c8] hover:text-[#6366f1] transition-colors flex-shrink-0"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
+              </div>
+            )}
+            {isOwnProfile && editBio && (
+              <div>
+                <textarea
+                  value={bioText}
+                  onChange={(e) => setBioText(e.target.value)}
+                  maxLength={160}
+                  rows={2}
+                  className="w-full px-3 py-2 bg-[#f5f6fa] border border-[#e8eaf0] rounded-lg text-sm text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-[#6366f1]/50 resize-none"
+                  placeholder={t('profile.bioPlaceholder') || 'Tell us about yourself...'}
+                />
+                <div className="flex items-center gap-2 mt-1.5">
+                  <button
+                    onClick={handleSaveBio}
+                    disabled={savingBio || !bioText.trim()}
+                    className="px-4 py-1.5 bg-[#6366f1] text-white text-xs font-semibold rounded-lg hover:bg-[#4f46e5] disabled:opacity-40 transition-all"
+                  >
+                    {savingBio ? '...' : (t('common.save') || 'Save')}
+                  </button>
+                  <button
+                    onClick={() => setEditBio(false)}
+                    className="px-4 py-1.5 text-xs text-[#8b8fa6] hover:text-[#1e2235] transition-colors"
+                  >
+                    {t('common.cancel') || 'Cancel'}
+                  </button>
+                  <span className="text-[10px] text-[#b5b8c8] ml-auto">{bioText.length}/160</span>
+                </div>
+              </div>
+            )}
+            {!isOwnProfile && profile.bio && (
+              <p className="text-[#5c6078] text-sm leading-relaxed">{profile.bio}</p>
+            )}
+          </div>
+
+          {/* Row 3: Stats */}
+          <div className="flex gap-8 mt-4 ml-[5.5rem]">
+            <div className="text-center">
+              <p className="text-xl font-bold text-[#1e2235]">{profile.collections_count}</p>
+              <p className="text-xs text-[#8b8fa6]">Collections</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold text-[#1e2235]">{profile.followers_count}</p>
+              <p className="text-xs text-[#8b8fa6]">{t('profile.followers') || 'Followers'}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold text-[#1e2235]">{profile.following_count}</p>
+              <p className="text-xs text-[#8b8fa6]">{t('profile.following') || 'Following'}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold text-[#1e2235]">{badges.length}</p>
+              <p className="text-xs text-[#8b8fa6]">{t('badges.title') || 'Badges'}</p>
+            </div>
           </div>
         </div>
 
