@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useT, useLocale } from '@/lib/i18n'
+import Link from 'next/link'
 
 interface MoverCard {
   name: string
@@ -24,6 +25,7 @@ export default function TopMovers() {
   const [movers, setMovers] = useState<{ gainers: MoverCard[]; losers: MoverCard[] }>({ gainers: [], losers: [] })
   const [activeTab, setActiveTab] = useState<'gainers' | 'losers'>('gainers')
   const [loading, setLoading] = useState(true)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     fetch('/api/movers')
@@ -55,78 +57,95 @@ export default function TopMovers() {
         <h2 className="text-xl font-extrabold text-[#1e2235]">
           📈 {isThai ? 'การ์ดเคลื่อนไหววันนี้' : 'Top Movers Today'}
         </h2>
-        <div className="flex bg-[#f5f6fa] rounded-lg p-0.5">
-          <button
-            onClick={() => setActiveTab('gainers')}
-            className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
-              activeTab === 'gainers' ? 'bg-emerald-500 text-white shadow-sm' : 'text-[#5c6078] hover:text-emerald-600'
-            }`}
-          >
-            ▲ {isThai ? 'ขึ้น' : 'Gainers'}
-          </button>
-          <button
-            onClick={() => setActiveTab('losers')}
-            className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
-              activeTab === 'losers' ? 'bg-red-500 text-white shadow-sm' : 'text-[#5c6078] hover:text-red-600'
-            }`}
-          >
-            ▼ {isThai ? 'ลง' : 'Losers'}
-          </button>
+        <div className="flex items-center gap-2">
+          <div className="flex bg-[#f5f6fa] rounded-lg p-0.5">
+            <button
+              onClick={() => setActiveTab('gainers')}
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
+                activeTab === 'gainers' ? 'bg-emerald-500 text-white shadow-sm' : 'text-[#5c6078] hover:text-emerald-600'
+              }`}
+            >
+              ▲ {isThai ? 'ขึ้น' : 'Gainers'}
+            </button>
+            <button
+              onClick={() => setActiveTab('losers')}
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
+                activeTab === 'losers' ? 'bg-red-500 text-white shadow-sm' : 'text-[#5c6078] hover:text-red-600'
+              }`}
+            >
+              ▼ {isThai ? 'ลง' : 'Losers'}
+            </button>
+          </div>
         </div>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[1,2,3,4].map(i => <div key={i} className="shimmer h-48 rounded-xl" />)}
+        <div className="flex gap-3 overflow-hidden">
+          {[1,2,3,4].map(i => <div key={i} className="flex-shrink-0 w-[160px] shimmer h-48 rounded-xl" />)}
         </div>
       ) : cards.length === 0 ? (
         <p className="text-sm text-[#8b8fa6]">{isThai ? 'ยังไม่มีข้อมูล' : 'No data yet'}</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {cards.slice(0, 4).map((card, i) => (
-            <a
-              key={`${card.game}-${card.setId}-${card.number}`}
-              href={getCardLink(card)}
-              className="group bg-white border border-[#e8eaf0] rounded-xl overflow-hidden hover:shadow-lg hover:border-[#6366f1]/30 transition-all duration-300"
-            >
-              {/* Image */}
-              <div className="relative aspect-square bg-[#f5f6fa] p-4 flex items-center justify-center overflow-hidden">
-                <img
-                  src={card.image}
-                  alt={card.name}
-                  className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-                {/* Rank badge */}
-                <div className={`absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${
-                  activeTab === 'gainers' ? 'bg-emerald-500' : 'bg-red-500'
-                }`}>
-                  {i + 1}
-                </div>
-                {/* Change badge */}
-                <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                  card.direction === 'up'
-                    ? 'bg-emerald-50 text-emerald-600'
-                    : 'bg-red-50 text-red-600'
-                }`}>
-                  {card.direction === 'up' ? '▲' : '▼'} {Math.abs(card.priceChangePercent)}%
-                </div>
-              </div>
-              {/* Info */}
-              <div className="p-3">
-                <h3 className="text-xs font-bold text-[#1e2235] truncate mb-0.5">{card.name}</h3>
-                <p className="text-[10px] text-[#8b8fa6] truncate">{getGameLabel(card.game)} · {card.setName}</p>
-                <div className="flex items-center justify-between mt-1.5">
-                  <span className="text-sm font-extrabold text-[#1e2235]">${card.price.toFixed(2)}</span>
-                  <span className={`text-[10px] font-semibold ${
-                    card.direction === 'up' ? 'text-emerald-600' : 'text-red-600'
+        <div className="relative">
+          {/* Horizontal scrollable container */}
+          <div
+            ref={scrollRef}
+            className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-[#e8eaf0] scrollbar-track-transparent"
+            style={{ scrollbarWidth: 'thin' }}
+          >
+            {cards.map((card, i) => (
+              <a
+                key={`${card.game}-${card.setId}-${card.number}`}
+                href={getCardLink(card)}
+                className="group flex-shrink-0 w-[160px] sm:w-[180px] bg-white border border-[#e8eaf0] rounded-xl overflow-hidden hover:shadow-lg hover:border-[#6366f1]/30 transition-all duration-300 snap-start"
+              >
+                {/* Image */}
+                <div className="relative aspect-square bg-[#f5f6fa] p-3 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={card.image}
+                    alt={card.name}
+                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  {/* Rank badge */}
+                  <div className={`absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${
+                    activeTab === 'gainers' ? 'bg-emerald-500' : 'bg-red-500'
                   }`}>
-                    {card.direction === 'up' ? '+' : ''}{card.priceChange.toFixed(2)}
-                  </span>
+                    {i + 1}
+                  </div>
+                  {/* Change badge */}
+                  <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    card.direction === 'up'
+                      ? 'bg-emerald-50 text-emerald-600'
+                      : 'bg-red-50 text-red-600'
+                  }`}>
+                    {card.direction === 'up' ? '▲' : '▼'} {Math.abs(card.priceChangePercent)}%
+                  </div>
                 </div>
-              </div>
-            </a>
-          ))}
+                {/* Info */}
+                <div className="p-3">
+                  <h3 className="text-xs font-bold text-[#1e2235] truncate mb-0.5">{card.name}</h3>
+                  <p className="text-[10px] text-[#8b8fa6] truncate">{getGameLabel(card.game)} · {card.setName}</p>
+                  <div className="flex items-center justify-between mt-1.5">
+                    <span className="text-sm font-extrabold text-[#1e2235]">${card.price.toFixed(2)}</span>
+                    <span className={`text-[10px] font-semibold ${
+                      card.direction === 'up' ? 'text-emerald-600' : 'text-red-600'
+                    }`}>
+                      {card.direction === 'up' ? '+' : ''}{card.priceChange.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+
+          {/* View all link */}
+          <Link
+            href="/movers"
+            className="block mt-3 text-center text-sm text-[#6366f1] font-semibold hover:text-[#4f46e5] transition-colors"
+          >
+            {isThai ? 'ดูทั้งหมด →' : 'View All →'}
+          </Link>
         </div>
       )}
     </div>

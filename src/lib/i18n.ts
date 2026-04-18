@@ -291,10 +291,20 @@ const translations = {
   'search.noImage': { th: 'ไม่มีรูป', en: 'No Image' },
 
   // Top Movers
-  'movers.title': { th: 'การ์ดเคลื่อนไหว', en: 'Top Movers' },
-  'movers.gainers': { th: 'ราคาขึ้น', en: 'Top Gainers' },
-  'movers.losers': { th: 'ราคาลง', en: 'Top Losers' },
+  'movers.title': { th: 'การ์ดเคลื่อนไหววันนี้', en: 'Top Movers Today' },
+  'movers.gainers': { th: 'ราคาขึ้น', en: 'Gainers' },
+  'movers.losers': { th: 'ราคาลง', en: 'Losers' },
   'movers.viewAll': { th: 'ดูทั้งหมด', en: 'View All' },
+  'movers.subtitle': { th: 'การ์ดที่ราคาเปลี่ยนแปลงมากที่สุด', en: 'Cards with the biggest price changes' },
+  'movers.all': { th: 'ทั้งหมด', en: 'All' },
+  'movers.filterGame': { th: 'เกม', en: 'Game' },
+  'movers.filterTime': { th: 'ช่วงเวลา', en: 'Timeframe' },
+  'movers.card': { th: 'การ์ด', en: 'Card' },
+  'movers.price': { th: 'ราคา', en: 'Price' },
+  'movers.change': { th: 'เปลี่ยนแปลง', en: 'Change' },
+  'movers.changePercent': { th: '%', en: '%' },
+  'movers.setView': { th: 'ดูรายละเอียด', en: 'View details' },
+  'movers.noData': { th: 'ยังไม่มีข้อมูล', en: 'No data yet' },
 
   // Price Alerts page
   'alerts.title': { th: 'แจ้งเตือนราคา', en: 'Price Alerts' },
