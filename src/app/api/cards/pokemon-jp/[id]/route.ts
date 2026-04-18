@@ -87,7 +87,8 @@ export async function GET(
     let imageUrl: string | null = null
     let imageSource: string = 'none'
     
-    const setId = cardData.set?.id || ''
+    // Extract setId from cardData.id (format: "SETID-NUMBER") since cardData.set may be undefined
+    const setId = cardData.set?.id || cardData.id?.split('-')[0] || ''
     const localId = cardData.localId || ''
     
     // Priority 1: pokemon-card.com authentic JP image

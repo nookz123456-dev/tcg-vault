@@ -24,7 +24,8 @@ export async function GET(request: NextRequest) {
       let imageSource: string = 'none'
       
       // Priority 1: pokemon-card.com authentic JP image
-      const setId = card.set?.id || ''
+      // Extract setId from card.id (format: "SETID-NUMBER") since card.set is undefined in list results
+      const setId = card.set?.id || card.id?.split('-')[0] || ''
       const localId = card.localId || ''
       if (setId && localId) {
         const jpImage = getJPCardImage(setId, localId)
