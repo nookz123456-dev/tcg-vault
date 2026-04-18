@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
+import { useT } from '@/lib/i18n'
 
 type Game = 'pokemon' | 'pokemon-jp' | 'onepiece'
 
@@ -40,6 +41,7 @@ const GAME_CONFIG: Record<Game, { label: string; color: string; linkPrefix: stri
 }
 
 export default function SetDetailPage() {
+  const t = useT()
   const params = useParams()
   const game = params.game as Game
   const setId = params.setId as string
@@ -118,7 +120,7 @@ export default function SetDetailPage() {
               <div className="flex items-center gap-3 mt-2 text-sm text-[#5c6078]">
                 {set.series && <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full text-xs font-medium">{set.series}</span>}
                 <span>{(set.totalCards || set.cardCount || totalCount).toLocaleString()} cards</span>
-                {set.releaseDate && <span>· Released {set.releaseDate}</span>}
+                {set.releaseDate && <span>· t("card.released") {set.releaseDate}</span>}
               </div>
             </div>
           </div>
@@ -132,7 +134,7 @@ export default function SetDetailPage() {
               onChange={e => setRarityFilter(e.target.value)}
               className="px-3 py-2 rounded-lg border border-[#e8eaf0] bg-white text-sm text-[#1e2235] focus:ring-2 focus:ring-indigo-400"
             >
-              <option value="all">All Rarities</option>
+              <option value="all">t("set.allRarities")</option>
               {rarities.map(r => (
                 <option key={r} value={r}>{r}</option>
               ))}
@@ -145,7 +147,7 @@ export default function SetDetailPage() {
               onChange={e => setTypeFilter(e.target.value)}
               className="px-3 py-2 rounded-lg border border-[#e8eaf0] bg-white text-sm text-[#1e2235] focus:ring-2 focus:ring-indigo-400"
             >
-              <option value="all">All Types</option>
+              <option value="all">t("set.allTypes")</option>
               {types.map(t => (
                 <option key={t} value={t}>{t}</option>
               ))}
@@ -153,7 +155,7 @@ export default function SetDetailPage() {
           )}
 
           <span className="text-sm text-[#8b8fa6] self-center">
-            Showing {filtered.length} of {totalCount} cards
+            t("set.showing") {filtered.length} t("set.of") {totalCount} cards
           </span>
         </div>
 
@@ -226,7 +228,7 @@ export default function SetDetailPage() {
           </div>
         )}
 
-        {/* Load More */}
+        {/* t("set.loadMore") */}
         {!loading && cards.length < totalCount && (
           <div className="text-center mt-8">
             <button
@@ -234,7 +236,7 @@ export default function SetDetailPage() {
               disabled={loading}
               className="px-6 py-2.5 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors font-medium text-sm disabled:opacity-50"
             >
-              Load More ({totalCount - cards.length} remaining)
+              t("set.loadMore") ({totalCount - cards.length} t("set.remaining"))
             </button>
           </div>
         )}

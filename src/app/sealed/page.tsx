@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
+import { useT } from '@/lib/i18n'
 
 interface SealedProduct {
   id: string
@@ -18,6 +19,7 @@ interface SealedProduct {
 }
 
 export default function SealedPage() {
+  const t = useT()
   const [products, setProducts] = useState<SealedProduct[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -40,9 +42,9 @@ export default function SealedPage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-2 h-8 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full" />
-            <h1 className="text-3xl font-bold text-[#1e2235]">Sealed Products</h1>
+            <h1 className="text-3xl font-bold text-[#1e2235]">t("sealed.title")</h1>
           </div>
-          <p className="text-[#5c6078] ml-5">Booster boxes, Elite Trainer Boxes, and more — latest sets</p>
+          <p className="text-[#5c6078] ml-5">t("sealed.subtitle")</p>
         </div>
 
         {/* Products grid */}

@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import { useExchangeRates } from '@/lib/useExchangeRates'
 import { useWishlist } from '@/lib/useWishlist'
+import { useT } from '@/lib/i18n'
+import { useLocale } from '@/lib/i18n'
 import { useComments } from '@/lib/useComments'
 import { useAuth } from '@/lib/useAuth'
 import PriceHistoryChart from '@/components/PriceHistoryChart'
@@ -90,6 +92,14 @@ const CONDITION_CONFIG = [
   { key: 'damaged', label: 'Damaged', color: '#ef4444', bgColor: 'bg-red-50' },
 ] as const
 
+const CONDITION_I18N_KEYS: Record<string, string> = {
+  nearMint: 'condition.nearMint',
+  lightlyPlayed: 'condition.lightlyPlayed',
+  moderatelyPlayed: 'condition.moderatelyPlayed',
+  heavilyPlayed: 'condition.heavilyPlayed',
+  damaged: 'condition.damaged',
+}
+
 const GRADE_ORDER = ['psa10', 'psa9', 'cgc10', 'cgc9.5', 'bgs10', 'bgs9.5', 'sgc10', 'sgc9.5']
 
 const GRADE_LABELS: Record<string, string> = {
@@ -121,6 +131,8 @@ export default function CardDetailPage() {
   const [loading, setLoading] = useState(true)
   const [imgLoaded, setImgLoaded] = useState(false)
   const [showTHB, setShowTHB] = useState(false)
+  const t = useT()
+  const { locale } = useLocale()
   const { formatUSD, formatTHB, toUSD, toTHB } = useExchangeRates()
   const { user } = useAuth()
   const { isInWishlist, toggleWishlist } = useWishlist()
@@ -226,9 +238,9 @@ export default function CardDetailPage() {
         <Navbar />
         <div className="max-w-7xl mx-auto px-4 py-20 text-center">
           <div className="text-6xl mb-4">😕</div>
-          <p className="text-[#5c6078] text-lg font-medium">Card not found</p>
+          <p className="text-[#5c6078] text-lg font-medium">t("card.cardNotFound")</p>
           <button onClick={() => router.back()} className="mt-4 text-[#6366f1] hover:text-[#4f46e5] text-sm font-medium">
-            ← Go back
+            {`← ${t("card.goBack")}`}
           </button>
         </div>
       </div>
@@ -244,7 +256,7 @@ export default function CardDetailPage() {
         <div className="flex items-center justify-between mb-6">
           <button onClick={() => router.back()} className="text-[#8b8fa6] hover:text-[#1e2235] text-sm flex items-center gap-1.5 transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
-            Back to search
+            t("card.backToSearch")
           </button>
           <button
             onClick={() => setShowTHB(!showTHB)}
@@ -319,7 +331,7 @@ export default function CardDetailPage() {
             {/* Artist credit */}
             {card.artist && (
               <div className="text-sm text-[#8b8fa6]">
-                Illustrated by <span className="text-[#5c6078] font-medium">{card.artist}</span>
+                {t("card.illustratedBy")} <span className="text-[#5c6078] font-medium">{card.artist}</span>
               </div>
             )}
 
@@ -327,21 +339,21 @@ export default function CardDetailPage() {
             {hasAnyConditionPrices() && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-[#e8eaf0] bg-gray-50/50">
-                  <h2 className="text-base font-semibold text-[#1e2235]">Price by Condition</h2>
+                  <h2 className="text-base font-semibold text-[#1e2235]">t("card.priceByCondition")</h2>
                   <p className="text-xs text-[#8b8fa6] mt-0.5">
-                    TCGplayer market prices
-                    {card.tcgplayer?.updatedAt && ` · Updated ${new Date(card.tcgplayer.updatedAt).toLocaleDateString()}`}
+                    t("card.tcgplayerPrices")
+                    {card.tcgplayer?.updatedAt && ` · ${new Date(card.tcgplayer.updatedAt).toLocaleDateString()}`}
                   </p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50/50">
-                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Condition</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">Market</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Low</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Mid</th>
-                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">High</th>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">t("card.condition")</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">t("card.market")</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">t("card.low")</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">t("card.mid")</th>
+                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">t("card.high")</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -356,7 +368,7 @@ export default function CardDetailPage() {
                                   className="w-2.5 h-2.5 rounded-full"
                                   style={{ backgroundColor: condition.color }}
                                 />
-                                <span className="text-[#1e2235] font-medium">{condition.label}</span>
+                                <span className="text-[#1e2235] font-medium">{t((CONDITION_I18N_KEYS[condition.key] || 'condition.damaged') as any) || condition.label}</span>
                               </div>
                             </td>
                             <td className="text-right px-4 py-3.5">
@@ -381,7 +393,7 @@ export default function CardDetailPage() {
                       rel="noopener noreferrer"
                       className="text-xs text-[#6366f1] hover:text-[#4f46e5] font-medium flex items-center gap-1"
                     >
-                      View on TCGplayer →
+                      {t("card.viewOnTCGplayer")} →
                     </a>
                   </div>
                 )}
@@ -392,15 +404,15 @@ export default function CardDetailPage() {
             {hasAnyGradedPrices() && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-[#e8eaf0] bg-gray-50/50">
-                  <h2 className="text-base font-semibold text-[#1e2235]">Graded Prices</h2>
-                  <p className="text-xs text-[#8b8fa6] mt-0.5">PSA, CGC, BGS slab values</p>
+                  <h2 className="text-base font-semibold text-[#1e2235]">t("card.graded")</h2>
+                  <p className="text-xs text-[#8b8fa6] mt-0.5">t("card.psaDesc")</p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50/50">
-                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Grade</th>
-                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">Market Price</th>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{locale === "th" ? "เกรด" : "Grade"}</th>
+                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">t("card.market")</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -434,34 +446,34 @@ export default function CardDetailPage() {
             {card.cardmarket?.trendPrice && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-[#e8eaf0] bg-gray-50/50">
-                  <h2 className="text-base font-semibold text-[#1e2235]">CardMarket Trend</h2>
+                  <h2 className="text-base font-semibold text-[#1e2235]">t("card.cardmarket")</h2>
                   <p className="text-xs text-[#8b8fa6] mt-0.5">
-                    European market (EUR → USD)
+                    t("card.cardmarketDesc")
                     {card.cardmarketUpdatedAt && ` · ${new Date(card.cardmarketUpdatedAt).toLocaleDateString()}`}
                   </p>
                 </div>
                 <div className="p-5">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="col-span-2 md:col-span-1 bg-[#6366f1]/5 border border-[#6366f1]/10 rounded-lg p-4">
-                      <p className="text-xs text-[#6366f1]/70 font-medium uppercase tracking-wider">Trend Price</p>
+                      <p className="text-xs text-[#6366f1]/70 font-medium uppercase tracking-wider">t("card.trendPrice")</p>
                       <p className="text-2xl font-bold text-[#6366f1] mt-1">
                         {fmtPrice(eurToUSD(card.cardmarket.trendPrice))}
                       </p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-xs text-[#8b8fa6] font-medium uppercase tracking-wider">Avg Sell</p>
+                      <p className="text-xs text-[#8b8fa6] font-medium uppercase tracking-wider">t("card.avgSell")</p>
                       <p className="text-lg font-semibold text-[#1e2235] mt-1">
                         {fmtPrice(eurToUSD(card.cardmarket.averageSellPrice))}
                       </p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-xs text-[#8b8fa6] font-medium uppercase tracking-wider">Low Price</p>
+                      <p className="text-xs text-[#8b8fa6] font-medium uppercase tracking-wider">t("card.lowPrice")</p>
                       <p className="text-lg font-semibold text-[#1e2235] mt-1">
                         {fmtPrice(eurToUSD(card.cardmarket.lowPrice))}
                       </p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-xs text-[#8b8fa6] font-medium uppercase tracking-wider">7-Day Avg</p>
+                      <p className="text-xs text-[#8b8fa6] font-medium uppercase tracking-wider">t("card.7dayAvg")</p>
                       <p className="text-lg font-semibold text-[#1e2235] mt-1">
                         {fmtPrice(eurToUSD(card.cardmarket.avg7))}
                       </p>
@@ -476,7 +488,7 @@ export default function CardDetailPage() {
                       rel="noopener noreferrer"
                       className="text-xs text-[#6366f1] hover:text-[#4f46e5] font-medium flex items-center gap-1"
                     >
-                      View on CardMarket →
+                      {t("card.viewOnCardMarket")} →
                     </a>
                   </div>
                 )}
@@ -490,38 +502,38 @@ export default function CardDetailPage() {
             {!hasAnyConditionPrices() && !hasAnyGradedPrices() && !card.cardmarket?.trendPrice && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl p-8 text-center shadow-sm">
                 <div className="text-4xl mb-3">📊</div>
-                <p className="text-[#5c6078] font-medium">No price data available</p>
-                <p className="text-[#8b8fa6] text-sm mt-1">This card doesn&apos;t have market prices yet</p>
+                <p className="text-[#5c6078] font-medium">t("card.noPriceData")</p>
+                <p className="text-[#8b8fa6] text-sm mt-1">t("card.noPriceDesc")</p>
               </div>
             )}
 
             {/* ========== CARD DETAILS ========== */}
             <div className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
-              <h2 className="text-base font-semibold text-[#1e2235] mb-4">Card Details</h2>
+              <h2 className="text-base font-semibold text-[#1e2235] mb-4">t("card.cardDetails")</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 {card.set.series && (
                   <div>
-                    <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">Series</p>
+                    <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">t("card.series")</p>
                     <p className="text-[#1e2235] font-medium mt-0.5">{card.set.series}</p>
                   </div>
                 )}
                 {card.set.releaseDate && (
                   <div>
-                    <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">Released</p>
+                    <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">t("card.released")</p>
                     <p className="text-[#1e2235] font-medium mt-0.5">
-                      {new Date(card.set.releaseDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                      {new Date(card.set.releaseDate).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                     </p>
                   </div>
                 )}
                 {card.nationalPokedexNumbers && card.nationalPokedexNumbers.length > 0 && (
                   <div>
-                    <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">Pokédex #</p>
+                    <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">t("card.pokedex")</p>
                     <p className="text-[#1e2235] font-medium mt-0.5">{card.nationalPokedexNumbers.join(', ')}</p>
                   </div>
                 )}
                 {card.subtypes && card.subtypes.length > 0 && (
                   <div>
-                    <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">Subtypes</p>
+                    <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">t("card.subtypes")</p>
                     <p className="text-[#1e2235] font-medium mt-0.5">{card.subtypes.join(', ')}</p>
                   </div>
                 )}
@@ -531,7 +543,7 @@ export default function CardDetailPage() {
             {/* Abilities */}
             {card.abilities && card.abilities.length > 0 && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
-                <h2 className="text-base font-semibold text-[#1e2235] mb-3">Abilities</h2>
+                <h2 className="text-base font-semibold text-[#1e2235] mb-3">t("card.abilities")</h2>
                 {card.abilities.map((ability, i) => (
                   <div key={i} className="mb-3 last:mb-0">
                     <p className="text-sm font-semibold text-[#6366f1]">{ability.name}</p>
@@ -544,7 +556,7 @@ export default function CardDetailPage() {
             {/* Attacks */}
             {card.attacks && card.attacks.length > 0 && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
-                <h2 className="text-base font-semibold text-[#1e2235] mb-3">Attacks</h2>
+                <h2 className="text-base font-semibold text-[#1e2235] mb-3">t("card.attacks")</h2>
                 <div className="space-y-3">
                   {card.attacks.map((attack, i) => (
                     <div key={i} className="flex items-start gap-3 pb-3 border-b border-[#e8eaf0] last:border-0 last:pb-0">
@@ -567,7 +579,7 @@ export default function CardDetailPage() {
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   {card.weaknesses && card.weaknesses.length > 0 && (
                     <div>
-                      <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">Weakness</p>
+                      <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">t("card.weakness")</p>
                       {card.weaknesses.map((w, i) => (
                         <p key={i} className="text-[#1e2235] font-medium mt-0.5">{w.type} {w.value}</p>
                       ))}
@@ -575,7 +587,7 @@ export default function CardDetailPage() {
                   )}
                   {card.resistances && card.resistances.length > 0 && (
                     <div>
-                      <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">Resistance</p>
+                      <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">t("card.resistance")</p>
                       {card.resistances.map((r, i) => (
                         <p key={i} className="text-[#1e2235] font-medium mt-0.5">{r.type} {r.value}</p>
                       ))}
@@ -583,7 +595,7 @@ export default function CardDetailPage() {
                   )}
                   {card.retreatCost && card.retreatCost.length > 0 && (
                     <div>
-                      <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">Retreat</p>
+                      <p className="text-[#8b8fa6] text-xs uppercase tracking-wider">t("card.retreat")</p>
                       <p className="text-[#1e2235] font-medium mt-0.5">{card.retreatCost.length}</p>
                     </div>
                   )}
@@ -634,7 +646,7 @@ export default function CardDetailPage() {
                       : 'bg-[#6366f1] text-white hover:bg-[#4f46e5] shadow-sm'
                   }`}
                 >
-                  {wishlisted ? '♥ In Wishlist' : '+ Add to Wishlist'}
+                  {wishlisted ? '♥ card.inWishlist' : '+ Add to Wishlist'}
                 </button>
                 <button
                   onClick={() => {
@@ -654,7 +666,7 @@ export default function CardDetailPage() {
                   }}
                   className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#e8eaf0] text-[#5c6078] rounded-xl font-semibold text-sm hover:text-amber-600 hover:border-amber-300 transition-all shadow-sm"
                 >
-                  🔔 Set Price Alert
+                  🔔 t("card.setPriceAlert")
                 </button>
                 <button
                   onClick={() => {
@@ -669,7 +681,7 @@ export default function CardDetailPage() {
 
               {/* Comments Section */}
               <div id="comments" className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
-                <h2 className="text-base font-semibold text-[#1e2235] mb-4">Community Discussion</h2>
+                <h2 className="text-base font-semibold text-[#1e2235] mb-4">t("card.communityDiscussion")</h2>
 
                 {/* Comment input */}
                 {user ? (
@@ -677,7 +689,7 @@ export default function CardDetailPage() {
                     <textarea
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="Share your thoughts about this card..."
+                      placeholder={t("card.shareYourThoughts")}
                       maxLength={1000}
                       rows={3}
                       className="w-full px-4 py-3 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-[#6366f1]/50 resize-none text-sm transition-colors"
@@ -693,13 +705,13 @@ export default function CardDetailPage() {
                         disabled={!newComment.trim()}
                         className="px-5 py-2 bg-[#6366f1] text-white rounded-lg text-sm font-semibold hover:bg-[#4f46e5] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                       >
-                        Post Comment
+                        t("card.postComment")
                       </button>
                     </div>
                   </div>
                 ) : (
                   <div className="bg-[#f5f6fa] rounded-xl p-4 mb-4 text-center">
-                    <p className="text-sm text-[#8b8fa6]">Sign in to join the discussion</p>
+                    <p className="text-sm text-[#8b8fa6]">t("card.signInToComment")</p>
                     <a
                       href="/login"
                       className="inline-block mt-2 px-5 py-2 bg-[#6366f1] text-white rounded-lg text-sm font-semibold hover:bg-[#4f46e5] transition-all"
@@ -715,7 +727,7 @@ export default function CardDetailPage() {
                 ) : comments.length === 0 ? (
                   <div className="text-center py-8">
                     <div className="text-3xl mb-2 opacity-40">💬</div>
-                    <p className="text-[#8b8fa6] text-sm">No comments yet. Be the first!</p>
+                    <p className="text-[#8b8fa6] text-sm">t("card.noComments")</p>
                   </div>
                 ) : (
                   <div className="space-y-3">

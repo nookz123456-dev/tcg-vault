@@ -25,6 +25,7 @@ import { getCardPrice, GAME_LABELS } from '@/lib/api'
 import { useExchangeRates } from '@/lib/useExchangeRates'
 import Navbar from '@/components/Navbar'
 import SearchBar from '@/components/SearchBar'
+import { useT } from '@/lib/i18n'
 
 /**
  * Build searchable keywords from EN Pokemon TCG API card
@@ -76,6 +77,7 @@ type DisplayCard = {
 }
 
 export default function SearchResults() {
+  const t = useT()
   const searchParams = useSearchParams()
   const query = searchParams.get('q') || ''
   const game = (searchParams.get('game') || 'pokemon') as 'pokemon' | 'onepiece'
@@ -339,7 +341,7 @@ export default function SearchResults() {
                 )}
               </p>
               <p className="text-xs text-[#5c6078] font-medium">
-                {GAME_LABELS[game]}{game === 'onepiece' ? ` · ${opLang === 'en' ? 'English' : 'Japanese'}` : game === 'pokemon' && pokeLang === 'jp' ? ' · JP Edition' : pokeSupertype !== 'all' ? ` · ${pokeSupertype}` : ''}
+                {GAME_LABELS[game]}{game === 'onepiece' ? ` · ${opLang === 'en' ? 'English' : 'Japanese'}` : game === 'pokemon' && pokeLang === 'jp' ? ' · t("search.jpEdition")' : pokeSupertype !== 'all' ? ` · ${pokeSupertype}` : ''}
               </p>
             </div>
             <button
@@ -372,7 +374,7 @@ export default function SearchResults() {
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-[#a0a3b1]">
                       <svg className="w-10 h-10 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" /></svg>
-                      <span className="text-xs">No Image</span>
+                      <span className="text-xs">t("common.noImage")</span>
                     </div>
                   )}
                   {card.rarity && (
@@ -435,7 +437,7 @@ export default function SearchResults() {
               onClick={() => setPage(p => p + 1)}
               className="px-8 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] text-[#3b3f56] rounded-xl hover:text-[#6366f1] hover:border-[#6366f1]/30 transition-all font-medium"
             >
-              Load More
+              t("search.loadMore")
             </button>
           </div>
         )}
@@ -443,8 +445,8 @@ export default function SearchResults() {
         {!loading && query && cards.length === 0 && (
           <div className="text-center py-20">
             <div className="text-6xl mb-4 opacity-50">🔍</div>
-            <p className="text-[#3b3f56] text-lg">No cards found for &quot;{query}&quot;</p>
-            <p className="text-[#8b8fa6] text-sm mt-1">Try a different search term or filter</p>
+            <p className="text-[#3b3f56] text-lg">t("search.noResults") for &quot;{query}&quot;</p>
+            <p className="text-[#8b8fa6] text-sm mt-1">t("search.tryDifferent") term or filter</p>
           </div>
         )}
 
@@ -488,7 +490,7 @@ function CardDetailModal({
               />
             ) : (
               <div className="w-[300px] h-[420px] bg-[#f5f6fa] rounded-xl flex items-center justify-center text-[#8b8fa6]">
-                No Image Available
+                t("common.noImage") Available
               </div>
             )}
           </div>
@@ -585,7 +587,7 @@ function CardDetailModal({
                 : `/card/onepiece/${encodeURIComponent(card.name)}`}
               className="block w-full py-2.5 text-center text-sm text-[#5c6078] hover:text-[#6366f1] transition-colors font-medium"
             >
-              View Full Details →
+              t("search.viewDetails") →
             </a>
           </div>
         </div>

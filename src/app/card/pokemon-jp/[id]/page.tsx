@@ -8,6 +8,7 @@ import { useWishlist } from '@/lib/useWishlist'
 import { useComments } from '@/lib/useComments'
 import { useAuth } from '@/lib/useAuth'
 import PriceHistoryChart from '@/components/PriceHistoryChart'
+import { useCardStrings } from '@/lib/useCardStrings'
 
 interface PriceCondition {
   market: number | null
@@ -75,6 +76,7 @@ export default function PokemonJPCardPage() {
   const [imgLoaded, setImgLoaded] = useState(false)
   const [showTHB, setShowTHB] = useState(false)
   const { formatUSD, formatTHB, toTHB } = useExchangeRates()
+  const s = useCardStrings()
   const { user } = useAuth()
   const { isInWishlist, toggleWishlist } = useWishlist()
   const { comments, loading: commentsLoading, fetchComments, addComment } = useComments()
@@ -141,7 +143,7 @@ export default function PokemonJPCardPage() {
         <Navbar />
         <div className="max-w-7xl mx-auto px-4 py-20 text-center">
           <div className="text-6xl mb-4">😕</div>
-          <p className="text-[#5c6078] text-lg font-medium">Card not found</p>
+          <p className="text-[#5c6078] text-lg font-medium">{s.cardNotFound}</p>
           <button onClick={() => router.back()} className="mt-4 text-[#6366f1] hover:text-[#4f46e5] text-sm font-medium">
             ← Go back
           </button>
@@ -247,7 +249,7 @@ export default function PokemonJPCardPage() {
             {/* Skills/Attacks */}
             {card.skills && card.skills.length > 0 && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
-                <h2 className="text-base font-semibold text-[#1e2235] mb-3">Attacks</h2>
+                <h2 className="text-base font-semibold text-[#1e2235] mb-3">{s.attacks}</h2>
                 <div className="space-y-3">
                   {card.skills.map((skill, i) => (
                     <div key={i} className="flex items-start gap-3 pb-3 border-b border-[#e8eaf0] last:border-0 last:pb-0">
@@ -267,23 +269,23 @@ export default function PokemonJPCardPage() {
             {/* Card Details — weakness, resistance, retreat, description */}
             {((card.weakness && card.weakness.length > 0) || (card.resistance && card.resistance.length > 0) || card.retreat != null || card.description || card.illustrator) && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
-                <h2 className="text-base font-semibold text-[#1e2235] mb-3">Card Details</h2>
+                <h2 className="text-base font-semibold text-[#1e2235] mb-3">{s.cardDetails}</h2>
                 <div className="space-y-2.5">
                   {card.weakness && card.weakness.length > 0 && (
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-[#5c6078] w-24">Weakness</span>
+                      <span className="text-xs font-medium text-[#5c6078] w-24">{s.weakness}</span>
                       <span className="text-sm text-[#1e2235]">{card.weakness.join(', ')}</span>
                     </div>
                   )}
                   {card.resistance && card.resistance.length > 0 && (
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-[#5c6078] w-24">Resistance</span>
+                      <span className="text-xs font-medium text-[#5c6078] w-24">{s.resistance}</span>
                       <span className="text-sm text-[#1e2235]">{card.resistance.join(', ')}</span>
                     </div>
                   )}
                   {card.retreat != null && (
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-[#5c6078] w-24">Retreat</span>
+                      <span className="text-xs font-medium text-[#5c6078] w-24">{s.retreat}</span>
                       <span className="text-sm text-[#1e2235]">{card.retreat}</span>
                     </div>
                   )}
@@ -313,7 +315,7 @@ export default function PokemonJPCardPage() {
             {card.cardMarket && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-[#e8eaf0] bg-gray-50/50">
-                  <h2 className="text-base font-semibold text-[#1e2235]">CardMarket Price Trend</h2>
+                  <h2 className="text-base font-semibold text-[#1e2235]">{s.cardmarket}</h2>
                   <p className="text-xs text-[#8b8fa6] mt-0.5">European market · Prices in {card.cardMarket.unit}</p>
                 </div>
                 <div className="overflow-x-auto">
@@ -326,7 +328,7 @@ export default function PokemonJPCardPage() {
                     </thead>
                     <tbody>
                       <tr className="border-t border-[#e8eaf0]">
-                        <td className="px-5 py-3.5 text-[#1e2235] font-medium">Trend</td>
+                        <td className="px-5 py-3.5 text-[#1e2235] font-medium">{s.trendPrice}</td>
                         <td className="text-right px-5 py-3.5 text-[#6366f1] font-bold">{fmtPrice(card.cardMarket.trend)}</td>
                       </tr>
                       <tr className="border-t border-[#e8eaf0]">
@@ -342,7 +344,7 @@ export default function PokemonJPCardPage() {
                         <td className="text-right px-5 py-3.5 text-[#5c6078]">{fmtPrice(card.cardMarket.avg)}</td>
                       </tr>
                       <tr className="border-t border-[#e8eaf0]">
-                        <td className="px-5 py-3.5 text-[#1e2235] font-medium">Low</td>
+                        <td className="px-5 py-3.5 text-[#1e2235] font-medium">{s.low}</td>
                         <td className="text-right px-5 py-3.5 text-[#5c6078]">{fmtPrice(card.cardMarket.low)}</td>
                       </tr>
                     </tbody>
@@ -355,18 +357,18 @@ export default function PokemonJPCardPage() {
             {hasAnyConditionPrices() && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-[#e8eaf0] bg-gray-50/50">
-                  <h2 className="text-base font-semibold text-[#1e2235]">Price by Condition</h2>
-                  <p className="text-xs text-[#8b8fa6] mt-0.5">TCGplayer market prices</p>
+                  <h2 className="text-base font-semibold text-[#1e2235]">{s.priceByCondition}</h2>
+                  <p className="text-xs text-[#8b8fa6] mt-0.5">{s.tcgplayerPrices}</p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50/50">
-                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Condition</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">Market</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Low</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Mid</th>
-                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">High</th>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{s.condition}</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">{s.market}</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{s.low}</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{s.mid}</th>
+                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{s.high}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -412,14 +414,14 @@ export default function PokemonJPCardPage() {
             {hasGraded && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-[#e8eaf0] bg-gray-50/50">
-                  <h2 className="text-base font-semibold text-[#1e2235]">Graded Prices</h2>
-                  <p className="text-xs text-[#8b8fa6] mt-0.5">PSA, CGC, BGS slab values</p>
+                  <h2 className="text-base font-semibold text-[#1e2235]">{s.graded}</h2>
+                  <p className="text-xs text-[#8b8fa6] mt-0.5">{s.psaDesc}</p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50/50">
-                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Grade</th>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{s.grade}</th>
                         <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">eBay 7d Avg</th>
                         <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">eBay 30d Avg</th>
                         <th className="text-right px-5 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">TCGplayer</th>
@@ -460,7 +462,7 @@ export default function PokemonJPCardPage() {
             {!hasAnyConditionPrices() && !hasGraded && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl p-8 text-center shadow-sm">
                 <div className="text-4xl mb-3">📊</div>
-                <p className="text-[#5c6078] font-medium">No price data available</p>
+                <p className="text-[#5c6078] font-medium">{s.noPriceData}</p>
                 <p className="text-[#8b8fa6] text-sm mt-1">This card doesn&apos;t have market prices yet</p>
               </div>
             )}
@@ -496,7 +498,7 @@ export default function PokemonJPCardPage() {
 
             {/* Comments Section */}
             <div id="comments" className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
-              <h2 className="text-base font-semibold text-[#1e2235] mb-4">Community Discussion</h2>
+              <h2 className="text-base font-semibold text-[#1e2235] mb-4">{s.communityDiscussion}</h2>
 
               {user ? (
                 <div className="mb-4">
@@ -525,7 +527,7 @@ export default function PokemonJPCardPage() {
                 </div>
               ) : (
                 <div className="bg-[#f5f6fa] rounded-xl p-4 mb-4 text-center">
-                  <p className="text-sm text-[#8b8fa6]">Sign in to join the discussion</p>
+                  <p className="text-sm text-[#8b8fa6]">{s.signInToComment}</p>
                   <a href="/login" className="inline-block mt-2 px-5 py-2 bg-[#6366f1] text-white rounded-lg text-sm font-semibold hover:bg-[#4f46e5] transition-all">
                     Sign In
                   </a>
@@ -537,7 +539,7 @@ export default function PokemonJPCardPage() {
               ) : comments.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-3xl mb-2 opacity-40">💬</div>
-                  <p className="text-[#8b8fa6] text-sm">No comments yet. Be the first!</p>
+                  <p className="text-[#8b8fa6] text-sm">{s.noComments}</p>
                 </div>
               ) : (
                 <div className="space-y-3">

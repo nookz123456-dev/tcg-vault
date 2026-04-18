@@ -8,6 +8,7 @@ import { useWishlist } from '@/lib/useWishlist'
 import { useComments } from '@/lib/useComments'
 import { useAuth } from '@/lib/useAuth'
 import PriceHistoryChart from '@/components/PriceHistoryChart'
+import { useCardStrings } from '@/lib/useCardStrings'
 
 interface PriceCondition {
   market: number | null
@@ -69,6 +70,7 @@ export default function OnePieceCardPage() {
   const [imgLoaded, setImgLoaded] = useState(false)
   const [showTHB, setShowTHB] = useState(false)
   const { formatUSD, formatTHB, toTHB } = useExchangeRates()
+  const s = useCardStrings()
   const { user } = useAuth()
   const { isInWishlist, toggleWishlist } = useWishlist()
   const { comments, loading: commentsLoading, fetchComments, addComment } = useComments()
@@ -135,7 +137,7 @@ export default function OnePieceCardPage() {
         <Navbar />
         <div className="max-w-7xl mx-auto px-4 py-20 text-center">
           <div className="text-6xl mb-4">😕</div>
-          <p className="text-[#5c6078] text-lg font-medium">Card not found</p>
+          <p className="text-[#5c6078] text-lg font-medium">{s.cardNotFound}</p>
           <button onClick={() => router.back()} className="mt-4 text-[#6366f1] hover:text-[#4f46e5] text-sm font-medium">
             ← Go back
           </button>
@@ -214,12 +216,12 @@ export default function OnePieceCardPage() {
               <div className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-[#8b8fa6] font-medium uppercase tracking-wider">Market Price</p>
+                    <p className="text-xs text-[#8b8fa6] font-medium uppercase tracking-wider">{s.market}</p>
                     <p className="text-3xl font-extrabold text-[#6366f1] mt-1">{fmtPrice(card.market_price)}</p>
                   </div>
                   {card.inventory_price && (
                     <div className="text-right">
-                      <p className="text-xs text-[#8b8fa6] font-medium">Inventory</p>
+                      <p className="text-xs text-[#8b8fa6] font-medium">{s.cardDetails}</p>
                       <p className="text-lg font-bold text-[#1e2235]">{fmtPrice(card.inventory_price)}</p>
                     </div>
                   )}
@@ -266,7 +268,7 @@ export default function OnePieceCardPage() {
             {/* ========== ABILITY ========== */}
             {card.ability && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
-                <h2 className="text-sm font-semibold text-[#1e2235] mb-2">Effect</h2>
+                <h2 className="text-sm font-semibold text-[#1e2235] mb-2">{s.effect}</h2>
                 <p className="text-sm text-[#5c6078] leading-relaxed">{card.ability}</p>
                 {card.sub_types && (
                   <p className="text-xs text-[#8b8fa6] mt-2">{card.sub_types}</p>
@@ -278,18 +280,18 @@ export default function OnePieceCardPage() {
             {hasAnyConditionPrices() && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-[#e8eaf0] bg-gray-50/50">
-                  <h2 className="text-base font-semibold text-[#1e2235]">Price by Condition</h2>
-                  <p className="text-xs text-[#8b8fa6] mt-0.5">TCGplayer market prices</p>
+                  <h2 className="text-base font-semibold text-[#1e2235]">{s.priceByCondition}</h2>
+                  <p className="text-xs text-[#8b8fa6] mt-0.5">{s.tcgplayerPrices}</p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50/50">
-                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Condition</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">Market</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Low</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Mid</th>
-                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">High</th>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{s.condition}</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">{s.market}</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{s.low}</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{s.mid}</th>
+                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{s.high}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -335,17 +337,17 @@ export default function OnePieceCardPage() {
             {hasGraded && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-[#e8eaf0] bg-gray-50/50">
-                  <h2 className="text-base font-semibold text-[#1e2235]">Graded Prices</h2>
-                  <p className="text-xs text-[#8b8fa6] mt-0.5">PSA, CGC, BGS slab values</p>
+                  <h2 className="text-base font-semibold text-[#1e2235]">{s.graded}</h2>
+                  <p className="text-xs text-[#8b8fa6] mt-0.5">{s.psaDesc}</p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50/50">
-                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">Grade</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">eBay 7d Avg</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">eBay 30d Avg</th>
-                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">TCGplayer</th>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{s.grade}</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{s.day7Avg}</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{s.day30Avg}</th>
+                        <th className="text-right px-5 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">{s.market}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -383,8 +385,8 @@ export default function OnePieceCardPage() {
             {!hasAnyConditionPrices() && !hasGraded && (
               <div className="bg-white border border-[#e8eaf0] rounded-xl p-8 text-center shadow-sm">
                 <div className="text-4xl mb-3">📊</div>
-                <p className="text-[#5c6078] font-medium">No price data available</p>
-                <p className="text-[#8b8fa6] text-sm mt-1">This card doesn&apos;t have market prices yet</p>
+                <p className="text-[#5c6078] font-medium">{s.noPriceData}</p>
+                <p className="text-[#8b8fa6] text-sm mt-1">{s.noPriceDesc}</p>
               </div>
             )}
 
@@ -404,7 +406,7 @@ export default function OnePieceCardPage() {
                     : 'bg-[#6366f1] text-white hover:bg-[#4f46e5] shadow-sm'
                 }`}
               >
-                {wishlisted ? '♥ In Wishlist' : '+ Add to Wishlist'}
+                {wishlisted ? `♥ ${s.inWishlist}` : `+ ${s.addWishlist}`}
               </button>
               <button
                 onClick={() => {
@@ -413,20 +415,20 @@ export default function OnePieceCardPage() {
                 }}
                 className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#e8eaf0] text-[#5c6078] rounded-xl font-semibold text-sm hover:text-[#6366f1] hover:border-[#6366f1]/30 transition-all shadow-sm"
               >
-                Comments ({comments.length})
+                {s.communityDiscussion} ({comments.length})
               </button>
             </div>
 
             {/* Comments Section */}
             <div id="comments" className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
-              <h2 className="text-base font-semibold text-[#1e2235] mb-4">Community Discussion</h2>
+              <h2 className="text-base font-semibold text-[#1e2235] mb-4">{s.communityDiscussion}</h2>
 
               {user ? (
                 <div className="mb-4">
                   <textarea
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Share your thoughts about this card..."
+                    placeholder={s.shareYourThoughts}
                     maxLength={1000}
                     rows={3}
                     className="w-full px-4 py-3 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-[#6366f1]/50 resize-none text-sm transition-colors"
@@ -448,7 +450,7 @@ export default function OnePieceCardPage() {
                 </div>
               ) : (
                 <div className="bg-[#f5f6fa] rounded-xl p-4 mb-4 text-center">
-                  <p className="text-sm text-[#8b8fa6]">Sign in to join the discussion</p>
+                  <p className="text-sm text-[#8b8fa6]">{s.signInToComment}</p>
                   <a href="/login" className="inline-block mt-2 px-5 py-2 bg-[#6366f1] text-white rounded-lg text-sm font-semibold hover:bg-[#4f46e5] transition-all">
                     Sign In
                   </a>
@@ -456,11 +458,11 @@ export default function OnePieceCardPage() {
               )}
 
               {commentsLoading ? (
-                <div className="text-center py-6 text-[#8b8fa6] text-sm">Loading comments...</div>
+                <div className="text-center py-6 text-[#8b8fa6] text-sm">{s.loading}</div>
               ) : comments.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-3xl mb-2 opacity-40">💬</div>
-                  <p className="text-[#8b8fa6] text-sm">No comments yet. Be the first!</p>
+                  <p className="text-[#8b8fa6] text-sm">{s.noComments}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
