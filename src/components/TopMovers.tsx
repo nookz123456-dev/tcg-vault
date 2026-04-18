@@ -92,7 +92,7 @@ export default function TopMovers() {
               {/* Image */}
               <div className="relative aspect-square bg-[#f5f6fa] p-4 flex items-center justify-center overflow-hidden">
                 <img
-                  src={card.game === 'onepiece' ? `/api/proxy-image?url=${encodeURIComponent(card.image)}` : card.image}
+                  src={card.image}
                   alt={card.name}
                   className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                   loading="lazy"

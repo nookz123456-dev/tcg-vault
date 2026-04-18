@@ -1,6 +1,7 @@
-// One Piece Card Game API - Scraping from official Bandai site
+// One Piece Card Game API
+// Primary data: OPTCG API (optcgapi.com) — images + prices, no hotlink block
+// Fallback: Bandai scraping (asia-en / www) — search + metadata
 // Supports both English (asia-en) and Japanese (www) sites
-// Supports card type filtering (LEADER, CHARACTER, EVENT, STAGE)
 
 export interface OnePieceCardData {
   id: string
@@ -19,6 +20,8 @@ export interface OnePieceCardData {
   setName: string
   image: string
   category: string   // L (Leader), C (Character), E (Event), S (Stage)
+  market_price?: number | null
+  inventory_price?: number | null
 }
 
 export interface OnePieceSearchResult {
@@ -51,7 +54,7 @@ export const OP_TYPE_PARAMS: Record<string, string> = {
   STAGE: '',
 }
 
-// One Piece rarity levels (from category field)
+// One Piece rarity levels
 export const OP_RARITIES: Record<string, string> = {
   all: 'All Rarities',
   C: 'Common',
@@ -64,6 +67,62 @@ export const OP_RARITIES: Record<string, string> = {
   P: 'Promo',
 }
 
+// OPTCG API: Get card image URL by card ID (e.g., "OP01-001")
+// Images are hosted on optcgapi.com — no hotlink block!
+export function getOPTCGImageUrl(cardId: string): string {
+  return `https://optcgapi.com/media/static/Card_Images/${cardId}.jpg`
+}
+
+// OPTCG API: Fetch card data by card ID (includes image + prices)
+export async function fetchOPTCGCard(cardId: string): Promise<any | null> {
+  try {
+    const res = await fetch(`https://optcgapi.com/api/sets/card/${cardId}/`, {
+      headers: { 'User-Agent': 'TCGVault/1.0' },
+      next: { revalidate: 3600 },
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    if (Array.isArray(data) && data.length > 0) return data[0]
+    return null
+  } catch {
+    return null
+  }
+}
+
+// OPTCG API: Fetch all cards in a set
+export async function fetchOPTCGSetCards(setId: string): Promise<any[]> {
+  try {
+    const res = await fetch(`https://optcgapi.com/api/sets/${setId}/`, {
+      headers: { 'User-Agent': 'TCGVault/1.0' },
+      next: { revalidate: 3600 },
+    })
+    if (!res.ok) return []
+    const data = await res.json()
+    if (Array.isArray(data)) return data
+    return []
+  } catch {
+    return []
+  }
+}
+
+// Try to find card in OPTCG API by card_set_id
+export async function findOPTCGCard(cardId: string): Promise<any | null> {
+  // Try direct lookup first
+  const direct = await fetchOPTCGCard(cardId)
+  if (direct) return direct
+
+  // Try extracting set ID from card ID (e.g., "OP01-001" → "OP-01")
+  const match = cardId.match(/^([A-Z]+)(\d+)-(\d+)$/i)
+  if (match) {
+    const setId = `${match[1]}-${match[2]}`
+    const setCards = await fetchOPTCGSetCards(setId)
+    const found = setCards.find(c => c.card_set_id === cardId)
+    if (found) return found
+  }
+
+  return null
+}
+
 export async function searchOnePieceCards(
   query: string,
   page: number = 1,
@@ -73,8 +132,6 @@ export async function searchOnePieceCards(
   rarity: string = 'all'
 ): Promise<OnePieceSearchResult> {
   const baseUrl = OP_LANG_SITES[lang]
-  // Bandai site doesn't support server-side type filtering
-  // We fetch all and filter client-side after parsing
   const url = `${baseUrl}/cardlist/?search=${encodeURIComponent(query)}`
 
   const res = await fetch(url, {
@@ -92,80 +149,61 @@ export async function searchOnePieceCards(
   const html = await res.text()
   const cards: OnePieceCardData[] = []
 
-  // Extract total count
   const totalMatch = html.match(/(\d+)\s*results/)
   const totalCount = totalMatch ? parseInt(totalMatch[1]) : 0
 
-  // Split by modalCol blocks
   const modalBlocks = html.split('class="modalCol"')
 
   for (let i = 1; i < modalBlocks.length; i++) {
     const block = modalBlocks[i]
     if (!block.includes('cardName')) continue
 
-    // Extract ID from the id attribute
     const idMatch = block.match(/^[\s\S]*?id="([^"]+)"/)
     const cardId = idMatch ? idMatch[1] : ''
-
-    // Skip alternate art cards
     if (cardId.includes('_p')) continue
 
-    // Extract infoCol: "OP15-001 | L | LEADER"
     const infoMatch = block.match(/class="infoCol"[\s\S]*?<span>([^<]+)<\/span>\s*\|\s*<span>([^<]+)<\/span>\s*\|\s*<span>([^<]+)<\/span>/)
     const code = infoMatch ? infoMatch[1].trim() : cardId
     const category = infoMatch ? infoMatch[2].trim() : ''
     const type = infoMatch ? infoMatch[3].trim() : ''
 
-    // Extract name
     const nameMatch = block.match(/class="cardName"[^>]*>([\s\S]*?)<\/div>/)
     const name = nameMatch ? nameMatch[1].trim() : 'Unknown'
 
-    // Construct image URL
-    const image = cardId ? `${baseUrl}/images/cardlist/card/${cardId}.png` : ''
+    // Use OPTCG API image URL (no hotlink block!) instead of Bandai
+    const image = cardId ? getOPTCGImageUrl(cardId) : ''
 
-    // Extract cost/life
     const costMatch = block.match(/class="cost"[^>]*>[\s\S]*?<\/h3>([\s\S]*?)<\/div>/)
     const costRaw = costMatch ? costMatch[1].replace(/<[^>]+>/g, '').trim() : ''
     const cost = costRaw.replace(/[^0-9\-]/g, '')
 
-    // Extract attribute
     const attrMatch = block.match(/class="attribute"[\s\S]*?<i>([^<]+)<\/i>/)
     const attribute = attrMatch ? attrMatch[1].trim() : null
 
-    // Extract power
     const powerMatch = block.match(/class="power"[^>]*>[\s\S]*?<\/h3>([\s\S]*?)<\/div>/)
     const powerRaw = powerMatch ? powerMatch[1].replace(/<[^>]+>/g, '').trim() : null
     const power = powerRaw && powerRaw !== '-' ? powerRaw.replace(/[^0-9]/g, '') : null
 
-    // Extract counter
     const counterMatch = block.match(/class="counter"[^>]*>[\s\S]*?<\/h3>([\s\S]*?)<\/div>/)
     const counterRaw = counterMatch ? counterMatch[1].replace(/<[^>]+>/g, '').trim() : null
     const counter = counterRaw && counterRaw !== '-' ? counterRaw : null
 
-    // Extract color
     const colorMatch = block.match(/class="color"[^>]*>[\s\S]*?<\/h3>([\s\S]*?)<\/div>/)
     const color = colorMatch ? colorMatch[1].replace(/<[^>]+>/g, '').trim() : ''
 
-    // Extract feature/type (family)
     const featureMatch = block.match(/class="feature"[^>]*>[\s\S]*?<\/h3>([\s\S]*?)<\/div>/)
     const family = featureMatch ? featureMatch[1].replace(/<[^>]+>/g, '').trim() : null
 
-    // Extract effect/ability
     const textMatch = block.match(/class="text"[^>]*>[\s\S]*?<\/h3>([\s\S]*?)<\/div>/)
     const ability = textMatch ? textMatch[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() : ''
 
-    // Extract trigger
     const triggerMatch = block.match(/class="trigger"[^>]*>[\s\S]*?<\/h3>([\s\S]*?)<\/div>/)
     const trigger = triggerMatch ? triggerMatch[1].replace(/<[^>]+>/g, '').trim() : null
 
-    // Extract rarity from card HTML
     const rarityMatch = block.match(/class="rarity"[^>]*>([\s\S]*?)<\/div>/)
     const cardRarity = rarityMatch ? rarityMatch[1].replace(/<[^>]+>/g, '').trim() : ''
 
-    // Client-side type filter (Bandai site doesn't support server-side type filtering)
     if (cardType !== 'all' && type !== cardType.toUpperCase()) continue
-
-    // Client-side rarity filter (compare category field since that's the rarity code: C, UC, R, SR, SEC, ALT, SP, P)
     if (rarity !== 'all' && category !== rarity) continue
 
     cards.push({
@@ -188,10 +226,37 @@ export async function searchOnePieceCards(
     })
   }
 
-  // Apply pagination (totalCount reflects filtered results)
   const filteredTotal = cards.length
   const start = (page - 1) * pageSize
   const pagedCards = cards.slice(start, start + pageSize)
+
+  // Enrich with OPTCG prices (batch by set to minimize API calls)
+  if (pagedCards.length > 0) {
+    // Group cards by set prefix (e.g., "OP01", "OP05", "ST01")
+    const setGroups = new Map<string, OnePieceCardData[]>()
+    for (const card of pagedCards) {
+      const setId = (card.id || card.code).match(/^([A-Z]+-?\d+)/i)?.[1]
+      if (setId) {
+        if (!setGroups.has(setId)) setGroups.set(setId, [])
+        setGroups.get(setId)!.push(card)
+      }
+    }
+
+    const setPromises = [...setGroups.entries()].map(async ([setId, cards]) => {
+      // Convert card ID to OPTCG set ID: "OP01" → "OP-01", "ST01" → "ST-01"
+      const optcgSetId = setId.replace(/^([A-Z]+)(\d+)$/i, '$1-$2')
+      const setCards = await fetchOPTCGSetCards(optcgSetId)
+      for (const card of cards) {
+        const match = setCards.find(c => c.card_set_id === (card.id || card.code))
+        if (match) {
+          card.market_price = match.market_price || null
+          card.inventory_price = match.inventory_price || null
+          if (match.set_name && !card.setName) card.setName = match.set_name
+        }
+      }
+    })
+    await Promise.all(setPromises)
+  }
 
   return {
     data: pagedCards,
@@ -222,7 +287,7 @@ export async function getOnePieceCard(id: string, lang: OnePieceLang = 'en'): Pr
     ability: '',
     trigger: null,
     setName: '',
-    image: '',
+    image: getOPTCGImageUrl(id),
     category: '',
   }
 }

@@ -27,6 +27,17 @@ interface CardPriceData {
   setName: string
   setSlug: string
   game: string
+  // OPTCG fields
+  market_price?: number | null
+  inventory_price?: number | null
+  color?: string | null
+  type?: string | null
+  cost?: string | null
+  power?: string | null
+  counter?: string | null
+  attribute?: string | null
+  sub_types?: string | null
+  ability?: string | null
   prices: {
     nearMint: PriceCondition | null
     lightlyPlayed: PriceCondition | null
@@ -164,7 +175,7 @@ export default function OnePieceCardPage() {
                 {!imgLoaded && <div className="w-[320px] h-[447px] bg-gray-200 rounded-xl animate-pulse" />}
                 {card.imageUrl ? (
                   <img
-                    src={card.imageUrl.startsWith('http') ? `/api/proxy-image?url=${encodeURIComponent(card.imageUrl)}` : card.imageUrl}
+                    src={card.imageUrl}
                     alt={card.name}
                     className={`w-full rounded-xl shadow-lg transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                     style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.12)' }}
@@ -197,6 +208,71 @@ export default function OnePieceCardPage() {
               <h1 className="text-3xl font-bold text-[#1e2235] mb-2">{card.name}</h1>
               <p className="text-[#5c6078] text-sm">{card.setName} &middot; #{card.number}</p>
             </div>
+
+            {/* ========== MARKET PRICE HERO ========== */}
+            {card.market_price && (
+              <div className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-[#8b8fa6] font-medium uppercase tracking-wider">Market Price</p>
+                    <p className="text-3xl font-extrabold text-[#6366f1] mt-1">{fmtPrice(card.market_price)}</p>
+                  </div>
+                  {card.inventory_price && (
+                    <div className="text-right">
+                      <p className="text-xs text-[#8b8fa6] font-medium">Inventory</p>
+                      <p className="text-lg font-bold text-[#1e2235]">{fmtPrice(card.inventory_price)}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ========== CARD STATS ========== */}
+            {(card.type || card.color || card.cost || card.power || card.attribute || card.counter) && (
+              <div className="flex flex-wrap gap-2">
+                {card.type && (
+                  <span className="px-3 py-1.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-lg text-sm font-medium">
+                    {card.type}
+                  </span>
+                )}
+                {card.color && (
+                  <span className="px-3 py-1.5 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-lg text-sm font-medium">
+                    {card.color}
+                  </span>
+                )}
+                {card.cost && (
+                  <span className="px-3 py-1.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-lg text-sm font-medium">
+                    {card.type === 'Leader' ? `Life ${card.cost}` : `Cost ${card.cost}`}
+                  </span>
+                )}
+                {card.power && (
+                  <span className="px-3 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg text-sm font-medium">
+                    Power {card.power}
+                  </span>
+                )}
+                {card.counter && (
+                  <span className="px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-sm font-medium">
+                    Counter {card.counter}
+                  </span>
+                )}
+                {card.attribute && (
+                  <span className="px-3 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 rounded-lg text-sm font-medium">
+                    {card.attribute}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* ========== ABILITY ========== */}
+            {card.ability && (
+              <div className="bg-white border border-[#e8eaf0] rounded-xl p-5 shadow-sm">
+                <h2 className="text-sm font-semibold text-[#1e2235] mb-2">Effect</h2>
+                <p className="text-sm text-[#5c6078] leading-relaxed">{card.ability}</p>
+                {card.sub_types && (
+                  <p className="text-xs text-[#8b8fa6] mt-2">{card.sub_types}</p>
+                )}
+              </div>
+            )}
 
             {/* ========== CONDITION PRICES TABLE ========== */}
             {hasAnyConditionPrices() && (

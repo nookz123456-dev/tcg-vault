@@ -59,13 +59,12 @@ export async function GET() {
     console.error('Failed to fetch trending Pokemon cards:', e)
   }
 
-  // Add One Piece cards (static — scraping too slow for homepage)
-  // Images go through /api/proxy-image to bypass Bandai hotlink protection
+  // Add One Piece cards (static — using OPTCG API images, no hotlink block)
   const onePieceCards: TrendingCard[] = [
     {
       id: 'op-st01-001',
       name: 'Monkey.D.Luffy',
-      image: '/api/proxy-image?url=' + encodeURIComponent('https://www.onepiece-cardgame.com/images/cardlist/card/ST01-001.png'),
+      image: 'https://optcgapi.com/media/static/Card_Images/ST01-001.jpg',
       game: 'onepiece',
       setName: 'Straw Hat Crew',
       rarity: 'L',
@@ -74,7 +73,7 @@ export async function GET() {
     {
       id: 'op-op02-001',
       name: 'Monkey.D.Luffy',
-      image: '/api/proxy-image?url=' + encodeURIComponent('https://www.onepiece-cardgame.com/images/cardlist/card/OP02-001.png'),
+      image: 'https://optcgapi.com/media/static/Card_Images/OP02-001.jpg',
       game: 'onepiece',
       setName: 'Paramount War',
       rarity: 'SEC',
