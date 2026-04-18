@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     const cardsNeedingENFallback = data.filter(c => !c.image && c.nameENFallback)
     if (cardsNeedingENFallback.length > 0) {
       // Limit to 5 concurrent lookups to avoid rate limiting
-      const batchSize = Math.min(cardsNeedingENFallback.length, 5)
+      const batchSize = Math.min(cardsNeedingENFallback.length, 10)
       const fallbackPromises = cardsNeedingENFallback.slice(0, batchSize).map(async (card) => {
         const enImage = await findENImageFallback(card.nameENFallback!)
         if (enImage) card.image = enImage
