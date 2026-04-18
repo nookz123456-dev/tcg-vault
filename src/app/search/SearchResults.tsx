@@ -22,7 +22,6 @@ import { PokemonCard as PokemonCardType } from '@/lib/types'
 import { OnePieceCardData } from '@/lib/onepiece-api'
 import { PokemonJPCardData } from '@/lib/pokemon-jp-api'
 import { getCardPrice, GAME_LABELS } from '@/lib/api'
-import { useLocalCollection, LocalCard } from '@/lib/useLocalCollection'
 import { useExchangeRates } from '@/lib/useExchangeRates'
 import Navbar from '@/components/Navbar'
 import SearchBar from '@/components/SearchBar'
@@ -98,11 +97,10 @@ export default function SearchResults() {
   const [page, setPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [selectedCard, setSelectedCard] = useState<DisplayCard | null>(null)
-  const [addedCards, setAddedCards] = useState<Set<string>>(new Set())
+
   const [priceMap, setPriceMap] = useState<Record<string, number>>({})
   const [showTHB, setShowTHB] = useState(false)
 
-  const { addCard, cards: collectionCards } = useLocalCollection()
   const { formatUSD, formatTHB, toTHB } = useExchangeRates()
 
   const fmtPrice = (usd: number | null | undefined): string => {
@@ -314,29 +312,7 @@ export default function SearchResults() {
     if (page > 1) fetchCards()
   }, [page])
 
-  useEffect(() => {
-    const inCollection = new Set(collectionCards.map(c => c.cardId))
-    setAddedCards(inCollection)
-  }, [collectionCards])
 
-  const handleAddToCollection = (card: DisplayCard) => {
-    const newCard: LocalCard = {
-      id: crypto.randomUUID(),
-      cardId: card.id,
-      game: card.game,
-      name: card.name,
-      imageUrl: card.image,
-      setName: card.setName,
-      rarity: card.rarity,
-      quantity: 1,
-      condition: 'near_mint',
-      purchasePrice: card.marketPrice ?? null,
-      marketPrice: card.marketPrice ?? null,
-      addedAt: new Date().toISOString(),
-    }
-    addCard(newCard)
-    setAddedCards(prev => new Set([...prev, card.id]))
-  }
 
   return (
     <div className="min-h-screen">
@@ -379,18 +355,12 @@ export default function SearchResults() {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
           {cards.map((card) => {
-            const isInCollection = addedCards.has(card.id)
             return (
               <div
                 key={card.id}
                 className="group bg-white border border-[#e8eaf0] rounded-2xl overflow-hidden card-hover text-left cursor-pointer relative transition-all duration-300 hover:border-[#6366f1]/30 hover:shadow-lg hover:shadow-[#6366f1]/5 block"
                 onClick={() => setSelectedCard(card)}
               >
-                {isInCollection && (
-                  <div className="absolute top-2.5 left-2.5 z-10 bg-emerald-500 text-[#1e2235] text-[10px] px-2 py-0.5 rounded-lg font-bold shadow-sm">
-                    IN COLLECTION
-                  </div>
-                )}
                 <div className="aspect-[2.5/3.5] relative overflow-hidden bg-gradient-to-br from-[#f5f6fa] to-[#e8eaf0]">
                   {card.image ? (
                     <img
@@ -440,20 +410,6 @@ export default function SearchResults() {
                     </p>
                   ) : null}
                 </div>
-                {/* Add to Collection button */}
-                <div className="p-3.5 pt-0">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleAddToCollection(card) }}
-                    disabled={isInCollection}
-                    className={`w-full py-2 rounded-lg font-semibold transition-all text-xs ${
-                      isInCollection
-                        ? 'bg-emerald-50 text-emerald-500 border border-emerald-200 cursor-default'
-                        : 'bg-[#6366f1] text-[#1e2235] hover:bg-[#4f46e5] shadow-sm'
-                    }`}
-                  >
-                    {isInCollection ? 'Added' : '+ Add to Collection'}
-                  </button>
-                </div>
               </div>
             )
           })}
@@ -496,8 +452,6 @@ export default function SearchResults() {
           <CardDetailModal
             card={selectedCard}
             onClose={() => setSelectedCard(null)}
-            onAdd={() => handleAddToCollection(selectedCard)}
-            isInCollection={addedCards.has(selectedCard.id)}
             showTHB={showTHB}
           />
         )}
@@ -509,14 +463,10 @@ export default function SearchResults() {
 function CardDetailModal({
   card,
   onClose,
-  onAdd,
-  isInCollection,
   showTHB
 }: {
   card: DisplayCard
   onClose: () => void
-  onAdd: () => void
-  isInCollection: boolean
   showTHB: boolean
 }) {
   const { formatUSD, formatTHB, toTHB } = useExchangeRates()
@@ -627,19 +577,7 @@ function CardDetailModal({
               <p className="text-xs text-[#5c6078]">Art by {card.artist}</p>
             )}
 
-            <button
-              onClick={onAdd}
-              disabled={isInCollection}
-              className={`w-full py-3 rounded-xl font-bold transition-all text-sm ${
-                isInCollection
-                  ? 'bg-emerald-50 text-emerald-500 border border-emerald-200 cursor-default'
-                  : 'bg-[#6366f1] text-[#1e2235] hover:bg-[#4f46e5] shadow-lg shadow-[#6366f1]/20'
-              }`}
-            >
-              {isInCollection ? 'Added' : '+ Add to Collection'}
-            </button>
-
-            <a
+<a
               href={card.game === 'pokemon'
                 ? (window?.location?.search?.includes('pokeLang=jp')
                   ? `/card/pokemon-jp/${card.id}`
