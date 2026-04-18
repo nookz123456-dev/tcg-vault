@@ -35,17 +35,20 @@ export async function POST(request: NextRequest) {
       resetAttempts.set(ip, { count: 1, lastAttempt: now })
     }
 
-    // Send password reset email via Supabase
+    // Send password reset email via Supabase with redirect URL
+    const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://tcg-vault-sandy.vercel.app'}/auth/reset-password`
+
     const res = await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_ANON_KEY,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({
+        email,
+        redirect_to: resetUrl,
+      }),
     })
-
-    const data = await res.json()
 
     // Always return success to prevent email enumeration
     return NextResponse.json({

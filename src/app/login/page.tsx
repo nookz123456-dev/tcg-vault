@@ -88,10 +88,13 @@ export default function LoginPage() {
     setError('')
     setSuccess('')
     try {
-      const res = await fetch(`${SUPABASE_URL}/auth/v1/magiclink`, {
+        const res = await fetch(`${SUPABASE_URL}/auth/v1/magiclink`, {
         method: 'POST',
         headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({
+          email,
+          redirect_to: `${window.location.origin}/auth/callback`,
+        }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -114,7 +117,10 @@ export default function LoginPage() {
       const res = await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
         method: 'POST',
         headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({
+          email,
+          redirect_to: `${window.location.origin}/auth/reset-password`,
+        }),
       })
       const data = await res.json()
       if (!res.ok) {
