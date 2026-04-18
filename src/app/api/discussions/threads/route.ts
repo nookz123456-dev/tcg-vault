@@ -29,14 +29,22 @@ export async function GET(request: NextRequest) {
 
   const threads = await res.json()
 
-  // Fetch reply counts for each thread
+  // Fetch reply counts and like counts for each thread
   const threadsWithCounts = await Promise.all(threads.map(async (thread: { id: string; [key: string]: unknown }) => {
     const countRes = await fetch(
       `${SUPABASE_URL}/rest/v1/discussion_replies?thread_id=eq.${thread.id}&select=id`,
       { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
     )
     const replies = countRes.ok ? await countRes.json() : []
-    return { ...thread, reply_count: replies.length }
+
+    // Fetch like count
+    const likeRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/thread_likes?thread_id=eq.${thread.id}&select=id`,
+      { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+    )
+    const likes = likeRes.ok ? await likeRes.json() : []
+
+    return { ...thread, reply_count: replies.length, like_count: likes.length }
   }))
 
   return NextResponse.json({ threads: threadsWithCounts })

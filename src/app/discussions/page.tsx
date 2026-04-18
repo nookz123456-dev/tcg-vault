@@ -28,6 +28,7 @@ interface Thread {
   discussion_boards: { name: string; slug: string; icon: string }
   reply_count: number
   image_url?: string
+  like_count?: number
 }
 
 export default function DiscussionsPage() {
@@ -310,6 +311,9 @@ export default function DiscussionsPage() {
                           <span>{timeAgo(thread.created_at)}</span>
                           <span>👁 {thread.views}</span>
                           <span>💬 {thread.reply_count} {t('discuss.replies')}</span>
+                          {thread.like_count !== undefined && thread.like_count > 0 && (
+                            <span>❤️ {thread.like_count}</span>
+                          )}
                         </div>
                       </div>
                     </div>
