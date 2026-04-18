@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import { useT, useLocale } from '@/lib/i18n'
+import { useExchangeRates } from '@/lib/useExchangeRates'
 
 interface MoverCard {
   name: string
@@ -26,6 +27,8 @@ export default function MoversPage() {
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'gainers' | 'losers' | 'all'>('gainers')
   const [gameFilter, setGameFilter] = useState<'all' | 'pokemon' | 'onepiece'>('all')
+  const [showTHB, setShowTHB] = useState(false)
+  const { toTHB, formatUSD, formatTHB } = useExchangeRates()
 
   useEffect(() => {
     fetch('/api/movers')
@@ -61,6 +64,18 @@ export default function MoversPage() {
     return cards
   }
 
+  const formatPrice = (usd: number) => {
+    if (showTHB) return formatTHB(toTHB(usd))
+    return formatUSD(usd)
+  }
+
+  const formatChange = (change: number) => {
+    const val = showTHB ? toTHB(change) : change
+    const prefix = change >= 0 ? '+' : ''
+    if (showTHB) return `${prefix}฿${val.toFixed(2)}`
+    return `${prefix}$${val.toFixed(2)}`
+  }
+
   const filtered = getFilteredCards()
 
   const tabs: { key: 'gainers' | 'losers' | 'all'; label: string; icon: string }[] = [
@@ -80,14 +95,25 @@ export default function MoversPage() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-[#1e2235] tracking-tight">
-            📈 {t('movers.title') || 'Top Movers Today'}
-          </h1>
-          <p className="text-base text-[#8b8fa6] mt-1">
-            {t('movers.subtitle') || 'Cards with the biggest price changes'}
-          </p>
+        {/* Header + Currency toggle */}
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-extrabold text-[#1e2235] tracking-tight">
+              📈 {t('movers.title') || 'Top Movers Today'}
+            </h1>
+            <p className="text-base text-[#8b8fa6] mt-1">
+              {t('movers.subtitle') || 'Cards with the biggest price changes'}
+            </p>
+          </div>
+          {/* Currency toggle */}
+          <button
+            onClick={() => setShowTHB(!showTHB)}
+            className="flex items-center gap-1 px-3 py-1.5 bg-white border border-[#e8eaf0] rounded-xl text-sm font-semibold hover:border-[#6366f1]/30 transition-all"
+          >
+            <span className={showTHB ? 'text-[#8b8fa6]' : 'text-[#6366f1]'}>$ USD</span>
+            <span className="text-[#b5b8c8]">/</span>
+            <span className={showTHB ? 'text-[#6366f1]' : 'text-[#8b8fa6]'}>฿ THB</span>
+          </button>
         </div>
 
         {/* Filters */}
@@ -149,7 +175,7 @@ export default function MoversPage() {
                 href={getCardLink(card)}
                 className="group bg-white border border-[#e8eaf0] rounded-2xl overflow-hidden hover:shadow-md hover:border-[#6366f1]/30 transition-all"
               >
-                {/* Image - larger */}
+                {/* Image */}
                 <div className="relative bg-[#f5f6fa] p-6 flex items-center justify-center aspect-[4/3]">
                   <img
                     src={card.image}
@@ -172,7 +198,7 @@ export default function MoversPage() {
                     {card.direction === 'up' ? '▲' : '▼'} {Math.abs(card.priceChangePercent).toFixed(1)}%
                   </div>
                 </div>
-                {/* Info - bigger */}
+                {/* Info */}
                 <div className="p-5">
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${
@@ -187,14 +213,14 @@ export default function MoversPage() {
                   <div className="flex items-end justify-between mt-3 pt-3 border-t border-[#f5f6fa]">
                     <div>
                       <p className="text-xs text-[#8b8fa6] mb-0.5">{t('movers.price') || 'Price'}</p>
-                      <p className="text-xl font-extrabold text-[#1e2235]">${card.price.toFixed(2)}</p>
+                      <p className="text-xl font-extrabold text-[#1e2235]">{formatPrice(card.price)}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-[#8b8fa6] mb-0.5">{t('movers.change') || 'Change'}</p>
                       <p className={`text-base font-bold ${
                         card.direction === 'up' ? 'text-emerald-600' : 'text-red-600'
                       }`}>
-                        {card.direction === 'up' ? '+' : ''}{card.priceChange.toFixed(2)}
+                        {formatChange(card.priceChange)}
                       </p>
                     </div>
                   </div>

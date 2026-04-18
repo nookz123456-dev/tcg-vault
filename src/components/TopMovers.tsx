@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useT, useLocale } from '@/lib/i18n'
+import { useExchangeRates } from '@/lib/useExchangeRates'
 import Link from 'next/link'
 
 interface MoverCard {
@@ -25,6 +26,8 @@ export default function TopMovers() {
   const [movers, setMovers] = useState<{ gainers: MoverCard[]; losers: MoverCard[] }>({ gainers: [], losers: [] })
   const [activeTab, setActiveTab] = useState<'gainers' | 'losers'>('gainers')
   const [loading, setLoading] = useState(true)
+  const [showTHB, setShowTHB] = useState(false)
+  const { toTHB, formatUSD, formatTHB } = useExchangeRates()
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -51,12 +54,28 @@ export default function TopMovers() {
     return '#'
   }
 
+  const formatPrice = (usd: number) => {
+    if (showTHB) return formatTHB(toTHB(usd))
+    return formatUSD(usd)
+  }
+
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-xl font-extrabold text-[#1e2235]">
-          📈 {isThai ? 'การ์ดเคลื่อนไหววันนี้' : 'Top Movers Today'}
-        </h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-extrabold text-[#1e2235]">
+            📈 {isThai ? 'การ์ดเคลื่อนไหววันนี้' : 'Top Movers Today'}
+          </h2>
+          {/* Currency toggle */}
+          <button
+            onClick={() => setShowTHB(!showTHB)}
+            className="flex items-center gap-0.5 px-2 py-1 bg-white border border-[#e8eaf0] rounded-lg text-[11px] font-semibold hover:border-[#6366f1]/30 transition-all"
+          >
+            <span className={showTHB ? 'text-[#8b8fa6]' : 'text-[#6366f1]'}>$</span>
+            <span className="text-[#b5b8c8]">/</span>
+            <span className={showTHB ? 'text-[#6366f1]' : 'text-[#8b8fa6]'}>฿</span>
+          </button>
+        </div>
         <div className="flex items-center gap-2">
           <div className="flex bg-[#f5f6fa] rounded-lg p-0.5">
             <button
@@ -87,7 +106,6 @@ export default function TopMovers() {
         <p className="text-sm text-[#8b8fa6]">{isThai ? 'ยังไม่มีข้อมูล' : 'No data yet'}</p>
       ) : (
         <div className="relative">
-          {/* Horizontal scrollable container */}
           <div
             ref={scrollRef}
             className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-[#e8eaf0] scrollbar-track-transparent"
@@ -99,7 +117,6 @@ export default function TopMovers() {
                 href={getCardLink(card)}
                 className="group flex-shrink-0 w-[160px] sm:w-[180px] bg-white border border-[#e8eaf0] rounded-xl overflow-hidden hover:shadow-lg hover:border-[#6366f1]/30 transition-all duration-300 snap-start"
               >
-                {/* Image */}
                 <div className="relative aspect-square bg-[#f5f6fa] p-3 flex items-center justify-center overflow-hidden">
                   <img
                     src={card.image}
@@ -107,13 +124,11 @@ export default function TopMovers() {
                     className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                   />
-                  {/* Rank badge */}
                   <div className={`absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${
                     activeTab === 'gainers' ? 'bg-emerald-500' : 'bg-red-500'
                   }`}>
                     {i + 1}
                   </div>
-                  {/* Change badge */}
                   <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                     card.direction === 'up'
                       ? 'bg-emerald-50 text-emerald-600'
@@ -122,16 +137,15 @@ export default function TopMovers() {
                     {card.direction === 'up' ? '▲' : '▼'} {Math.abs(card.priceChangePercent)}%
                   </div>
                 </div>
-                {/* Info */}
                 <div className="p-3">
                   <h3 className="text-xs font-bold text-[#1e2235] truncate mb-0.5">{card.name}</h3>
                   <p className="text-[10px] text-[#8b8fa6] truncate">{getGameLabel(card.game)} · {card.setName}</p>
                   <div className="flex items-center justify-between mt-1.5">
-                    <span className="text-sm font-extrabold text-[#1e2235]">${card.price.toFixed(2)}</span>
+                    <span className="text-sm font-extrabold text-[#1e2235]">{formatPrice(card.price)}</span>
                     <span className={`text-[10px] font-semibold ${
                       card.direction === 'up' ? 'text-emerald-600' : 'text-red-600'
                     }`}>
-                      {card.direction === 'up' ? '+' : ''}{card.priceChange.toFixed(2)}
+                      {card.direction === 'up' ? '+' : ''}{showTHB ? '฿' : '$'}{showTHB ? toTHB(card.priceChange).toFixed(0) : card.priceChange.toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -139,7 +153,6 @@ export default function TopMovers() {
             ))}
           </div>
 
-          {/* View all link */}
           <Link
             href="/movers"
             className="block mt-3 text-center text-sm text-[#6366f1] font-semibold hover:text-[#4f46e5] transition-colors"
