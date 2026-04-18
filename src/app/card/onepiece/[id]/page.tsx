@@ -77,23 +77,41 @@ export default function OnePieceCardPage() {
  const [newComment, setNewComment] = useState('')
  const [wishlistLoading, setWishlistLoading] = useState(false)
 
- const cardId = cardName
  const cardGame = 'onepiece'
- const wishlisted = isInWishlist(cardId, cardGame)
+
+ // Detect if URL param is a card ID (e.g. OP01-022) or a name (e.g. "Roronoa Zoro")
+ const isCardId = /^[A-Z]+-?\d+-\d+$/i.test(cardName)
+ const [resolvedId, setResolvedId] = useState(cardName)
+
+ // If it's a name (old URL format), search to find the real card ID first
+ useEffect(() => {
+ if (!isCardId) {
+ fetch(`/api/cards/onepiece?q=${encodeURIComponent(cardName)}&pageSize=5`)
+ .then(r => r.json())
+ .then(data => {
+ const results = data.data || []
+ const exact = results.find((c: any) => c.name?.toLowerCase() === cardName.toLowerCase()) || results[0]
+ if (exact?.id) setResolvedId(exact.id)
+ })
+ .catch(() => {})
+ }
+ }, [cardName, isCardId])
+
+ const wishlisted = isInWishlist(resolvedId, cardGame)
 
  useEffect(() => {
- fetchComments(cardId, cardGame)
- }, [cardId, cardGame, fetchComments])
+ fetchComments(resolvedId, cardGame)
+ }, [resolvedId, cardGame, fetchComments])
 
  useEffect(() => {
- fetch(`/api/cards/onepiece/${encodeURIComponent(cardName)}`)
+ fetch(`/api/cards/onepiece/${encodeURIComponent(resolvedId)}`)
  .then(r => r.json())
  .then(data => {
  setCard(data)
  setLoading(false)
  })
  .catch(() => setLoading(false))
- }, [cardName])
+ }, [resolvedId])
 
  const fmtPrice = (amount: number | null | undefined): string => {
  if (amount === null || amount === undefined || amount === 0) return '\u2014'
@@ -379,7 +397,7 @@ export default function OnePieceCardPage() {
  )}
 
  {/* Price History Chart */}
- <PriceHistoryChart cardId={cardId} game="onepiece" height={280} />
+ <PriceHistoryChart cardId={resolvedId} game="onepiece" height={280} />
 
  {/* No prices message */}
  {!hasAnyConditionPrices() && !hasGraded && (
@@ -396,7 +414,7 @@ export default function OnePieceCardPage() {
  onClick={async () => {
  if (!user) { window.location.href = '/login'; return }
  setWishlistLoading(true)
- await toggleWishlist(cardId, cardGame)
+ await toggleWishlist(resolvedId, cardGame)
  setWishlistLoading(false)
  }}
  disabled={wishlistLoading}
@@ -438,7 +456,7 @@ export default function OnePieceCardPage() {
  <button
  onClick={async () => {
  if (!newComment.trim()) return
- await addComment(cardId, cardGame, newComment.trim())
+ await addComment(resolvedId, cardGame, newComment.trim())
  setNewComment('')
  }}
  disabled={!newComment.trim()}

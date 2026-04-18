@@ -272,7 +272,7 @@ export default function SearchResults() {
               key={card.id}
               href={card.game === 'pokemon'
                 ? (pokeLang === 'jp' ? `/card/pokemon-jp/${card.id}` : `/card/pokemon/${card.id}`)
-                : `/card/onepiece/${encodeURIComponent(card.name)}`}
+                : `/card/onepiece/${encodeURIComponent(card.id)}`}
               className="group bg-white rounded-xl overflow-hidden border border-transparent hover:border-[#6366f1]/20 hover:shadow-md hover:shadow-[#6366f1]/5 transition-all duration-200"
             >
               {/* Image */}

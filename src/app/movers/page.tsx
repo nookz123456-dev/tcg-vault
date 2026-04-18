@@ -48,7 +48,7 @@ export default function MoversPage() {
 
   const getCardLink = (card: MoverCard) => {
     if (card.game === 'pokemon') return `/card/pokemon/${card.setId}-${card.number}`
-    if (card.game === 'onepiece') return `/card/onepiece/${card.name}`
+    if (card.game === 'onepiece') return `/card/onepiece/${card.setId}-${card.number}`
     return '#'
   }
 
