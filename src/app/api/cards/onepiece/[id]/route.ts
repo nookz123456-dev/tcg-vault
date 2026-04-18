@@ -46,12 +46,12 @@ export async function GET(
       return NextResponse.json({ error: 'Card not found' }, { status: 404 })
     }
 
-    // Build response from available data
-    // Prefer OPTCG image (no hotlink block!) over TCG Price Lookup image
-    const imageUrl = optcgData?.card_image
+    // Build response — proxy external images to avoid browser blocking
+    const rawImageUrl = optcgData?.card_image
       || (optcgData?.card_image_id ? getOPTCGImageUrl(optcgData.card_image_id) : null)
       || priceData?.image_url
       || getOPTCGImageUrl(cardId)
+    const imageUrl = rawImageUrl ? `/api/proxy-image?url=${encodeURIComponent(rawImageUrl)}` : null
 
     return NextResponse.json({
       id: priceData?.id || cardId,

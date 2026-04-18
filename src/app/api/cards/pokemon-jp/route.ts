@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { searchPokemonJPCardsTCGdex, getJPImageUrl } from '@/lib/tcgdex-jp-api'
+import { searchPokemonJPCardsTCGdex, getJPImageUrl, buildJPFallbackImageUrl, findENImageFallback } from '@/lib/tcgdex-jp-api'
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
@@ -13,27 +13,55 @@ export async function GET(request: NextRequest) {
   try {
     const result = await searchPokemonJPCardsTCGdex(keyword, page)
     
-    // Transform for display
-    const data = result.data.map(card => ({
-      id: card.id,
-      name: card.name, // Japanese name
-      nameEN: null,
-      image: card.image ? getJPImageUrl(card.image, 'high') : null,
-      setName: card.set?.name || '',
-      rarity: card.rarity || null,
-      hp: card.hp?.toString() || null,
-      types: card.types?.map(t => t) || [],
-      supertype: card.category || 'Pokemon',
-      evolution: card.stage || null,
-      number: card.localId || '',
-      skills: card.attacks?.map(a => ({
-        name: a.name,
-        cost: a.cost?.join(', ') || '',
-        damage: a.damage || '',
-      })) || [],
-      keywords: buildKeywords(card),
-      game: 'pokemon',
-    }))
+    // Transform for display with image fallback chain:
+    // 1. TCGdex image (best — JP art)
+    // 2. Fallback URL from setId + localId pattern
+    // 3. EN equivalent image from Pokemon TCG API (same art, different language)
+    const data = result.data.map(card => {
+      let imageUrl: string | null = null
+      if (card.image) {
+        imageUrl = getJPImageUrl(card.image, 'high')
+      } else if (card.set?.id && card.localId) {
+        imageUrl = buildJPFallbackImageUrl(card.set.id, card.localId)
+      }
+      // Note: EN fallback is async, handled below
+      return {
+        id: card.id,
+        name: card.name,
+        nameEN: null,
+        image: imageUrl,
+        nameENFallback: card.name, // store for EN lookup
+        setName: card.set?.name || '',
+        rarity: card.rarity || null,
+        hp: card.hp?.toString() || null,
+        types: card.types?.map(t => t) || [],
+        supertype: card.category || 'Pokemon',
+        evolution: card.stage || null,
+        number: card.localId || '',
+        skills: card.attacks?.map(a => ({
+          name: a.name,
+          cost: a.cost?.join(', ') || '',
+          damage: a.damage || '',
+        })) || [],
+        keywords: buildKeywords(card),
+        game: 'pokemon',
+      }
+    })
+
+    // EN image fallback for cards without JP image (async batch)
+    const cardsNeedingENFallback = data.filter(c => !c.image && c.nameENFallback)
+    if (cardsNeedingENFallback.length > 0) {
+      // Limit to 5 concurrent lookups to avoid rate limiting
+      const batchSize = Math.min(cardsNeedingENFallback.length, 5)
+      const fallbackPromises = cardsNeedingENFallback.slice(0, batchSize).map(async (card) => {
+        const enImage = await findENImageFallback(card.nameENFallback!)
+        if (enImage) card.image = enImage
+      })
+      await Promise.all(fallbackPromises)
+    }
+
+    // Remove temp field
+    data.forEach(c => { delete (c as any).nameENFallback })
 
     return NextResponse.json({ data, totalCount: result.totalCount, page: result.page })
   } catch (error) {

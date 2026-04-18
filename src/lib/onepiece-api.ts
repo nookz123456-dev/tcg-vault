@@ -68,9 +68,15 @@ export const OP_RARITIES: Record<string, string> = {
 }
 
 // OPTCG API: Get card image URL by card ID (e.g., "OP01-001")
-// Images are hosted on optcgapi.com — no hotlink block!
+// Images are hosted on optcgapi.com
 export function getOPTCGImageUrl(cardId: string): string {
   return `https://optcgapi.com/media/static/Card_Images/${cardId}.jpg`
+}
+
+// Get displayable image URL for One Piece cards (proxied to avoid browser blocking)
+export function getOPDisplayImageUrl(cardId: string): string {
+  const optcgUrl = getOPTCGImageUrl(cardId)
+  return `/api/proxy-image?url=${encodeURIComponent(optcgUrl)}`
 }
 
 // OPTCG API: Fetch card data by card ID (includes image + prices)
@@ -170,8 +176,8 @@ export async function searchOnePieceCards(
     const nameMatch = block.match(/class="cardName"[^>]*>([\s\S]*?)<\/div>/)
     const name = nameMatch ? nameMatch[1].trim() : 'Unknown'
 
-    // Use OPTCG API image URL (no hotlink block!) instead of Bandai
-    const image = cardId ? getOPTCGImageUrl(cardId) : ''
+    // Use OPTCG API image URL (proxied to avoid browser blocking)
+    const image = cardId ? getOPDisplayImageUrl(cardId) : ''
 
     const costMatch = block.match(/class="cost"[^>]*>[\s\S]*?<\/h3>([\s\S]*?)<\/div>/)
     const costRaw = costMatch ? costMatch[1].replace(/<[^>]+>/g, '').trim() : ''
@@ -287,7 +293,7 @@ export async function getOnePieceCard(id: string, lang: OnePieceLang = 'en'): Pr
     ability: '',
     trigger: null,
     setName: '',
-    image: getOPTCGImageUrl(id),
+    image: getOPDisplayImageUrl(id),
     category: '',
   }
 }

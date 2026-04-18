@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { buildJPFallbackImageUrl } from '@/lib/tcgdex-jp-api'
 
 const TCGDEX_JP = 'https://api.tcgdex.net/v2/ja'
 
@@ -29,7 +30,7 @@ export async function GET(
       id: c.id,
       localId: c.localId,
       name: c.name,
-      image: c.image ? `${c.image}/high.webp` : (c.id ? (() => { const sid = setId; const prefix = sid.match(/^(SV|SM|S|E|ADV|neo|web|VS|PMCG|swsh)/i)?.[1] || sid.replace(/[0-9]+.*$/, ''); return `https://assets.tcgdex.net/ja/${prefix}/${sid}/${c.localId}/high.webp`; })() : null),
+      image: c.image ? `${c.image}/high.webp` : (c.id ? buildJPFallbackImageUrl(setId, c.localId) : null),
       category: c.category || null,
       hp: c.hp || null,
       types: c.types || [],

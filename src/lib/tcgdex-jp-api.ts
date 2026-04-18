@@ -78,10 +78,65 @@ export function getJPImageUrl(baseImageUrl: string, quality: 'high' | 'low' = 'h
   return `${baseImageUrl}/${quality}.webp`
 }
 
+// Build fallback image URL for JP cards that don't have image in search results
+// TCGdex asset URL pattern: https://assets.tcgdex.net/ja/{PREFIX}/{SET_ID}/{LOCAL_ID}/high.webp
+// Prefix examples: SV (SV2D, SV3, SV8a), S (S12a, S9), SM (SM1M, SM8b), etc.
+export function buildJPFallbackImageUrl(setId: string, localId: string): string {
+  const prefix = setId.match(/^(SV|SM|S|E|ADV|neo|web|VS|PMCG|swsh)/i)?.[1] || setId.replace(/[0-9]+.*$/, '')
+  return `https://assets.tcgdex.net/ja/${prefix}/${setId}/${localId}/high.webp`
+}
+
+// Find EN equivalent image by card name (supports both EN and JP names)
+// Pokemon TCG API images are reliable and don't have hotlink blocks
+export async function findENImageFallback(cardName: string): Promise<string | null> {
+  try {
+    // Try direct search first (works for EN names)
+    let res = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${encodeURIComponent(cardName)}"&pageSize=1`, {
+      headers: { 'User-Agent': 'TCGVault/1.0' },
+      cache: 'no-store',
+    })
+    if (res.ok) {
+      const data = await res.json()
+      if (data.data?.[0]?.images?.large) {
+        return data.data[0].images.large
+      }
+    }
+
+    // If JP name, try TCGdex EN API to find the same card
+    if (isJapanese(cardName)) {
+      // Search TCGdex EN by JP name (cross-language match)
+      res = await fetch(`https://api.tcgdex.net/v2/en/cards?name=${encodeURIComponent(cardName)}&pageSize=1`, {
+        cache: 'no-store',
+      })
+      if (res.ok) {
+        const data = await res.json()
+        const enCard = data?.[0]
+        if (enCard?.image) {
+          return getJPImageUrl(enCard.image, 'high').replace('/ja/', '/en/')
+        }
+        // Also try to get the EN name from TCGdex
+        if (enCard?.name) {
+          res = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${encodeURIComponent(enCard.name)}"&pageSize=1`, {
+            headers: { 'User-Agent': 'TCGVault/1.0' },
+            cache: 'no-store',
+          })
+          if (res.ok) {
+            const data2 = await res.json()
+            if (data2.data?.[0]?.images?.large) {
+              return data2.data[0].images.large
+            }
+          }
+        }
+      }
+    }
+  } catch {}
+  return null
+}
+
 /**
  * Check if a string contains Japanese characters
  */
-function isJapanese(text: string): boolean {
+export function isJapanese(text: string): boolean {
   return /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/.test(text)
 }
 
