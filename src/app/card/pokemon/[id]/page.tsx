@@ -638,6 +638,26 @@ export default function CardDetailPage() {
                 </button>
                 <button
                   onClick={() => {
+                    if (!user) { window.location.href = '/login'; return }
+                    const price = card.conditionPrices?.nearMint?.market || 0
+                    const target = prompt('Set price alert (USD):\n\nType a target price below current $' + price.toFixed(2) + ' to get notified when it drops,\nor above to get notified when it rises.', price ? (price * 0.8).toFixed(2) : '10.00')
+                    if (!target || isNaN(Number(target))) return
+                    const dir = Number(target) < price ? 'below' : 'above'
+                    fetch('/api/price-alerts', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.access_token}` },
+                      body: JSON.stringify({ card_name: card.name, game: 'pokemon', card_id: cardId, target_price: Number(target), direction: dir })
+                    }).then(r => r.json()).then(data => {
+                      if (data.alert) alert('Price alert set! ' + (dir === 'below' ? 'Below' : 'Above') + ' $' + Number(target).toFixed(2))
+                      else alert('Failed: ' + (data.error || 'Unknown error'))
+                    })
+                  }}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#e8eaf0] text-[#5c6078] rounded-xl font-semibold text-sm hover:text-amber-600 hover:border-amber-300 transition-all shadow-sm"
+                >
+                  🔔 Set Price Alert
+                </button>
+                <button
+                  onClick={() => {
                     const section = document.getElementById('comments')
                     section?.scrollIntoView({ behavior: 'smooth' })
                   }}

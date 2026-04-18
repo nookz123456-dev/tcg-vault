@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import TrendingCarousel from '@/components/TrendingCarousel'
+import TopMovers from '@/components/TopMovers'
 import { useT } from '@/lib/i18n'
 
 export default function Home() {
@@ -23,7 +24,11 @@ export default function Home() {
       <section className="relative overflow-hidden bg-white">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#6366f1]/[0.04] rounded-full blur-[100px]" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-28">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+          <TopMovers />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28">
           <div className="text-center">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#6366f1]/5 border border-[#6366f1]/15 rounded-full text-[#6366f1] text-xs font-semibold mb-8 tracking-wide">

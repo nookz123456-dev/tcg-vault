@@ -10,6 +10,7 @@ const translations = {
   'nav.discuss': { th: 'พูดคุย', en: 'Discuss' },
   'nav.community': { th: 'ชุมชน', en: 'Community' },
   'nav.collection': { th: 'คอลเลกชัน', en: 'Collection' },
+  'nav.alerts': { th: 'แจ้งเตือนราคา', en: 'Price Alerts' },
   'nav.signIn': { th: 'เข้าสู่ระบบ', en: 'Sign In' },
   'nav.signOut': { th: 'ออกจากระบบ', en: 'Sign Out' },
 
