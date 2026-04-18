@@ -164,7 +164,7 @@ export default function OnePieceCardPage() {
                 {!imgLoaded && <div className="w-[320px] h-[447px] bg-gray-200 rounded-xl animate-pulse" />}
                 {card.imageUrl ? (
                   <img
-                    src={card.imageUrl}
+                    src={card.imageUrl.startsWith('http') ? `/api/proxy-image?url=${encodeURIComponent(card.imageUrl)}` : card.imageUrl}
                     alt={card.name}
                     className={`w-full rounded-xl shadow-lg transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                     style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.12)' }}

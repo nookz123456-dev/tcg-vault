@@ -86,7 +86,7 @@ export async function GET(
       number: cardData.localId,
       rarity: cardData.rarity || null,
       variant: null,
-      imageUrl: cardData.image ? getJPImageUrl(cardData.image, 'high') : null,
+      imageUrl: cardData.image ? getJPImageUrl(cardData.image, 'high') : (cardData.set?.id && cardData.localId ? (() => { const sid = cardData.set.id; const prefix = sid.match(/^(SV|SM|S|E|ADV|neo|web|VS|PMCG|swsh)/i)?.[1] || sid.replace(/[0-9]+.*$/, ''); return `https://assets.tcgdex.net/ja/${prefix}/${sid}/${cardData.localId}/high.webp`; })() : null),
       setName: cardData.set?.name || '',
       setSlug: cardData.set?.id || '',
       game: 'pokemon-jp',

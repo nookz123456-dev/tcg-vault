@@ -115,7 +115,7 @@ export default function TrendingCarousel() {
                 {/* Card image */}
                 <div className="relative w-full h-[220px] bg-[#f5f6fa] flex items-center justify-center overflow-hidden">
                   <img
-                    src={card.image}
+                    src={card.game === 'onepiece' && card.image.startsWith('http') ? `/api/proxy-image?url=${encodeURIComponent(card.image)}` : card.image}
                     alt={card.name}
                     className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                     loading={i < 3 ? 'eager' : 'lazy'}

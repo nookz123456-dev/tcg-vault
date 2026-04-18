@@ -177,7 +177,7 @@ export default function SetDetailPage() {
                 <div className="aspect-[2.5/3.5] bg-[#f5f6fa] flex items-center justify-center overflow-hidden">
                   {(card.imageLarge || card.image) ? (
                     <img
-                      src={card.imageLarge || card.image || ''}
+                      src={(card.imageLarge || card.image || '').startsWith('http') && game === 'onepiece' ? `/api/proxy-image?url=${encodeURIComponent(card.imageLarge || card.image || '')}` : (card.imageLarge || card.image || '')}
                       alt={card.name}
                       className="w-full h-full object-contain group-hover:scale-105 transition-transform"
                       loading="lazy"

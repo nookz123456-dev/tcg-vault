@@ -256,8 +256,8 @@ export default function SearchResults() {
         const mapped: DisplayCard[] = (data.data || []).map((card: OnePieceCardData) => ({
           id: card.id,
           name: card.name,
-          image: card.image || '',
-          imageLarge: card.image || '',
+          image: card.image ? `/api/proxy-image?url=${encodeURIComponent(card.image)}` : '',
+          imageLarge: card.image ? `/api/proxy-image?url=${encodeURIComponent(card.image)}` : '',
           setName: card.setName || '',
           rarity: card.rarity || card.category || null,
           types: [],
