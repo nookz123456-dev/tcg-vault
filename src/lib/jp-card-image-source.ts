@@ -14,9 +14,9 @@ const SUPABASE_URL = 'https://hezbxloxsgqwbondebjt.supabase.co'
 const STORAGE_BUCKET = 'jp-card-images'
 
 export interface JPImageResult {
-  imageUrl: string | null        // Direct CDN URL (Supabase Storage)
-  proxiedUrl: string | null      // Same as imageUrl for CDN (no proxy needed)
-  source: 'supabase-cdn' | 'tcgdex' | 'none'
+  imageUrl: string | null
+  proxiedUrl: string | null
+  source: 'supabase-cdn' | 'tcgdex' | 'tcgdex-available' | 'none'
 }
 
 // Sets with images on Supabase CDN (SV, S, SM, XY, DP from original batch + BW, XY, LEGEND, promos)
@@ -74,6 +74,12 @@ const PROMO_SETS = new Set([
   'SNPo','SNPr',
 ])
 
+// TCGdex-only sets (have images in TCGdex but not on our CDN yet)
+// For these, the API route will use TCGdex image URL as fallback
+const TCGDEX_IMAGE_SETS = new Set([
+  'SVLS','SVK','SVLN',
+])
+
 // All sets with CDN images
 const ALL_CDN_SETS = new Set([
   ...ORIGINAL_SETS, ...BW_SETS, ...XY_SETS, ...LEGEND_SETS, ...PROMO_SETS
@@ -85,26 +91,19 @@ const ALL_CDN_SETS = new Set([
  * @param localId Card number in set (e.g., "017", "001", "27101")
  */
 export function getJPCardImage(setId: string, localId: string): JPImageResult {
-  // Normalize localId to 3-digit zero-padded (most sets use this format)
-  // But some sets use longer IDs (BW, XY promos use 5-digit IDs like "27101")
   const normalizedId = localId
   
   if (ALL_CDN_SETS.has(setId)) {
     const cdnUrl = `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${setId}/${normalizedId}.webp`
-    
-    return {
-      imageUrl: cdnUrl,
-      proxiedUrl: cdnUrl,  // CDN URL doesn't need proxy
-      source: 'supabase-cdn'
-    }
+    return { imageUrl: cdnUrl, proxiedUrl: cdnUrl, source: 'supabase-cdn' }
   }
   
-  // Not found — will fall back to TCGdex or show "No Image"
-  return {
-    imageUrl: null,
-    proxiedUrl: null,
-    source: 'none'
+  // TCGdex sets with images available (but not on our CDN)
+  if (TCGDEX_IMAGE_SETS.has(setId)) {
+    return { imageUrl: null, proxiedUrl: null, source: 'tcgdex-available' }
   }
+  
+  return { imageUrl: null, proxiedUrl: null, source: 'none' }
 }
 
 /**

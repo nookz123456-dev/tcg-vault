@@ -32,6 +32,10 @@ export async function GET(request: NextRequest) {
         if (jpImage.imageUrl) {
           imageUrl = jpImage.imageUrl
           imageSource = jpImage.source // 'supabase-cdn'
+        } else if (jpImage.source === 'tcgdex-available' && card.image) {
+          // Set has TCGdex images but not on our CDN — use TCGdex directly
+          imageUrl = getJPImageUrl(card.image, 'high')
+          imageSource = 'tcgdex'
         }
       }
       
