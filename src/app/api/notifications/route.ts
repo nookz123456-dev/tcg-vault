@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/notifications?${query}`, {
     headers: {
       'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Authorization': `Bearer ${token}`,
     },
   })
 
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
   const countRes = await fetch(
     `${SUPABASE_URL}/rest/v1/notifications?user_id=eq.${userData.id}&is_read=eq.false&select=id`,
     {
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}` },
     }
   )
   const unread = countRes.ok ? (await countRes.json()).length : 0
@@ -81,7 +81,7 @@ export async function PATCH(request: NextRequest) {
         method: 'PATCH',
         headers: {
           'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ is_read: true }),
@@ -103,7 +103,7 @@ export async function PATCH(request: NextRequest) {
         method: 'PATCH',
         headers: {
           'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ is_read: true }),

@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     method: 'POST',
     headers: {
       'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
       'Prefer': 'return=representation',
     },
@@ -127,7 +127,7 @@ export async function DELETE(request: NextRequest) {
       method: 'DELETE',
       headers: {
         'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Authorization': `Bearer ${token}`,
       },
     }
   )
