@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import { useT } from '@/lib/i18n'
 
-type Game = 'pokemon' | 'pokemon-jp' | 'onepiece'
+type Game = 'pokemon' | 'pokemon-jp'
 
 interface SetInfo {
  id: string
@@ -22,7 +22,7 @@ interface SetInfo {
 const GAME_CONFIG: Record<Game, { labelTh: string; labelEn: string; color: string; emoji: string }> = {
  pokemon: { labelTh: 'โปเกม่อน EN', labelEn: 'Pokemon EN', color: 'bg-yellow-500', emoji: '⚡' },
  'pokemon-jp': { labelTh: 'โปเกม่อน JP', labelEn: 'Pokemon JP', color: 'bg-indigo-500', emoji: '🗼' },
- onepiece: { labelTh: 'วันพีซ', labelEn: 'One Piece', color: 'bg-red-500', emoji: '🏴‍☠️' },
+ // onepiece: temporarily disabled
 }
 
 export default function SetsPage() {

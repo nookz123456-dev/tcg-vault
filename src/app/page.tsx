@@ -33,7 +33,7 @@ export default function Home() {
  {/* Badge */}
  <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#6366f1]/5 border border-[#6366f1]/15 rounded-full text-[#6366f1] text-xs font-semibold mb-8 tracking-wide">
  <span className="w-1.5 h-1.5 bg-[#6366f1] rounded-full animate-pulse" />
- Pokemon &amp; One Piece TCG
+ Pokemon TCG
  </div>
 
  {/* Title */}

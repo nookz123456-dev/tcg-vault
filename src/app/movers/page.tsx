@@ -26,7 +26,7 @@ export default function MoversPage() {
   const [movers, setMovers] = useState<{ gainers: MoverCard[]; losers: MoverCard[] }>({ gainers: [], losers: [] })
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'gainers' | 'losers' | 'all'>('gainers')
-  const [gameFilter, setGameFilter] = useState<'all' | 'pokemon' | 'onepiece'>('all')
+  const [gameFilter, setGameFilter] = useState<'all' | 'pokemon'>('all')
   const [showTHB, setShowTHB] = useState(false)
   const { toTHB, formatUSD, formatTHB } = useExchangeRates()
 
@@ -84,10 +84,9 @@ export default function MoversPage() {
     { key: 'all', label: t('movers.all') || 'All', icon: '◆' },
   ]
 
-  const gameTabs: { key: 'all' | 'pokemon' | 'onepiece'; label: string }[] = [
+  const gameTabs: { key: 'all' | 'pokemon'; label: string }[] = [
     { key: 'all', label: isThai ? 'ทั้งหมด' : 'All' },
     { key: 'pokemon', label: 'Pokémon' },
-    { key: 'onepiece', label: 'One Piece' },
   ]
 
   return (

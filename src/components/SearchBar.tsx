@@ -153,7 +153,7 @@ export default function SearchBar() {
     <form onSubmit={handleSearch} className="w-full max-w-2xl mx-auto space-y-5">
       {/* Game tabs */}
       <div className="flex items-center gap-1 bg-[#f5f6fa] rounded-full p-1 w-fit">
-        {(['pokemon', 'onepiece'] as CardGame[]).map((g) => (
+        {(['pokemon'] as CardGame[]).map((g) => (
           <button
             key={g}
             type="button"
@@ -217,7 +217,8 @@ export default function SearchBar() {
             )}
           </>
         )}
-        {game === 'onepiece' && (
+        {/* One Piece filters temporarily disabled */}
+        {/* {game === 'onepiece' && (
           <>
             <div className="flex gap-1 bg-[#f5f6fa] rounded-lg p-0.5">
               <button type="button" onClick={() => setOpLang('en')} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${opLang === 'en' ? 'bg-white text-[#6366f1] shadow-sm' : 'text-[#8b8fa6]'}`}>EN</button>
@@ -226,7 +227,7 @@ export default function SearchBar() {
             <Select value={opType} onChange={setOpType} options={OP_CARD_TYPES} />
             <Select value={opRarity} onChange={setOpRarity} options={OP_RARITIES} />
           </>
-        )}
+        )} */}
         {hasActiveFilters && (
           <button type="button" onClick={clearFilters} className="text-xs text-[#8b8fa6] hover:text-[#6366f1] font-medium transition-colors underline underline-offset-2">
             Clear
