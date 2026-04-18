@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildJPFallbackImageUrl } from '@/lib/tcgdex-jp-api'
+import { getJPCardImage } from '@/lib/jp-card-image-source'
 
 const TCGDEX_JP = 'https://api.tcgdex.net/v2/ja'
 
@@ -25,18 +26,41 @@ export async function GET(
 
     const setData = await setRes.json()
 
-    // Extract cards from set data
-    const cards = (setData.cards || []).map((c: any) => ({
-      id: c.id,
-      localId: c.localId,
-      name: c.name,
-      image: c.image ? `${c.image}/high.webp` : (c.id ? buildJPFallbackImageUrl(setId, c.localId) : null),
-      category: c.category || null,
-      hp: c.hp || null,
-      types: c.types || [],
-      rarity: c.rarity || null,
-      stage: c.stage || null,
-    }))
+    // Extract cards from set data with JP image priority:
+    // 1. pokemon-card.com authentic JP image (proxied)
+    // 2. TCGdex image
+    // 3. TCGdex fallback URL pattern
+    const cards = (setData.cards || []).map((c: any) => {
+      let image: string | null = null
+      
+      // Priority 1: pokemon-card.com JP image
+      const jpImg = getJPCardImage(setId, c.localId)
+      if (jpImg.proxiedUrl) {
+        image = jpImg.proxiedUrl
+      }
+      
+      // Priority 2: TCGdex image
+      if (!image && c.image) {
+        image = `${c.image}/high.webp`
+      }
+      
+      // Priority 3: TCGdex fallback
+      if (!image && c.id) {
+        image = buildJPFallbackImageUrl(setId, c.localId)
+      }
+      
+      return {
+        id: c.id,
+        localId: c.localId,
+        name: c.name,
+        image,
+        category: c.category || null,
+        hp: c.hp || null,
+        types: c.types || [],
+        rarity: c.rarity || null,
+        stage: c.stage || null,
+      }
+    })
 
     const setInfo = {
       id: setData.id,

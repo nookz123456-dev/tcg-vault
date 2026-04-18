@@ -1,0 +1,27 @@
+{
+  "totalCards": 10351,
+  "totalSets": 100,
+  "sets": {
+    "SV1S": 108, "SV1V": 108, "SV1a": 103, "SV2D": 99, "SV2P": 99, "SV2a": 363,
+    "SV3": 141, "SV3a": 92, "SV4K": 95, "SV4M": 95, "SV4a": 484, "SV5K": 100,
+    "SV5M": 100, "SV5a": 96, "SV6": 133, "SV6a": 94, "SV7": 135, "SV7a": 94,
+    "SV8": 138, "SV8a": 381, "SV9": 132, "SV9a": 92, "SV10": 132, "SV11B": 254,
+    "SV11W": 254, "S1H": 68, "S1W": 68, "S1a": 78, "S2": 106, "S2a": 78,
+    "S3": 110, "S3a": 85, "S4": 111, "S4a": 326, "S5I": 81, "S5R": 81,
+    "S5a": 84, "S6H": 83, "S6K": 83, "S6a": 87, "S7D": 79, "S7R": 79,
+    "S8": 115, "S8a": 26, "S8b": 271, "S9": 127, "S9a": 138, "S10D": 88,
+    "S10P": 88, "S10a": 148, "S10b": 93, "S11": 127, "S11a": 140, "S12": 125,
+    "S12a": 343, "SM1p": 63, "SM1M": 66, "SM1S": 66, "SM2K": 55, "SM2L": 55,
+    "SM2p": 61, "SM3H": 57, "SM3N": 57, "SM3p": 77, "SM4A": 55, "SM4S": 55,
+    "SM4p": 120, "SM5M": 72, "SM5S": 72, "SM5p": 56, "SM6": 102, "SM6a": 59,
+    "SM6b": 77, "SM7": 104, "SM7a": 66, "SM7b": 56, "SM8": 103, "SM8a": 58,
+    "SM8b": 243, "SM9": 109, "SM9a": 63, "SM9b": 62, "SM10": 107, "SM10a": 62,
+    "SM10b": 62, "SM11": 106, "SM11a": 73, "SM11b": 68, "SM12": 108, "SM12a": 210,
+    "XY2": 87, "XY3": 103, "XY4": 95, "XY6": 11, "XY7": 11,
+    "DP1": 106, "DP2": 119, "DP3": 126, "DP4": 116, "DP5": 99
+  },
+  "generatedAt": "2026-04-18T08:30:00.000Z",
+  "source": "PTCG-database data_jp + pokemon-card.com",
+  "coverage": "SV, S, SM, XY(partial), DP — 100 sets, 10351 cards",
+  "missing": "XY9, XY10, BW, PCG, ADV, e-Card, neo, PMCG, base — very old sets not on pokemon-card.com"
+}

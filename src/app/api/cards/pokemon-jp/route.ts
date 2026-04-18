@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { searchPokemonJPCardsTCGdex, getJPImageUrl, buildJPFallbackImageUrl, findENImageFallback } from '@/lib/tcgdex-jp-api'
+import { getJPCardImage } from '@/lib/jp-card-image-source'
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
@@ -14,23 +15,44 @@ export async function GET(request: NextRequest) {
     const result = await searchPokemonJPCardsTCGdex(keyword, page)
     
     // Transform for display with image fallback chain:
-    // 1. TCGdex image (best — JP art)
-    // 2. Fallback URL from setId + localId pattern
-    // 3. EN equivalent image from Pokemon TCG API (same art, different language)
+    // 1. pokemon-card.com JP image (best — authentic JP card art, needs proxy)
+    // 2. TCGdex image (good — JP card art, may not always exist)
+    // 3. Fallback URL from setId + localId pattern (TCGdex assets)
+    // 4. EN equivalent image from Pokemon TCG API (last resort)
     const data = result.data.map(card => {
       let imageUrl: string | null = null
-      if (card.image) {
-        imageUrl = getJPImageUrl(card.image, 'high')
-      } else if (card.set?.id && card.localId) {
-        imageUrl = buildJPFallbackImageUrl(card.set.id, card.localId)
+      let imageSource: string = 'none'
+      
+      // Priority 1: pokemon-card.com authentic JP image
+      const setId = card.set?.id || ''
+      const localId = card.localId || ''
+      if (setId && localId) {
+        const jpImage = getJPCardImage(setId, localId)
+        if (jpImage.proxiedUrl) {
+          imageUrl = jpImage.proxiedUrl
+          imageSource = 'pokemon-card-jp'
+        }
       }
-      // Note: EN fallback is async, handled below
+      
+      // Priority 2: TCGdex image
+      if (!imageUrl && card.image) {
+        imageUrl = getJPImageUrl(card.image, 'high')
+        imageSource = 'tcgdex'
+      }
+      
+      // Priority 3: TCGdex fallback URL pattern
+      if (!imageUrl && setId && localId) {
+        imageUrl = buildJPFallbackImageUrl(setId, localId)
+        imageSource = 'tcgdex-fallback'
+      }
+      
       return {
         id: card.id,
         name: card.name,
         nameEN: null,
         image: imageUrl,
-        nameENFallback: card.name, // store for EN lookup
+        imageSource,
+        nameENFallback: imageSource === 'none' ? card.name : null, // only do EN fallback if no JP image at all
         setName: card.set?.name || '',
         rarity: card.rarity || null,
         hp: card.hp?.toString() || null,
@@ -48,14 +70,16 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // EN image fallback for cards without JP image (async batch)
+    // EN image fallback only for cards with NO JP image at all
     const cardsNeedingENFallback = data.filter(c => !c.image && c.nameENFallback)
     if (cardsNeedingENFallback.length > 0) {
-      // Limit to 5 concurrent lookups to avoid rate limiting
       const batchSize = Math.min(cardsNeedingENFallback.length, 10)
       const fallbackPromises = cardsNeedingENFallback.slice(0, batchSize).map(async (card) => {
         const enImage = await findENImageFallback(card.nameENFallback!)
-        if (enImage) card.image = enImage
+        if (enImage) {
+          card.image = enImage
+          card.imageSource = 'en-fallback'
+        }
       })
       await Promise.all(fallbackPromises)
     }

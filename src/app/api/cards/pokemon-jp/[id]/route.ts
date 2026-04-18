@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getPokemonJPCardTCGdex, getJPImageUrl, mapType, buildJPFallbackImageUrl, findENImageFallback } from '@/lib/tcgdex-jp-api'
+import { getJPCardImage } from '@/lib/jp-card-image-source'
 import { getJapanesePokemonName } from '@/lib/pokemon-jp-names'
 
 const TCG_API_BASE = 'https://api.tcgpricelookup.com/v1'
@@ -78,6 +79,47 @@ export async function GET(
       unit: cm.unit, // EUR
     } : null
 
+    // Step 4: Determine card image with priority chain:
+    // 1. pokemon-card.com JP image (authentic JP card art)
+    // 2. TCGdex JP image (good quality JP art)
+    // 3. TCGdex fallback URL pattern
+    // 4. EN equivalent image (last resort)
+    let imageUrl: string | null = null
+    let imageSource: string = 'none'
+    
+    const setId = cardData.set?.id || ''
+    const localId = cardData.localId || ''
+    
+    // Priority 1: pokemon-card.com authentic JP image
+    if (setId && localId) {
+      const jpImage = getJPCardImage(setId, localId)
+      if (jpImage.proxiedUrl) {
+        imageUrl = jpImage.proxiedUrl
+        imageSource = 'pokemon-card-jp'
+      }
+    }
+    
+    // Priority 2: TCGdex image
+    if (!imageUrl && cardData.image) {
+      imageUrl = getJPImageUrl(cardData.image, 'high')
+      imageSource = 'tcgdex'
+    }
+    
+    // Priority 3: TCGdex fallback URL
+    if (!imageUrl && setId && localId) {
+      imageUrl = buildJPFallbackImageUrl(setId, localId)
+      imageSource = 'tcgdex-fallback'
+    }
+    
+    // Priority 4: EN equivalent image (only if no JP image available)
+    if (!imageUrl && cardData.name) {
+      const enImage = await findENImageFallback(cardData.name)
+      if (enImage) {
+        imageUrl = enImage
+        imageSource = 'en-fallback'
+      }
+    }
+
     // Build response
     const result: any = {
       id: cardData.id,
@@ -86,11 +128,8 @@ export async function GET(
       number: cardData.localId,
       rarity: cardData.rarity || null,
       variant: null,
-      imageUrl: cardData.image
-        ? getJPImageUrl(cardData.image, 'high')
-        : (cardData.set?.id && cardData.localId ? buildJPFallbackImageUrl(cardData.set.id, cardData.localId) : null),
-      setName: cardData.set?.name || '',
-      setSlug: cardData.set?.id || '',
+      imageUrl,
+      imageSource,
       game: 'pokemon-jp',
       // JP-specific fields
       hp: cardData.hp?.toString() || null,
@@ -122,14 +161,6 @@ export async function GET(
       },
       graded: priceData?.prices?.graded || null,
       lastPriceUpdate: priceData?.last_price_update || cardData.updated || null,
-    }
-
-    // EN image fallback: if JP has no image, try to find EN equivalent
-    if (!result.imageUrl && cardData.name) {
-      const enImage = await findENImageFallback(cardData.name)
-      if (enImage) {
-        result.imageUrl = enImage
-      }
     }
 
     return NextResponse.json(result)
