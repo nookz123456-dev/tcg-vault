@@ -87,17 +87,24 @@ export function buildJPFallbackImageUrl(setId: string, localId: string): string 
 }
 
 // Find EN equivalent image by card name (supports both EN and JP names)
+// Uses static JP→EN map first (no API call), then PokeAPI as fallback
 // Pokemon TCG API images are reliable and don't have hotlink blocks
 export async function findENImageFallback(cardName: string): Promise<string | null> {
   try {
-    // Try direct search first (works for EN names)
     let searchName = cardName
     
-    // If JP name, try to convert to EN for Pokemon TCG API
+    // If JP name, try static map first (instant, no API call)
     if (isJapanese(cardName)) {
-      const { getEnglishPokemonName } = await import('@/lib/pokemon-jp-names')
-      const enName = await getEnglishPokemonName(cardName)
-      if (enName) searchName = enName
+      const { lookupENName } = await import('@/lib/pokemon-jp-en-map')
+      const enName = lookupENName(cardName)
+      if (enName) {
+        searchName = enName
+      } else {
+        // Fallback to PokeAPI for names not in the map
+        const { getEnglishPokemonName } = await import('@/lib/pokemon-jp-names')
+        const apiEnName = await getEnglishPokemonName(cardName)
+        if (apiEnName) searchName = apiEnName
+      }
     }
     
     const res = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${encodeURIComponent(searchName)}"&pageSize=1`, {
