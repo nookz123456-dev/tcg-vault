@@ -104,6 +104,54 @@ export async function getJapanesePokemonName(englishName: string): Promise<strin
 }
 
 /**
+ * Get the English name for a Japanese Pokemon name using PokeAPI.
+ * Returns null if the name can't be found.
+ */
+const enNameCache = new Map<string, string | null>()
+
+export async function getEnglishPokemonName(japaneseName: string): Promise<string | null> {
+  // Clean up suffixes like EX, V, VMAX etc.
+  const cleanJP = japaneseName
+    .replace(/\s*(EX|V|VMAX|VSTAR|GX)$/i, '')
+    .replace(/\s*ex$/i, '')
+    .trim()
+
+  const cacheKey = cleanJP
+  if (enNameCache.has(cacheKey)) {
+    return enNameCache.get(cacheKey)!
+  }
+
+  try {
+    // PokeAPI species endpoint can search by ID or name
+    // For JP names, we need to search differently
+    // Use the Pokemon TCG API which accepts Japanese names in some cases
+    // Or use a reverse lookup via PokeAPI's pokemon-species list
+    
+    // Strategy: Search Pokemon TCG API which may have JP name matches
+    const res = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:${encodeURIComponent(cleanJP)}&pageSize=1`, {
+      headers: { 'User-Agent': 'TCGVault/1.0' },
+      cache: 'no-store',
+    })
+    
+    if (res.ok) {
+      const data = await res.json()
+      if (data.data?.[0]?.name) {
+        // We got an EN name from the Pokemon TCG API
+        enNameCache.set(cacheKey, data.data[0].name)
+        return data.data[0].name
+      }
+    }
+
+    enNameCache.set(cacheKey, null)
+    return null
+  } catch (error) {
+    console.error(`[JP Name Mapper] Error getting EN name for ${cleanJP}:`, error)
+    enNameCache.set(cacheKey, null)
+    return null
+  }
+}
+
+/**
  * Get Japanese names for multiple Pokemon at once.
  * Processes in batches to avoid rate limiting.
  */

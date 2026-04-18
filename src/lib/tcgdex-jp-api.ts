@@ -91,7 +91,16 @@ export function buildJPFallbackImageUrl(setId: string, localId: string): string 
 export async function findENImageFallback(cardName: string): Promise<string | null> {
   try {
     // Try direct search first (works for EN names)
-    let res = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${encodeURIComponent(cardName)}"&pageSize=1`, {
+    let searchName = cardName
+    
+    // If JP name, try to convert to EN for Pokemon TCG API
+    if (isJapanese(cardName)) {
+      const { getEnglishPokemonName } = await import('@/lib/pokemon-jp-names')
+      const enName = await getEnglishPokemonName(cardName)
+      if (enName) searchName = enName
+    }
+    
+    const res = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${encodeURIComponent(searchName)}"&pageSize=1`, {
       headers: { 'User-Agent': 'TCGVault/1.0' },
       cache: 'no-store',
     })
@@ -99,34 +108,6 @@ export async function findENImageFallback(cardName: string): Promise<string | nu
       const data = await res.json()
       if (data.data?.[0]?.images?.large) {
         return data.data[0].images.large
-      }
-    }
-
-    // If JP name, try TCGdex EN API to find the same card
-    if (isJapanese(cardName)) {
-      // Search TCGdex EN by JP name (cross-language match)
-      res = await fetch(`https://api.tcgdex.net/v2/en/cards?name=${encodeURIComponent(cardName)}&pageSize=1`, {
-        cache: 'no-store',
-      })
-      if (res.ok) {
-        const data = await res.json()
-        const enCard = data?.[0]
-        if (enCard?.image) {
-          return getJPImageUrl(enCard.image, 'high').replace('/ja/', '/en/')
-        }
-        // Also try to get the EN name from TCGdex
-        if (enCard?.name) {
-          res = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${encodeURIComponent(enCard.name)}"&pageSize=1`, {
-            headers: { 'User-Agent': 'TCGVault/1.0' },
-            cache: 'no-store',
-          })
-          if (res.ok) {
-            const data2 = await res.json()
-            if (data2.data?.[0]?.images?.large) {
-              return data2.data[0].images.large
-            }
-          }
-        }
       }
     }
   } catch {}
