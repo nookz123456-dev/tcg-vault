@@ -193,7 +193,19 @@ export default function SearchResults() {
           family: card.family || null, ability: card.ability || null, cardType: card.type || null,
           keywords: buildOPKeywords(card),
         }))
-        if (page === 1) setCards(mapped); else setCards(prev => [...prev, ...mapped])
+        // Client-side keyword filter for One Piece (Bandai search is too broad)
+        const q = query.toLowerCase().trim()
+        const filtered = mapped.filter(card => {
+          const searchFields = [
+            card.name, card.family, card.attribute, card.cardType,
+            card.color, card.ability, card.rarity, card.setName,
+            ...card.keywords,
+          ].filter(Boolean).map(s => s!.toLowerCase())
+          const searchText = searchFields.join(' ')
+          const tokens = q.split(/\s+/).filter(t => t.length >= 2)
+          return tokens.length === 0 || tokens.some(token => searchText.includes(token))
+        })
+        if (page === 1) setCards(filtered); else setCards(prev => [...prev, ...filtered])
         setTotalCount(data.totalCount || 0)
 
         const priceGame = game === 'onepiece' ? 'onepiece' : game === 'pokemon' && pokeLang === 'jp' ? 'pokemon-jp' : null
