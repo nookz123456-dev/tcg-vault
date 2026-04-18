@@ -320,10 +320,31 @@ export function lookupENName(jpName: string): string | null {
   }
 
   // Try extracting Pokemon name from JP prefixes:
-  // Patterns like: ロケットのミュウツー, 輝くミュウツー
-  // Remove text before の
+  // Pattern 1: text before の → remove prefix (ロケットのミュウツー, RocketのMewtwo)
   const noPrefix = clean.replace(/^[^\s]*の/, '').trim()
-  if (noPrefix !== clean && JP_TO_EN[noPrefix]) return JP_TO_EN[noPrefix]
+  if (noPrefix !== clean) {
+    if (JP_TO_EN[noPrefix]) return JP_TO_EN[noPrefix]
+    // After removing の prefix, also try EN match
+    const enAfterNo = noPrefix.match(/[A-Za-z][a-z]+/)
+    if (enAfterNo) {
+      const enName2 = enAfterNo[0].charAt(0).toUpperCase() + enAfterNo[0].slice(1).toLowerCase()
+      for (const [jp, en] of Object.entries(JP_TO_EN)) {
+        if (en === enName2) return enName2
+      }
+    }
+  }
+
+  // Pattern 2: try removing common JP adjective prefixes (輝く, 光る, etc.)
+  const jpAdjectives = /^(輝く|光る|闇の|古の|浮遊の|眠れる|怒りの|怒れる|踊る|走る|飛ぶ|泳ぐ|燃える|凍る|咲く|潜伏の|はねる|まもる|つきとばす|古来の|秘めたる|目覚めし|まぎれた|まもれる|よみがえる)\s*/
+  const stripped = clean.replace(jpAdjectives, '').trim()
+  if (stripped !== clean && JP_TO_EN[stripped]) return JP_TO_EN[stripped]
+
+  // Pattern 3: try matching last 2+ JP characters against map keys
+  // (handles prefixes we don't know about)
+  for (let len = clean.length; len >= 2; len--) {
+    const substr = clean.slice(-len)
+    if (JP_TO_EN[substr]) return JP_TO_EN[substr]
+  }
 
   // Try splitting by space and checking each word
   const words = clean.split(/\s+/)
