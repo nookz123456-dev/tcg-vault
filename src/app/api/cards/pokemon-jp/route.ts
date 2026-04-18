@@ -35,17 +35,15 @@ export async function GET(request: NextRequest) {
         }
       }
       
-      // Priority 2: TCGdex image
+      // Priority 2: TCGdex image (only if card has actual image URL from API)
       if (!imageUrl && card.image) {
         imageUrl = getJPImageUrl(card.image, 'high')
         imageSource = 'tcgdex'
       }
       
-      // Priority 3: TCGdex fallback URL pattern
-      if (!imageUrl && setId && localId) {
-        imageUrl = buildJPFallbackImageUrl(setId, localId)
-        imageSource = 'tcgdex-fallback'
-      }
+      // Note: We skip Priority 3 (tcgdex-fallback URL pattern) because
+      // many old sets (E, PMCG, neo, PCG) return 404 for fabricated URLs.
+      // Cards without images will use EN fallback below.
       
       return {
         id: card.id,
@@ -53,7 +51,7 @@ export async function GET(request: NextRequest) {
         nameEN: null,
         image: imageUrl,
         imageSource,
-        nameENFallback: imageSource === 'none' ? card.name : null, // only do EN fallback if no JP image at all
+        nameENFallback: (!imageUrl || imageSource === 'none') ? card.name : null, // EN fallback for cards with NO image
         setName: card.set?.name || '',
         rarity: card.rarity || null,
         hp: card.hp?.toString() || null,

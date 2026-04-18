@@ -28,8 +28,7 @@ export async function GET(
 
     // Extract cards from set data with JP image priority:
     // 1. Supabase CDN self-hosted webp (fast, no proxy)
-    // 2. TCGdex image
-    // 3. TCGdex fallback URL pattern
+    // 2. TCGdex image (only if card has actual image URL)
     const cards = (setData.cards || []).map((c: any) => {
       let image: string | null = null
       let imageSource: string = 'none'
@@ -41,16 +40,10 @@ export async function GET(
         imageSource = jpImg.source
       }
       
-      // Priority 2: TCGdex image
+      // Priority 2: TCGdex image (only actual URLs, no fabricated patterns)
       if (!image && c.image) {
         image = `${c.image}/high.webp`
         imageSource = 'tcgdex'
-      }
-      
-      // Priority 3: TCGdex fallback
-      if (!image && c.id) {
-        image = buildJPFallbackImageUrl(setId, c.localId)
-        imageSource = 'tcgdex-fallback'
       }
       
       return {
