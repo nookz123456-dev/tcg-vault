@@ -165,12 +165,6 @@ export default function Home() {
  >
  {t('home.community.cta')}
  </Link>
- <Link
- href="/login"
- className="px-6 py-3 bg-white border border-[#e8eaf0] text-[#5c6078] font-semibold rounded-xl hover:text-[#6366f1] hover:border-[#6366f1]/30 transition-all"
- >
- {t('nav.signIn')}
- </Link>
  </div>
  </div>
  <div className="space-y-3">
