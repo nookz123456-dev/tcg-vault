@@ -41,9 +41,10 @@ export async function GET(request: NextRequest) {
         imageSource = 'tcgdex'
       }
       
-      // Note: We skip Priority 3 (tcgdex-fallback URL pattern) because
-      // many old sets (E, PMCG, neo, PCG) return 404 for fabricated URLs.
-      // Cards without images will use EN fallback below.
+      // Note: We skip tcgdex-fallback URL pattern because many old sets
+      // (E, PMCG, neo, PCG) return 404 for fabricated URLs.
+      // Cards without images will show a placeholder — we do NOT use EN images
+      // as fallback because they show the wrong card art (wrong set/variant).
       
       return {
         id: card.id,
@@ -51,7 +52,6 @@ export async function GET(request: NextRequest) {
         nameEN: null,
         image: imageUrl,
         imageSource,
-        nameENFallback: (!imageUrl || imageSource === 'none') ? card.name : null, // EN fallback for cards with NO image
         setName: card.set?.name || '',
         rarity: card.rarity || null,
         hp: card.hp?.toString() || null,
@@ -68,23 +68,6 @@ export async function GET(request: NextRequest) {
         game: 'pokemon',
       }
     })
-
-    // EN image fallback only for cards with NO JP image at all
-    const cardsNeedingENFallback = data.filter(c => !c.image && c.nameENFallback)
-    if (cardsNeedingENFallback.length > 0) {
-      const batchSize = Math.min(cardsNeedingENFallback.length, 10)
-      const fallbackPromises = cardsNeedingENFallback.slice(0, batchSize).map(async (card) => {
-        const enImage = await findENImageFallback(card.nameENFallback!)
-        if (enImage) {
-          card.image = enImage
-          card.imageSource = 'en-fallback'
-        }
-      })
-      await Promise.all(fallbackPromises)
-    }
-
-    // Remove temp field
-    data.forEach(c => { delete (c as any).nameENFallback })
 
     return NextResponse.json({ data, totalCount: result.totalCount, page: result.page })
   } catch (error) {

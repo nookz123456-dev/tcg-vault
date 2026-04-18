@@ -108,15 +108,8 @@ export async function GET(
     
     // Note: We skip tcgdex-fallback URL pattern because many old sets
     // (E, PMCG, neo, PCG) return 404 for fabricated URLs.
-    
-    // Priority 3: EN equivalent image (only if no JP image available)
-    if (!imageUrl && cardData.name) {
-      const enImage = await findENImageFallback(cardData.name)
-      if (enImage) {
-        imageUrl = enImage
-        imageSource = 'en-fallback'
-      }
-    }
+    // We also skip EN image fallback because EN cards show wrong art
+    // for JP-specific variants. No image is better than wrong image.
 
     // Build response
     const result: any = {
