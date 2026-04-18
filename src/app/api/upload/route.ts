@@ -44,12 +44,13 @@ export async function POST(request: NextRequest) {
     // Determine bucket
     const bucketName = folder === 'seller-docs' ? 'seller-docs' : 'discussion-images'
 
-    // Generate unique filename
+    // Generate unique file path
     const ext = file.name.split('.').pop() || 'jpg'
     const filePath = `${userData.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
 
-    // Upload to Supabase Storage using service role with standard POST
+    // Upload to Supabase Storage using service role (binary upload with x-upsert)
     const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
 
     const uploadRes = await fetch(
       `${SUPABASE_URL}/storage/v1/object/${bucketName}/${filePath}`,
@@ -58,50 +59,22 @@ export async function POST(request: NextRequest) {
         headers: {
           'apikey': SUPABASE_SERVICE_KEY,
           'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-          'Content-Type': 'application/json',
+          'Content-Type': file.type,
+          'x-upsert': 'true',
         },
-        body: JSON.stringify({
-          data: Buffer.from(arrayBuffer).toString('base64'),
-          contentType: file.type,
-        }),
+        body: buffer,
       }
     )
 
     if (!uploadRes.ok) {
       const err = await uploadRes.text()
       console.error('Upload failed:', uploadRes.status, err)
-
-      // Try alternative: raw binary upload with multipart
-      const formData2 = new FormData()
-      const fileBlob = new Blob([arrayBuffer], { type: file.type })
-      formData2.append('file', fileBlob, filePath)
-
-      const retryRes = await fetch(
-        `${SUPABASE_URL}/storage/v1/object/${bucketName}/${filePath}`,
-        {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_SERVICE_KEY,
-            'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-          },
-          body: formData2,
-        }
-      )
-
-      if (!retryRes.ok) {
-        const retryErr = await retryRes.text()
-        console.error('Upload retry failed:', retryRes.status, retryErr)
-        return NextResponse.json({ error: 'Failed to upload file', details: retryErr }, { status: 500 })
-      }
-
-      const retryData = await retryRes.json()
-      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${bucketName}/${filePath}`
-      return NextResponse.json({ url: publicUrl, path: filePath, key: retryData.Key || retryData.key })
+      return NextResponse.json({ error: 'Failed to upload file', details: err }, { status: 500 })
     }
 
-    const uploadData = await uploadRes.json()
+    // Get public URL
     const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${bucketName}/${filePath}`
-    return NextResponse.json({ url: publicUrl, path: filePath, key: uploadData.Key || uploadData.key })
+    return NextResponse.json({ url: publicUrl, path: filePath })
 
   } catch (err) {
     console.error('Upload error:', err)
