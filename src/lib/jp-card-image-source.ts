@@ -1,31 +1,32 @@
 /**
- * JP Card Image Source — pokemon-card.com (Official JP Pokemon TCG Site)
+ * JP Card Image Source — Supabase Storage CDN + pokemon-card.com fallback
  * 
- * Provides authentic Japanese card images from pokemon-card.com
- * Coverage: 99+ sets (SV, S, SM, XY partial, DP)
+ * Primary: Supabase Storage CDN (self-hosted webp images, ~50KB each)
+ * Fallback: pokemon-card.com via /api/proxy-image proxy
  * 
- * URL Pattern: https://www.pokemon-card.com/assets/images/card_images/large/{SET}/{JP_ID}_P_{NAME}.jpg
- * 
- * This module loads a pre-built mapping from PTCG-database data_jp JSON files
- * which maps TCGdex set+number → pokemon-card.com image URL
- * 
- * Since pokemon-card.com doesn't send CORS headers, all images must be
- * proxied through /api/proxy-image?url=...
+ * Coverage: 100 sets (SV, S, SM, XY, DP) = 10,350+ cards
+ * Images stored at: {SUPABASE_URL}/storage/v1/object/public/jp-card-images/{setId}/{localId}.webp
  */
 
 import jpCardImages from './jp-card-images.json'
 
+const SUPABASE_URL = 'https://hezbxloxsgqwbondebjt.supabase.co'
+const STORAGE_BUCKET = 'jp-card-images'
+
 export interface JPImageResult {
-  imageUrl: string | null        // Direct pokemon-card.com URL (needs proxy)
-  proxiedUrl: string | null      // Proxied URL via /api/proxy-image
-  source: 'pokemon-card-jp' | 'tcgdex' | 'none'
+  imageUrl: string | null        // Direct CDN URL (Supabase Storage)
+  proxiedUrl: string | null      // Same as imageUrl for CDN (no proxy needed)
+  source: 'supabase-cdn' | 'pokemon-card-jp' | 'tcgdex' | 'none'
 }
 
 /**
- * Look up a JP card image from the pre-built mapping
+ * Look up a JP card image
+ * Priority:
+ * 1. Supabase Storage CDN (self-hosted webp) — fastest, no proxy needed
+ * 2. pokemon-card.com via proxy — original source, higher quality but needs proxy
+ * 
  * @param setId TCGdex set ID (e.g., "SV2D", "SM1M", "S12a")
  * @param localId Card number in set (e.g., "017", "001")
- * @returns Image result with direct and proxied URLs
  */
 export function getJPCardImage(setId: string, localId: string): JPImageResult {
   // Normalize localId to 3-digit zero-padded
@@ -35,11 +36,13 @@ export function getJPCardImage(setId: string, localId: string): JPImageResult {
   const mapping = (jpCardImages as Record<string, { img: string; name: string; jp_id: number }>)[key]
   
   if (mapping?.img) {
-    const proxiedUrl = `/api/proxy-image?url=${encodeURIComponent(mapping.img)}`
+    // Priority 1: Supabase Storage CDN (self-hosted webp)
+    const cdnUrl = `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${setId}/${normalizedId}.webp`
+    
     return {
-      imageUrl: mapping.img,
-      proxiedUrl,
-      source: 'pokemon-card-jp'
+      imageUrl: cdnUrl,
+      proxiedUrl: cdnUrl,  // CDN URL doesn't need proxy
+      source: 'supabase-cdn'
     }
   }
   
@@ -53,7 +56,6 @@ export function getJPCardImage(setId: string, localId: string): JPImageResult {
 
 /**
  * Check if a set has JP images available in the mapping
- * @param setId TCGdex set ID
  */
 export function setHasJPImages(setId: string): boolean {
   const prefix = `${setId}/`

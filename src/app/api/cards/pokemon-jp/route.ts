@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const result = await searchPokemonJPCardsTCGdex(keyword, page)
     
     // Transform for display with image fallback chain:
-    // 1. pokemon-card.com JP image (best — authentic JP card art, needs proxy)
+    // 1. Supabase CDN self-hosted webp (best — fast, no proxy needed)
     // 2. TCGdex image (good — JP card art, may not always exist)
     // 3. Fallback URL from setId + localId pattern (TCGdex assets)
     // 4. EN equivalent image from Pokemon TCG API (last resort)
@@ -23,15 +23,15 @@ export async function GET(request: NextRequest) {
       let imageUrl: string | null = null
       let imageSource: string = 'none'
       
-      // Priority 1: pokemon-card.com authentic JP image
+      // Priority 1: Supabase CDN self-hosted JP image
       // Extract setId from card.id (format: "SETID-NUMBER") since card.set is undefined in list results
       const setId = card.set?.id || card.id?.split('-')[0] || ''
       const localId = card.localId || ''
       if (setId && localId) {
         const jpImage = getJPCardImage(setId, localId)
-        if (jpImage.proxiedUrl) {
-          imageUrl = jpImage.proxiedUrl
-          imageSource = 'pokemon-card-jp'
+        if (jpImage.imageUrl) {
+          imageUrl = jpImage.imageUrl
+          imageSource = jpImage.source // 'supabase-cdn'
         }
       }
       

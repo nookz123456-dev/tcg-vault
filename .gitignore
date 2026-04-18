@@ -35,6 +35,12 @@ yarn-error.log*
 next-env.d.ts
 
 # test scripts
+build-*-*.js
+check-*.js
+create-bucket.js
+download-jp-images.js
+resize-jp-images.js
+upload-jp-images*.js
 test*.js
 test*.ps1
 analyze-*.js
@@ -45,6 +51,9 @@ find-*.ps1
 deep-*.ps1
 op-sample.html
 cardList.js
+
+# JP card images (hosted on Supabase Storage)
+public/jp-card-images/
 
 # IDE
 .vscode/

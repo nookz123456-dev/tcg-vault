@@ -91,12 +91,12 @@ export async function GET(
     const setId = cardData.set?.id || cardData.id?.split('-')[0] || ''
     const localId = cardData.localId || ''
     
-    // Priority 1: pokemon-card.com authentic JP image
+    // Priority 1: Supabase CDN self-hosted JP image
     if (setId && localId) {
       const jpImage = getJPCardImage(setId, localId)
-      if (jpImage.proxiedUrl) {
-        imageUrl = jpImage.proxiedUrl
-        imageSource = 'pokemon-card-jp'
+      if (jpImage.imageUrl) {
+        imageUrl = jpImage.imageUrl
+        imageSource = jpImage.source // 'supabase-cdn'
       }
     }
     
