@@ -42,9 +42,9 @@ export default function SealedPage() {
  <div className="mb-8">
  <div className="flex items-center gap-3 mb-2">
  <div className="w-2 h-8 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full" />
- <h1 className="text-3xl font-bold text-[#1e2235]">t("sealed.title")</h1>
+ <h1 className="text-3xl font-bold text-[#1e2235]">{t("sealed.title")}</h1>
  </div>
- <p className="text-[#5c6078] ml-5">t("sealed.subtitle")</p>
+ <p className="text-[#5c6078] ml-5">{t("sealed.subtitle")}</p>
  </div>
 
  {/* Products grid */}
