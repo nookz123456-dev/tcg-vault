@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Determine bucket
-    const bucketName = folder === 'seller-docs' ? 'seller-docs' : 'discussion-images'
+    const bucketName = folder === 'seller-docs' ? 'seller-docs' : folder === 'avatars' ? 'avatars' : 'discussion-images'
 
     // Generate unique file path
     const ext = file.name.split('.').pop() || 'jpg'

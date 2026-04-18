@@ -304,6 +304,14 @@ const translations = {
   'card.color': { th: 'สี', en: 'Color' },
   'card.cost': { th: 'ค่าใช้จ่าย', en: 'Cost' },
   'card.power': { th: 'พลัง', en: 'Power' },
+
+  // Profile - avatar and bio
+  'profile.changeAvatar': { th: 'เปลี่ยนรูปประจำตัว', en: 'Change avatar' },
+  'profile.addBio': { th: 'เพิ่มข้อมูลตัวเอง...', en: 'Add a bio...' },
+  'profile.bioPlaceholder': { th: 'แนะนำตัวเองสั้นๆ...', en: 'Tell us about yourself...' },
+  'profile.fileTooLarge': { th: 'ไฟล์ใหญ่เกิน (สูงสุด 2MB)', en: 'File too large (max 2MB)' },
+  'profile.invalidFileType': { th: 'ประเภทไฟล์ไม่รองรับ', en: 'Invalid file type' },
+  'profile.uploading': { th: 'กำลังอัพโหลด...', en: 'Uploading...' },
 } as const
 
 export type Locale = 'th' | 'en'
