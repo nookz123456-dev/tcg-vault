@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
   const token = authHeader.split(' ')[1]
   const body = await request.json()
-  const { thread_id, content } = body
+  const { thread_id, content, image_url } = body
 
   if (!thread_id || !content) {
     return NextResponse.json({ error: 'thread_id and content are required' }, { status: 400 })
@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
       thread_id,
       user_id: userData.id,
       content,
+      image_url: image_url || null,
     }),
   })
 

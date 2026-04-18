@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
+import ImageUpload from '@/components/ImageUpload'
 import { useAuth } from '@/lib/useAuth'
-import { useT } from '@/lib/i18n'
+import { useT, useLocale } from '@/lib/i18n'
 
 interface Board {
   id: string
@@ -26,11 +27,14 @@ interface Thread {
   profiles: { username: string; avatar_url: string | null }
   discussion_boards: { name: string; slug: string; icon: string }
   reply_count: number
+  image_url?: string
 }
 
 export default function DiscussionsPage() {
   const { user } = useAuth()
   const t = useT()
+  const { locale } = useLocale()
+  const isThai = locale === 'th'
   const [boards, setBoards] = useState<Board[]>([])
   const [threads, setThreads] = useState<Thread[]>([])
   const [selectedBoard, setSelectedBoard] = useState<string | null>(null)
@@ -38,6 +42,7 @@ export default function DiscussionsPage() {
   const [showNewThread, setShowNewThread] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [newContent, setNewContent] = useState('')
+  const [newImage, setNewImage] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
@@ -71,11 +76,13 @@ export default function DiscussionsPage() {
           board_id: selectedBoard,
           title: newTitle.trim(),
           content: newContent.trim(),
+          image_url: newImage || undefined,
         }),
       })
       if (res.ok) {
         setNewTitle('')
         setNewContent('')
+        setNewImage('')
         setShowNewThread(false)
         const data = await fetch(`/api/discussions/threads?boardId=${selectedBoard}`).then(r => r.json())
         setThreads(data.threads || [])
@@ -222,6 +229,12 @@ export default function DiscussionsPage() {
                   rows={4}
                   className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-[#6366f1]/50 resize-none text-sm"
                 />
+                <ImageUpload
+                  value={newImage}
+                  onChange={url => setNewImage(url)}
+                  label={isThai ? 'รูปภาพประกอบ' : 'Attach Image'}
+                  folder="discussion-images"
+                />
                 <div className="flex justify-between items-center mt-3">
                   <span className="text-xs text-[#b5b8c8]">{newContent.length}/5000</span>
                   <div className="flex gap-2">
@@ -286,6 +299,11 @@ export default function DiscussionsPage() {
                           </h3>
                         </div>
                         <p className="text-xs text-[#8b8fa6] line-clamp-1">{thread.content}</p>
+                        {thread.image_url && (
+                          <div className="mt-2">
+                            <img src={thread.image_url} alt="" className="h-20 w-20 object-cover rounded-lg border border-[#e8eaf0]" />
+                          </div>
+                        )}
                         <div className="flex items-center gap-3 mt-2 text-[10px] text-[#b5b8c8]">
                           <span className="font-semibold text-[#5c6078]">{thread.profiles?.username || 'Unknown'}</span>
                           <span>{thread.discussion_boards?.icon} {thread.discussion_boards?.name}</span>

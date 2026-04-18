@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
   const token = authHeader.split(' ')[1]
   const body = await request.json()
-  const { board_id, title, content } = body
+  const { board_id, title, content, image_url } = body
 
   if (!board_id || !title || !content) {
     return NextResponse.json({ error: 'board_id, title, and content are required' }, { status: 400 })
@@ -88,6 +88,7 @@ export async function POST(request: NextRequest) {
       user_id: userData.id,
       title,
       content,
+      image_url: image_url || null,
     }),
   })
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
+import ImageUpload from '@/components/ImageUpload'
 import { useAuth } from '@/lib/useAuth'
 
 interface Thread {
@@ -10,6 +11,7 @@ interface Thread {
   board_id: string
   title: string
   content: string
+  image_url?: string
   is_pinned: boolean
   is_locked: boolean
   views: number
@@ -21,6 +23,7 @@ interface Thread {
 interface Reply {
   id: string
   content: string
+  image_url?: string
   created_at: string
   profiles: { username: string; avatar_url: string | null }
 }
@@ -35,6 +38,7 @@ export default function ThreadPage() {
   const [replies, setReplies] = useState<Reply[]>([])
   const [loading, setLoading] = useState(true)
   const [newReply, setNewReply] = useState('')
+  const [replyImage, setReplyImage] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
@@ -61,6 +65,7 @@ export default function ThreadPage() {
         body: JSON.stringify({
           thread_id: threadId,
           content: newReply.trim(),
+          image_url: replyImage || undefined,
         }),
       })
       if (res.ok) {
@@ -68,6 +73,8 @@ export default function ThreadPage() {
         // Refresh replies
         const data = await fetch(`/api/discussions/threads/${threadId}`).then(r => r.json())
         setReplies(data.replies || [])
+        setNewReply('')
+        setReplyImage('')
       }
     } catch { /* ignore */ }
     setSubmitting(false)
@@ -153,7 +160,12 @@ export default function ThreadPage() {
 
         {/* Thread Content (styled as first post) */}
         <div className="bg-white border border-[#e8eaf0] rounded-2xl p-5 mb-6">
-          <div className="text-sm text-[var(--warm-200)] leading-relaxed whitespace-pre-wrap">{thread.content}</div>
+          <div className="text-sm text-[#5c6078] leading-relaxed whitespace-pre-wrap">{thread.content}</div>
+          {thread.image_url && (
+            <div className="mt-3">
+              <img src={thread.image_url} alt="Thread image" className="max-w-full max-h-96 object-contain rounded-xl border border-[#e8eaf0]" />
+            </div>
+          )}
         </div>
 
         {/* Replies */}
@@ -182,6 +194,11 @@ export default function ThreadPage() {
                   <span className="text-[10px] text-[#b5b8c8] ml-auto">#{index + 1}</span>
                 </div>
                 <div className="text-sm text-[#5c6078] leading-relaxed whitespace-pre-wrap pl-9">{reply.content}</div>
+                {reply.image_url && (
+                  <div className="pl-9 mt-2">
+                    <img src={reply.image_url} alt="Reply image" className="max-w-full max-h-64 object-contain rounded-lg border border-[#e8eaf0]" />
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -198,7 +215,13 @@ export default function ThreadPage() {
                 placeholder="Write your reply..."
                 maxLength={3000}
                 rows={3}
-                className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-amber-500/50 resize-none text-sm"
+                className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-[#6366f1]/50 resize-none text-sm"
+              />
+              <ImageUpload
+                value={replyImage}
+                onChange={url => setReplyImage(url)}
+                label="Attach Image"
+                folder="discussion-images"
               />
               <div className="flex justify-between items-center mt-2">
                 <span className="text-xs text-[#b5b8c8]">{newReply.length}/3000</span>

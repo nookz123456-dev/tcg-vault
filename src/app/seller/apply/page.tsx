@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
+import ImageUpload from '@/components/ImageUpload'
 import { useAuth } from '@/lib/useAuth'
 import { useT, useLocale } from '@/lib/i18n'
 
@@ -325,33 +326,23 @@ export default function SellerApplyPage() {
                 ? 'อัปโหลดรูปบัตรประชาชนและรูปถ่ายคู่บัตร เพื่อยืนยันตัวตน (ข้อมูลจะถูกเก็บอย่างปลอดภัย)'
                 : 'Upload your ID card photo and a selfie with your ID. Data is stored securely.'}
             </p>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-[#5c6078] mb-1">
-                  {isThai ? 'รูปบัตรประชาชน' : 'ID Card Photo'} *
-                </label>
-                <input
-                  type="url"
-                  value={form.id_card_image_url}
-                  onChange={e => handleChange('id_card_image_url', e.target.value)}
-                  required
-                  className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder-[#b5b8c8] focus:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
-                  placeholder={isThai ? 'วางลิงก์รูปบัตรประชาชน' : 'Paste ID card image URL'}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[#5c6078] mb-1">
-                  {isThai ? 'รูปถ่ายคู่บัตรประชาชน' : 'Selfie with ID'} *
-                </label>
-                <input
-                  type="url"
-                  value={form.selfie_with_id_url}
-                  onChange={e => handleChange('selfie_with_id_url', e.target.value)}
-                  required
-                  className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder-[#b5b8c8] focus:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
-                  placeholder={isThai ? 'วางลิงก์รูปถ่ายคู่บัตร' : 'Paste selfie with ID URL'}
-                />
-              </div>
+            <div className="space-y-4">
+              <ImageUpload
+                value={form.id_card_image_url}
+                onChange={url => handleChange('id_card_image_url', url)}
+                label={isThai ? 'รูปบัตรประชาชน' : 'ID Card Photo'}
+                placeholder={isThai ? 'อัปโหลดรูปบัตรประชาชน' : 'Upload ID card photo'}
+                folder="seller-docs"
+                required
+              />
+              <ImageUpload
+                value={form.selfie_with_id_url}
+                onChange={url => handleChange('selfie_with_id_url', url)}
+                label={isThai ? 'รูปถ่ายคู่บัตรประชาชน' : 'Selfie with ID'}
+                placeholder={isThai ? 'อัปโหลดรูปถ่ายคู่บัตร' : 'Upload selfie with ID'}
+                folder="seller-docs"
+                required
+              />
             </div>
           </div>
 
