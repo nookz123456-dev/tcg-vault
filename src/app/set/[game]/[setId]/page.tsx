@@ -34,10 +34,10 @@ interface CardInfo {
   tcgplayer?: { url?: string; prices?: any } | null
 }
 
-const GAME_CONFIG: Record<Game, { label: string; color: string; linkPrefix: string }> = {
-  pokemon: { label: 'Pokemon EN', color: 'bg-yellow-500', linkPrefix: '/card/pokemon' },
-  'pokemon-jp': { label: 'Pokemon JP', color: 'bg-indigo-500', linkPrefix: '/card/pokemon-jp' },
-  onepiece: { label: 'One Piece', color: 'bg-red-500', linkPrefix: '/card/onepiece' },
+const GAME_CONFIG: Record<Game, { label: string; linkPrefix: string }> = {
+  pokemon: { label: 'Pokemon EN', linkPrefix: '/card/pokemon' },
+  'pokemon-jp': { label: 'Pokemon JP', linkPrefix: '/card/pokemon-jp' },
+  onepiece: { label: 'One Piece', linkPrefix: '/card/onepiece' },
 }
 
 export default function SetDetailPage() {
@@ -64,7 +64,6 @@ export default function SetDetailPage() {
     try {
       const res = await fetch(`/api/sets/${game}/${encodeURIComponent(setId)}?page=${p}&pageSize=${pageSize}`)
       const data = await res.json()
-      
       if (p === 1) {
         setSet(data.set || null)
         setCards(data.data || [])
@@ -79,7 +78,6 @@ export default function SetDetailPage() {
     setLoading(false)
   }
 
-  // Get unique rarities and types
   const rarities = [...new Set(cards.map(c => c.rarity).filter(Boolean))] as string[]
   const types = [...new Set(cards.flatMap(c => c.types || []))] as string[]
 
@@ -92,13 +90,13 @@ export default function SetDetailPage() {
   const config = GAME_CONFIG[game] || GAME_CONFIG.pokemon
 
   return (
-    <div className="min-h-screen bg-[#f5f6fa]">
+    <div className="min-h-screen bg-[#fafbfc]">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-[#8b8fa6] mb-4">
-          <Link href="/sets" className="hover:text-indigo-500 transition-colors">Sets</Link>
+          <Link href="/sets" className="hover:text-[#6366f1] transition-colors">{t('nav.sets') || 'Sets'}</Link>
           <span>/</span>
           <span className="text-[#5c6078]">{config.label}</span>
           <span>/</span>
@@ -107,7 +105,7 @@ export default function SetDetailPage() {
 
         {/* Set Header */}
         {set && (
-          <div className="bg-white rounded-xl border border-[#e8eaf0] p-6 mb-6 flex items-center gap-6">
+          <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6 mb-6 flex items-center gap-6">
             {(set.images?.logo || set.logo) && (
               <img
                 src={(set.images?.logo || set.logo || '')}
@@ -118,51 +116,49 @@ export default function SetDetailPage() {
             <div>
               <h1 className="text-2xl font-bold text-[#1e2235]">{set.name}</h1>
               <div className="flex items-center gap-3 mt-2 text-sm text-[#5c6078]">
-                {set.series && <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full text-xs font-medium">{set.series}</span>}
+                {set.series && <span className="bg-[#6366f1]/10 text-[#6366f1] px-2.5 py-0.5 rounded-full text-xs font-medium">{set.series}</span>}
                 <span>{(set.totalCards || set.cardCount || totalCount).toLocaleString()} cards</span>
-                {set.releaseDate && <span>· t("card.released") {set.releaseDate}</span>}
+                {set.releaseDate && <span>· {t('card.released') || 'Released'} {set.releaseDate}</span>}
               </div>
             </div>
           </div>
         )}
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-3 mb-6">
+        <div className="flex flex-wrap items-center gap-3 mb-6">
           {rarities.length > 1 && (
             <select
               value={rarityFilter}
               onChange={e => setRarityFilter(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-[#e8eaf0] bg-white text-sm text-[#1e2235] focus:ring-2 focus:ring-indigo-400"
+              className="px-3 py-2 rounded-lg border border-[#e8eaf0] bg-white text-sm text-[#1e2235] focus:outline-none focus:border-[#6366f1]"
             >
-              <option value="all">t("set.allRarities")</option>
+              <option value="all">{t('set.allRarities') || 'All Rarities'}</option>
               {rarities.map(r => (
                 <option key={r} value={r}>{r}</option>
               ))}
             </select>
           )}
-
           {types.length > 1 && (
             <select
               value={typeFilter}
               onChange={e => setTypeFilter(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-[#e8eaf0] bg-white text-sm text-[#1e2235] focus:ring-2 focus:ring-indigo-400"
+              className="px-3 py-2 rounded-lg border border-[#e8eaf0] bg-white text-sm text-[#1e2235] focus:outline-none focus:border-[#6366f1]"
             >
-              <option value="all">t("set.allTypes")</option>
-              {types.map(t => (
-                <option key={t} value={t}>{t}</option>
+              <option value="all">{t('set.allTypes') || 'All Types'}</option>
+              {types.map(type => (
+                <option key={type} value={type}>{type}</option>
               ))}
             </select>
           )}
-
-          <span className="text-sm text-[#8b8fa6] self-center">
-            t("set.showing") {filtered.length} t("set.of") {totalCount} cards
+          <span className="text-sm text-[#8b8fa6]">
+            {t('set.showing') || 'Showing'} {filtered.length} / {totalCount}
           </span>
         </div>
 
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500" />
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#6366f1] border-t-transparent" />
           </div>
         )}
 
@@ -173,31 +169,26 @@ export default function SetDetailPage() {
               <Link
                 key={card.id}
                 href={`${config.linkPrefix}/${encodeURIComponent(card.id)}`}
-                className="bg-white rounded-xl border border-[#e8eaf0] overflow-hidden hover:shadow-lg hover:border-indigo-300 transition-all group"
+                className="group bg-white rounded-xl overflow-hidden border border-transparent hover:border-[#6366f1]/20 hover:shadow-md hover:shadow-[#6366f1]/5 transition-all"
               >
-                {/* Card Image */}
                 <div className="aspect-[2.5/3.5] bg-[#f5f6fa] flex items-center justify-center overflow-hidden">
                   {(card.imageLarge || card.image) ? (
                     <img
                       src={card.imageLarge || card.image || ''}
                       alt={card.name}
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+                      className="w-full h-full object-contain group-hover:scale-[1.03] transition-transform duration-300"
                       loading="lazy"
                     />
                   ) : (
-                    <div className="text-[#8b8fa6] text-center px-2">
+                    <div className="text-[#b5b8c8] text-center px-2">
                       <div className="text-2xl mb-1">🃏</div>
-                      <div className="text-xs">No image</div>
+                      <div className="text-xs">{t('common.noImage') || 'No image'}</div>
                     </div>
                   )}
                 </div>
-
-                {/* Card Info */}
                 <div className="p-3">
-                  <h3 className="font-medium text-sm text-[#1e2235] leading-tight line-clamp-2 group-hover:text-indigo-600 transition-colors">
-                    {card.name}
-                  </h3>
-                  <div className="mt-1 flex items-center gap-1.5 text-xs text-[#8b8fa6]">
+                  <h3 className="text-sm font-medium text-[#1e2235] truncate leading-tight">{card.name}</h3>
+                  <div className="mt-0.5 flex items-center gap-1.5 text-xs text-[#8b8fa6]">
                     <span>#{card.number || card.localId || '?'}</span>
                     {card.rarity && (
                       <>
@@ -207,18 +198,14 @@ export default function SetDetailPage() {
                     )}
                   </div>
                   {card.hp && (
-                    <div className="mt-1 text-xs">
-                      <span className="bg-red-50 text-red-600 px-1.5 py-0.5 rounded font-medium">
-                        HP {card.hp}
-                      </span>
-                    </div>
+                    <span className="mt-1 inline-block bg-red-50 text-red-500 px-1.5 py-0.5 rounded text-[10px] font-medium">
+                      HP {card.hp}
+                    </span>
                   )}
                   {card.types && card.types.length > 0 && (
                     <div className="mt-1 flex gap-1 flex-wrap">
-                      {card.types.slice(0, 3).map(t => (
-                        <span key={t} className="text-[10px] bg-[#f0f0f5] px-1.5 py-0.5 rounded text-[#5c6078]">
-                          {t}
-                        </span>
+                      {card.types.slice(0, 3).map(type => (
+                        <span key={type} className="text-[10px] bg-[#f5f6fa] px-1.5 py-0.5 rounded text-[#5c6078]">{type}</span>
                       ))}
                     </div>
                   )}
@@ -228,15 +215,15 @@ export default function SetDetailPage() {
           </div>
         )}
 
-        {/* t("set.loadMore") */}
+        {/* Load more */}
         {!loading && cards.length < totalCount && (
           <div className="text-center mt-8">
             <button
               onClick={() => fetchSetCards(page + 1)}
               disabled={loading}
-              className="px-6 py-2.5 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors font-medium text-sm disabled:opacity-50"
+              className="px-6 py-2.5 bg-white border border-[#e8eaf0] text-[#5c6078] rounded-full hover:border-[#6366f1]/30 hover:text-[#6366f1] transition-all text-sm font-medium disabled:opacity-50"
             >
-              t("set.loadMore") ({totalCount - cards.length} t("set.remaining"))
+              {t('set.loadMore') || 'Load more'} ({totalCount - cards.length})
             </button>
           </div>
         )}
