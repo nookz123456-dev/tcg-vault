@@ -298,11 +298,38 @@ export const JP_TO_EN: Record<string, string> = {
  * then fall back to PokeAPI for names not in the map.
  */
 export function lookupENName(jpName: string): string | null {
-  // Clean suffixes
-  const clean = jpName
+  // Clean suffixes and prefixes
+  let clean = jpName
     .replace(/\s*(EX|ex|V|VMAX|VSTAR|GX|V-UNION|V-STAR|BREAK|Mega|★)$/i, '')
     .replace(/（[^）]*）/g, '') // Remove parenthetical text like （デルタ種）
+    .replace(/\([^)]*\)/g, '') // Also remove English parens
     .trim()
 
-  return JP_TO_EN[clean] || null
+  // Direct lookup
+  if (JP_TO_EN[clean]) return JP_TO_EN[clean]
+
+  // If the name contains English characters, try extracting just the EN part
+  // e.g. "mewtwo" from "mewtwo（デルタ種）" or "Mewtwo" from "RocketのMewtwo Ex"
+  const enMatch = clean.match(/[A-Za-z][a-z]+/)
+  if (enMatch) {
+    const enName = enMatch[0].charAt(0).toUpperCase() + enMatch[0].slice(1).toLowerCase()
+    // Check if this English name exists in our values (reverse lookup)
+    for (const [jp, en] of Object.entries(JP_TO_EN)) {
+      if (en === enName) return enName
+    }
+  }
+
+  // Try extracting Pokemon name from JP prefixes:
+  // Patterns like: ロケットのミュウツー, 輝くミュウツー
+  // Remove text before の
+  const noPrefix = clean.replace(/^[^\s]*の/, '').trim()
+  if (noPrefix !== clean && JP_TO_EN[noPrefix]) return JP_TO_EN[noPrefix]
+
+  // Try splitting by space and checking each word
+  const words = clean.split(/\s+/)
+  for (const word of words) {
+    if (JP_TO_EN[word]) return JP_TO_EN[word]
+  }
+
+  return null
 }
