@@ -40,21 +40,26 @@ function ResetPasswordContent() {
   const [validToken, setValidToken] = useState(false)
 
   useEffect(() => {
-    const hash = window.location.hash
-    if (hash) {
-      const params = new URLSearchParams(hash.substring(1))
-      const token = params.get('access_token')
-      const refresh = params.get('refresh_token')
-      const type = params.get('type')
-      if (token && (type === 'recovery' || type === 'signup')) {
-        setAccessToken(token)
-        setRefreshToken(refresh || '')
-        setValidToken(true)
-      } else {
-        setError(isThai ? 'ลิงก์รีเซ็ตรหัสผ่านไม่ถูกต้อง กรุณาขอลิงก์ใหม่' : 'Invalid reset link. Please request a new one.')
+    // Supabase sends tokens via URL fragment (#access_token=...&type=recovery)
+    // or via query params (?access_token=...&type=recovery)
+    const checkTokens = () => {
+      const hash = window.location.hash
+      if (hash) {
+        const params = new URLSearchParams(hash.substring(1))
+        const token = params.get('access_token')
+        const refresh = params.get('refresh_token')
+        const type = params.get('type')
+        if (token && (type === 'recovery' || type === 'signup')) {
+          setAccessToken(token)
+          setRefreshToken(refresh || '')
+          setValidToken(true)
+          // Clean up the URL hash so it doesn't leak
+          window.history.replaceState(null, '', window.location.pathname)
+          return
+        }
       }
-    } else {
-      // Also check URL params (some Supabase versions use query params)
+
+      // Also check query params (some Supabase versions)
       const token = searchParams.get('access_token')
       const refresh = searchParams.get('refresh_token')
       const type = searchParams.get('type')
@@ -62,8 +67,16 @@ function ResetPasswordContent() {
         setAccessToken(token)
         setRefreshToken(refresh || '')
         setValidToken(true)
+        // Clean up URL
+        window.history.replaceState(null, '', window.location.pathname)
+        return
       }
+
+      // No valid token found
+      setError(isThai ? 'ลิงก์รีเซ็ตรหัสผ่านไม่ถูกต้อง กรุณาขอลิงก์ใหม่' : 'Invalid reset link. Please request a new one.')
     }
+
+    checkTokens()
   }, [searchParams, isThai])
 
   const handleReset = async (e: React.FormEvent) => {
