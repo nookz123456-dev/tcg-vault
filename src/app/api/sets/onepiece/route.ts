@@ -8,7 +8,7 @@ export async function GET() {
     // Fetch the card list page which has all set links
     const res = await fetch(`${OP_EN_BASE}/cardlist/`, {
       headers: {
-        'User-Agent': 'TCGVault/1.0',
+        'User-Agent': 'HoloCheck/1.0',
         'Accept': 'text/html',
       },
       cache: 'no-store',

@@ -8,11 +8,11 @@ export async function GET() {
     // Fetch JP sets (minimal: id, name, cardCount)
     const [jpRes, enRes] = await Promise.all([
       fetch(`${TCGDEX_JP}/sets`, {
-        headers: { 'User-Agent': 'TCGVault/1.0', 'Accept': 'application/json' },
+        headers: { 'User-Agent': 'HoloCheck/1.0', 'Accept': 'application/json' },
         cache: 'no-store',
       }),
       fetch(`${TCGDEX_EN}/sets`, {
-        headers: { 'User-Agent': 'TCGVault/1.0', 'Accept': 'application/json' },
+        headers: { 'User-Agent': 'HoloCheck/1.0', 'Accept': 'application/json' },
         cache: 'no-store',
       }),
     ])

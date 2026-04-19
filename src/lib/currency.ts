@@ -1,4 +1,4 @@
-// Currency conversion utility for TCG Vault
+// Currency conversion utility for HoloCheck
 // Uses live exchange rates with fallback to hardcoded rates
 
 const FALLBACK_RATES: Record<string, number> = {

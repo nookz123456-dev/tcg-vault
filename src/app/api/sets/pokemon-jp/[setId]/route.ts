@@ -14,7 +14,7 @@ export async function GET(
     // Fetch set info + cards
     const setRes = await fetch(`${TCGDEX_JP}/sets/${setId}`, {
       headers: {
-        'User-Agent': 'TCGVault/1.0',
+        'User-Agent': 'HoloCheck/1.0',
         'Accept': 'application/json',
       },
       cache: 'no-store',

@@ -246,7 +246,7 @@ export default function LoginPage() {
  {/* Logo */}
  <div className="text-center mb-8">
  <div className="text-5xl mb-3">🃏</div>
- <h1 className="text-3xl font-extrabold text-[#6366f1] tracking-tight">TCG Vault</h1>
+ <h1 className="text-3xl font-extrabold text-[#6366f1] tracking-tight">HoloCheck</h1>
  <p className="text-[#5c6078] mt-2">
  {isThai ? 'จัดการคอลเลกชันการ์ดของคุณ' : 'Your card collection, tracked.'}
  </p>

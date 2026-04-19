@@ -108,7 +108,7 @@ export async function findENImageFallback(cardName: string): Promise<string | nu
     }
     
     const res = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${encodeURIComponent(searchName)}"&pageSize=1`, {
-      headers: { 'User-Agent': 'TCGVault/1.0' },
+      headers: { 'User-Agent': 'HoloCheck/1.0' },
       cache: 'no-store',
     })
     if (res.ok) {
@@ -230,7 +230,7 @@ export async function searchTCGdexJP(keyword: string): Promise<TCGdexJPCard[]> {
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'TCGVault/1.0',
+        'User-Agent': 'HoloCheck/1.0',
         'Accept': 'application/json',
       },
       cache: 'no-store',
@@ -259,7 +259,7 @@ async function searchTCGdexEN(keyword: string): Promise<any[]> {
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'TCGVault/1.0',
+        'User-Agent': 'HoloCheck/1.0',
         'Accept': 'application/json',
       },
       cache: 'no-store',
@@ -285,7 +285,7 @@ export async function getPokemonJPCardTCGdex(cardId: string): Promise<TCGdexJPCa
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'TCGVault/1.0',
+        'User-Agent': 'HoloCheck/1.0',
         'Accept': 'application/json',
       },
       cache: 'no-store',
@@ -311,7 +311,7 @@ export async function getJPSets(): Promise<any[]> {
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'TCGVault/1.0',
+        'User-Agent': 'HoloCheck/1.0',
         'Accept': 'application/json',
       },
       next: { revalidate: 3600 }, // Sets rarely change, cache 1 hour

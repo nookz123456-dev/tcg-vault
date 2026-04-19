@@ -1,4 +1,4 @@
-// Thai/English UI translations for TCG Vault
+// Thai/English UI translations for HoloCheck
 // Card data stays in its original language (EN/JP)
 
 const translations = {
@@ -15,7 +15,7 @@ const translations = {
   'nav.signOut': { th: 'ออกจากระบบ', en: 'Sign Out' },
 
   // Homepage
-  'home.hero.title': { th: 'ติดตามราคาการ์ด TCG ทุกเซ็ต', en: 'Track TCG card prices across every set' },
+  'home.hero.title': { th: 'ตรวจสอบราคาการ์ดโปเกม่อนทุกเซ็ต', en: 'Track TCG card prices across every set' },
   'home.hero.subtitle': { th: 'ฐานข้อมูลการ์ดโปเกม่อน One Piece ครบทุกภาษา พร้อมราคาอัปเดต', en: 'Complete Pokemon & One Piece card database with live pricing' },
   'home.hero.cta': { th: 'เริ่มค้นหา', en: 'Start Searching' },
   'home.hero.cta2': { th: 'ดูเซ็ตการ์ด', en: 'Browse Sets' },
@@ -45,7 +45,7 @@ const translations = {
   'home.community.title': { th: 'เข้าร่วมชุมชนนักสะสม', en: 'Join the Collector Community' },
   'home.community.desc': { th: 'พูดคุยเรื่องการ์ด แลกเปลี่ยน ตามกระแสตลาด ร่วมกับนักสะสมคนอื่น', en: 'Discuss cards, trade with others, follow market trends' },
   'home.community.cta': { th: 'เข้าชุมชน', en: 'Join Community' },
-  'home.footer.desc': { th: 'ฐานข้อมูลการ์ด TCG ที่ครบที่สุด สำหรับนักสะสมไทย', en: 'The most complete TCG card database for Thai collectors' },
+  'home.footer.desc': { th: 'ฐานข้อมูลการ์ดโปเกม่อนที่ครบที่สุด สำหรับนักสะสมไทย', en: 'The most complete TCG card database for Thai collectors' },
 
   // Sets page
   'sets.title': { th: 'เซ็ตการ์ด', en: 'Card Sets' },
@@ -354,7 +354,7 @@ export function useLocale() {
   const locale = useContext(LocaleContext)
   const setLocale = (newLocale: Locale) => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('tcg-vault-locale', newLocale)
+      localStorage.setItem('holocheck-locale', newLocale)
       window.location.reload()
     }
   }

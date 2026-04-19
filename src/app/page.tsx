@@ -202,8 +202,14 @@ export default function Home() {
  <div className="max-w-7xl mx-auto px-4">
  <div className="flex flex-col md:flex-row items-center justify-between gap-4">
  <div className="flex items-center gap-2.5">
- <span className="text-xl">🃏</span>
- <span className="text-sm font-bold text-[#6366f1]">TCG Vault</span>
+ <span className="text-xl">
+    <svg viewBox="0 0 32 32" className="w-5 h-5 inline-block" fill="none">
+      <path d="M8 8h10v2H10v6h6v2H8V8z" fill="#6366f1"/>
+      <path d="M14 16h10v2H16v6h8v2H14V16z" fill="#6366f1" opacity="0.7"/>
+      <circle cx="24" cy="8" r="3" fill="#6366f1" opacity="0.5"/>
+    </svg>
+  </span>
+ <span className="text-sm font-bold text-[#6366f1]">HoloCheck</span>
  </div>
  <p className="text-xs text-[#8b8fa6]">
  {t('home.footer.desc')} · Made with ♥ by Sora

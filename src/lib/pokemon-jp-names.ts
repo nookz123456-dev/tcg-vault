@@ -31,14 +31,14 @@ export async function getJapanesePokemonName(englishName: string): Promise<strin
   try {
     // Step 1: Look up Pokemon by name to get species URL
     const pokemonRes = await fetch(`https://pokeapi.co/api/v2/pokemon/${cacheKey}`, {
-      headers: { 'User-Agent': 'TCGVault/1.0' },
+      headers: { 'User-Agent': 'HoloCheck/1.0' },
       cache: 'no-store',
     })
 
     if (!pokemonRes.ok) {
       // Try direct species lookup
       const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${cacheKey}`, {
-        headers: { 'User-Agent': 'TCGVault/1.0' },
+        headers: { 'User-Agent': 'HoloCheck/1.0' },
         cache: 'no-store',
       })
       
@@ -61,7 +61,7 @@ export async function getJapanesePokemonName(englishName: string): Promise<strin
 
     // Step 2: Get species data for Japanese name
     const speciesRes = await fetch(speciesUrl, {
-      headers: { 'User-Agent': 'TCGVault/1.0' },
+      headers: { 'User-Agent': 'HoloCheck/1.0' },
       cache: 'no-store',
     })
 
@@ -129,7 +129,7 @@ export async function getEnglishPokemonName(japaneseName: string): Promise<strin
     
     // Strategy: Search Pokemon TCG API which may have JP name matches
     const res = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:${encodeURIComponent(cleanJP)}&pageSize=1`, {
-      headers: { 'User-Agent': 'TCGVault/1.0' },
+      headers: { 'User-Agent': 'HoloCheck/1.0' },
       cache: 'no-store',
     })
     

@@ -60,11 +60,16 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6366f1] to-[#818cf8] flex items-center justify-center shadow-sm shadow-[#6366f1]/20">
-              <span className="text-white text-sm font-bold">T</span>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6366f1] to-[#a78bfa] flex items-center justify-center shadow-sm shadow-[#6366f1]/20 relative overflow-hidden">
+              {/* HoloCheck Logo SVG */}
+              <svg viewBox="0 0 32 32" className="w-5 h-5" fill="none">
+                <path d="M8 8h10v2H10v6h6v2H8V8z" fill="white"/>
+                <path d="M14 16h10v2H16v6h8v2H14V16z" fill="white" opacity="0.7"/>
+                <circle cx="24" cy="8" r="3" fill="white" opacity="0.5"/>
+              </svg>
             </div>
             <span className="text-lg font-bold text-[#1e2235] tracking-tight hidden sm:block">
-              TCG Vault
+              HoloCheck
             </span>
           </Link>
 

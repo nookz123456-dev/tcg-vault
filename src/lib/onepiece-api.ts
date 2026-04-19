@@ -83,7 +83,7 @@ export function getOPDisplayImageUrl(cardId: string): string {
 export async function fetchOPTCGCard(cardId: string): Promise<any | null> {
   try {
     const res = await fetch(`https://optcgapi.com/api/sets/card/${cardId}/`, {
-      headers: { 'User-Agent': 'TCGVault/1.0' },
+      headers: { 'User-Agent': 'HoloCheck/1.0' },
       next: { revalidate: 3600 },
     })
     if (!res.ok) return null
@@ -99,7 +99,7 @@ export async function fetchOPTCGCard(cardId: string): Promise<any | null> {
 export async function fetchOPTCGSetCards(setId: string): Promise<any[]> {
   try {
     const res = await fetch(`https://optcgapi.com/api/sets/${setId}/`, {
-      headers: { 'User-Agent': 'TCGVault/1.0' },
+      headers: { 'User-Agent': 'HoloCheck/1.0' },
       next: { revalidate: 3600 },
     })
     if (!res.ok) return []

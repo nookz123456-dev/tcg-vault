@@ -11,21 +11,21 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "TCG Vault — ติดตามราคาการ์ด TCG | Card Price Tracker",
-  description: "ฐานข้อมูลการ์ดโปเกม่อน One Piece ครบทุกเซ็ต พร้อมราคาอัปเดต จัดการคอลเลกชัน พูดคุยกับนักสะสมคนอื่น",
+  title: "HoloCheck — ตรวจราคาการ์ดโปเกม่อน | Card Price Tracker",
+  description: "ฐานข้อมูลการ์ดโปเกม่อน ครบทุกเซ็ต พร้อมราคาอัปเดต จัดการคอลเลกชัน พูดคุยกับนักสะสมคนอื่น",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/icon.svg",
   },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "TCG Vault",
+    title: "HoloCheck",
   },
   openGraph: {
-    title: "TCG Vault — Card Price Tracker & Marketplace",
-    description: "Track Pokemon & One Piece TCG card prices, manage your collection, and connect with collectors",
-    siteName: "TCG Vault",
+    title: "HoloCheck — Card Price Tracker & Community",
+    description: "Track Pokemon TCG card prices, manage your collection, and connect with collectors",
+    siteName: "HoloCheck",
     type: "website",
     images: ["/icon-512.png"],
   },
@@ -39,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="th">
       <head>
-        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
       </head>
       <body className="antialiased">
         <ClientLayout>{children}</ClientLayout>
