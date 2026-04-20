@@ -8,9 +8,9 @@ export async function GET(
 ) {
   let { id } = await params
 
-  // Pokemon TCG API requires lowercase IDs
-  // Convert e.g. "SV8pt5-4" → "sv8pt5-4"
-  id = id.toLowerCase()
+  // Pokemon TCG API requires lowercase IDs with hyphens
+  // Convert e.g. "SV8pt5-4" → "sv8pt5-4" and "sv8pt5.4" → "sv8pt5-4"
+  id = id.toLowerCase().replace(/\./g, '-')
 
   try {
     const card: PokemonCard = await getPokemonCard(id)
