@@ -727,6 +727,26 @@ const translations = {
   'holoscore.gradingROI': { th: 'คุ้มจัดเกรด', en: 'Grading ROI' },
   'holoscore.rarity': { th: 'ความหายาก', en: 'Rarity' },
   'holoscore.momentum': { th: 'โมเมนตัม', en: 'Momentum' },
+
+  // Market Index
+  'index.title': { th: 'ดัชนีตลาด HoloCheck', en: 'HoloCheck Market Index' },
+  'index.subtitle': { th: 'ติดตามภาพรวมตลาดการ์ด TCG แบบเรียลไทม์', en: 'Track the TCG card market in real-time' },
+  'index.holo100': { th: 'HoloCheck 100', en: 'HoloCheck 100' },
+  'index.sealed': { th: 'ดัชนีซีล', en: 'Sealed Index' },
+  'index.graded': { th: 'ดัชนีจัดเกรด', en: 'Graded Index' },
+  'index.jp': { th: 'ดัชนี JP', en: 'JP Index' },
+  'index.overview': { th: 'ภาพรวม', en: 'Overview' },
+  'index.hot': { th: 'ร้อนวันนี้', en: 'Hot Today' },
+  'index.cold': { th: 'เย็นวันนี้', en: 'Cold Today' },
+  'index.aboutTitle': { th: 'เกี่ยวกับดัชนี', en: 'About the Index' },
+  'index.about1': { th: 'HoloCheck 100 คือดัชนีราคาการ์ด TCG 100 ใบที่มีสภาพคล่องสูงสุด คำนวณจากราคาตลาดถ่วงน้ำหนัก', en: 'The HoloCheck 100 is a market-cap weighted index of the 100 most liquid TCG cards.' },
+  'index.about2': { th: 'ดัชนีซีลติดตามราคาผลิตภัณฑ์ที่ยังไม่แกะ รวม Booster Box, ETB, และ Blister Pack', en: 'The Sealed Index tracks unopened product prices including Booster Boxes, ETBs, and Blister Packs.' },
+  'index.about3': { th: 'ดัชนีจัดเกรดวัดมูลค่าการ์ดที่ผ่านการจัดเกรดจาก PSA, BGS, CGC, SGC', en: 'The Graded Index measures values of cards graded by PSA, BGS, CGC, and SGC.' },
+  'index.cardsTracked': { th: 'การ์ดในดัชนี', en: 'Cards in Index' },
+  'index.24hChange': { th: 'เปลี่ยนแปลง 24 ชม.', en: '24h Change' },
+  'index.setsCovered': { th: 'เซ็ตที่ครอบคลุม', en: 'Sets Covered' },
+  'index.updateFreq': { th: 'ความถี่อัปเดต', en: 'Update Freq' },
+  'index.disclaimer': { th: 'ดัชนีนี้เป็นข้อมูลอ้างอิงเท่านั้น ไม่ใช่คำแนะนำการลงทุน', en: 'Index is for reference only. Not financial advice.' },
 } as const
 
 export type Locale = 'th' | 'en'
