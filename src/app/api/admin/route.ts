@@ -3,6 +3,13 @@ import { NextRequest, NextResponse } from 'next/server'
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 
+function checkEnv() {
+  if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
+    return { ok: false, missing: [!SUPABASE_URL && 'NEXT_PUBLIC_SUPABASE_URL', !SERVICE_ROLE_KEY && 'SUPABASE_SERVICE_ROLE_KEY'].filter(Boolean) }
+  }
+  return { ok: true, missing: [] }
+}
+
 async function isUserAdmin(authToken: string): Promise<{ isAdmin: boolean; userId: string }> {
   const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: { 'apikey': SERVICE_ROLE_KEY, 'Authorization': `Bearer ${authToken}` },
@@ -20,6 +27,11 @@ async function isUserAdmin(authToken: string): Promise<{ isAdmin: boolean; userI
 
 // GET /api/admin — comprehensive dashboard data
 export async function GET(request: NextRequest) {
+  const envCheck = checkEnv()
+  if (!envCheck.ok) {
+    return NextResponse.json({ error: `Missing env vars: ${envCheck.missing.join(', ')}` }, { status: 500 })
+  }
+
   const authHeader = request.headers.get('Authorization')
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -37,15 +49,16 @@ export async function GET(request: NextRequest) {
 
   // Overview stats — enhanced with marketplace + signup trend
   if (section === 'overview') {
+    try {
     const [usersRes, threadsRes, commentsRes, sellersRes, tradesRes, listingsRes, ordersRes, disputedRes, signupWeekRes, signupTodayRes] = await Promise.all([
       fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id,created_at`, { headers }),
       fetch(`${SUPABASE_URL}/rest/v1/discussion_threads?select=id`, { headers }),
       fetch(`${SUPABASE_URL}/rest/v1/discussion_replies?select=id`, { headers }),
       fetch(`${SUPABASE_URL}/rest/v1/seller_profiles?select=id,status`, { headers }),
       fetch(`${SUPABASE_URL}/rest/v1/trade_offers?select=id,status`, { headers }),
-      fetch(`${SUPABASE_URL}/rest/v1/marketplace_listings?select=id`, { headers }).catch(() => ({ json: async () => [] } as any)),
-      fetch(`${SUPABASE_URL}/rest/v1/orders?select=id,status`, { headers }).catch(() => ({ json: async () => [] } as any)),
-      fetch(`${SUPABASE_URL}/rest/v1/orders?status=eq.disputed&select=id`, { headers }).catch(() => ({ json: async () => [] } as any)),
+      fetch(`${SUPABASE_URL}/rest/v1/marketplace_listings?select=id`, { headers }).catch(() => null),
+      fetch(`${SUPABASE_URL}/rest/v1/orders?select=id,status`, { headers }).catch(() => null),
+      fetch(`${SUPABASE_URL}/rest/v1/orders?status=eq.disputed&select=id`, { headers }).catch(() => null),
       // Users created in last 7 days
       fetch(`${SUPABASE_URL}/rest/v1/profiles?select=created_at&created_at=gte.${new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()}&order=created_at.asc`, { headers }),
       // Users created today
@@ -58,10 +71,12 @@ export async function GET(request: NextRequest) {
     const totalComments = (await commentsRes.json())?.length || 0
     const sellers: any[] = (await sellersRes.json()) || []
     const trades: any[] = (await tradesRes.json()) || []
-    const totalListings = Array.isArray(await listingsRes.json?.()) ? (await listingsRes.json()).length : 0
-    const allOrders: any[] = Array.isArray(await ordersRes.json?.()) ? (await ordersRes.json()) : []
-    const totalOrders = allOrders.length
-    const disputedOrders = Array.isArray(await disputedRes.json?.()) ? (await disputedRes.json()).length : 0
+    const listingsData = listingsRes ? (await listingsRes.json()) : []
+    const totalListings = Array.isArray(listingsData) ? listingsData.length : 0
+    const ordersData = ordersRes ? (await ordersRes.json()) : []
+    const totalOrders = Array.isArray(ordersData) ? ordersData.length : 0
+    const disputedData = disputedRes ? (await disputedRes.json()) : []
+    const disputedOrders = Array.isArray(disputedData) ? disputedData.length : 0
     const newUsersToday = (await signupTodayRes.json())?.length || 0
 
     // Calculate signup trend (7 days grouped by date)
@@ -96,13 +111,16 @@ export async function GET(request: NextRequest) {
       recentActivities,
       signupTrend,
     })
+    } catch (err: any) {
+      return NextResponse.json({ error: 'Overview failed: ' + (err.message || String(err)), stack: err.stack?.slice(0, 200) }, { status: 500 })
+    }
   }
 
   // Users section — enhanced with email + ban_reason
   if (section === 'users') {
     const search = url.searchParams.get('search') || ''
-    let query = 'select=id,username,display_name,email,role,created_at,seller_status,ban_reason&order=created_at.desc&limit=50'
-    if (search) query += `&or=(username.ilike.*${search}*,display_name.ilike.*${search}*,email.ilike.*${search}*)`
+    let query = 'select=id,username,display_name,role,created_at,seller_status,ban_reason&order=created_at.desc&limit=50'
+    if (search) query += `&or=(username.ilike.*${search}*,display_name.ilike.*${search}*)`
     const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?${query}`, { headers })
     const users = await res.json()
     return NextResponse.json({ users: users || [] })
@@ -178,6 +196,11 @@ export async function GET(request: NextRequest) {
 
 // PATCH /api/admin — all admin actions
 export async function PATCH(request: NextRequest) {
+  const envCheck = checkEnv()
+  if (!envCheck.ok) {
+    return NextResponse.json({ error: `Missing env vars: ${envCheck.missing.join(', ')}` }, { status: 500 })
+  }
+
   const authHeader = request.headers.get('Authorization')
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
