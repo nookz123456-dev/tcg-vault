@@ -747,6 +747,20 @@ const translations = {
   'index.setsCovered': { th: 'เซ็ตที่ครอบคลุม', en: 'Sets Covered' },
   'index.updateFreq': { th: 'ความถี่อัปเดต', en: 'Update Freq' },
   'index.disclaimer': { th: 'ดัชนีนี้เป็นข้อมูลอ้างอิงเท่านั้น ไม่ใช่คำแนะนำการลงทุน', en: 'Index is for reference only. Not financial advice.' },
+
+  // Grading ROI
+  'grade.title': { th: 'เครื่องคำนวณ ROI การจัดเกรด', en: 'Grading ROI Calculator' },
+  'grade.subtitle': { th: 'คำนวณว่าส่งการ์ดจัดเกรดคุ้มไหม เปรียบเทียบ PSA, BGS, CGC, SGC', en: 'Is it worth grading? Compare PSA, BGS, CGC, SGC returns' },
+  'grade.calculator': { th: 'ใส่ข้อมูล', en: 'Enter Details' },
+  'grade.rawPrice': { th: 'ราคาการ์ดดิบ (USD)', en: 'Raw Card Price (USD)' },
+  'grade.condition': { th: 'สภาพการ์ด', en: 'Card Condition' },
+  'grade.company': { th: 'บริษัทจัดเกรด', en: 'Grading Company' },
+  'grade.turnaround': { th: 'ระยะเวลาดำเนินการ', en: 'Turnaround' },
+  'grade.results': { th: 'ผลลัพธ์', en: 'Results' },
+  'grade.estimatedValue': { th: 'มูลค่าโดยประมาณ', en: 'Estimated Value' },
+  'grade.totalCost': { th: 'ต้นทุนรวม', en: 'Total Cost' },
+  'grade.disclaimer': { th: 'ค่าโดยประมาณเท่านั้น ผลลัพธ์จริงอาจแตกต่างตามตลาด', en: 'Estimates only. Actual results may vary by market conditions.' },
+  'grade.enterPrice': { th: 'ใส่ราคาการ์ดเพื่อเริ่มคำนวณ', en: 'Enter a card price to calculate' },
 } as const
 
 export type Locale = 'th' | 'en'
