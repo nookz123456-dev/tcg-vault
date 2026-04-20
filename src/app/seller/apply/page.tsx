@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import ImageUpload from '@/components/ImageUpload'
 import { useAuth } from '@/lib/useAuth'
-import { useT, useLocale } from '@/lib/i18n'
+import { useT } from '@/lib/i18n'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
@@ -27,8 +27,6 @@ const THAI_PROVINCES = [
 export default function SellerApplyPage() {
   const { user } = useAuth()
   const t = useT()
-  const { locale } = useLocale()
-  const isThai = locale === 'th'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -67,9 +65,9 @@ export default function SellerApplyPage() {
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error || 'Failed to submit'); return }
-      setSuccess(isThai ? 'ส่งใบสมัครสำเร็จ! เราจะตรวจสอบและแจ้งผลให้คุณทราบ' : 'Application submitted! We will review and notify you.')
+      setSuccess(t('seller.applicationSubmitted'))
       setExistingStatus('pending')
-    } catch { setError(isThai ? 'ข้อผิดพลาดเครือข่าย' : 'Network error') }
+    } catch { setError(t('seller.networkError')) }
     finally { setLoading(false) }
   }
 
@@ -78,9 +76,9 @@ export default function SellerApplyPage() {
       <div className="min-h-screen bg-[#fafbfc]">
         <Navbar />
         <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-          <p className="text-[#8b8fa6]">{isThai ? 'กรุณาเข้าสู่ระบบก่อนสมัครผู้ขาย' : 'Please sign in to apply as a seller'}</p>
+          <p className="text-[#8b8fa6]">{t('seller.signInToApply')}</p>
           <a href="/login" className="inline-block mt-4 px-5 py-2 bg-[#6366f1] text-white rounded-lg text-sm font-semibold hover:bg-[#4f46e5] transition-all">
-            {isThai ? 'เข้าสู่ระบบ' : 'Sign In'}
+            {t('common.signIn')}
           </a>
         </div>
       </div>
@@ -93,8 +91,8 @@ export default function SellerApplyPage() {
         <Navbar />
         <div className="max-w-2xl mx-auto px-4 py-20 text-center">
           <div className="text-5xl mb-4 opacity-30">⏳</div>
-          <h2 className="text-xl font-bold text-[#1e2235] mb-2">{isThai ? 'รอการตรวจสอบ' : 'Pending Verification'}</h2>
-          <p className="text-[#8b8fa6]">{isThai ? 'ใบสมัครของคุณอยู่ระหว่างตรวจสอบ' : 'Your application is being reviewed.'}</p>
+          <h2 className="text-xl font-bold text-[#1e2235] mb-2">{t('seller.pendingTitle')}</h2>
+          <p className="text-[#8b8fa6]">{t('seller.pendingDesc')}</p>
         </div>
       </div>
     )
@@ -106,8 +104,8 @@ export default function SellerApplyPage() {
         <Navbar />
         <div className="max-w-2xl mx-auto px-4 py-20 text-center">
           <div className="text-5xl mb-4 opacity-30">✅</div>
-          <h2 className="text-xl font-bold text-[#1e2235] mb-2">{isThai ? 'ผู้ขายที่ผ่านการตรวจสอบ' : 'Verified Seller'}</h2>
-          <p className="text-[#8b8fa6]">{isThai ? 'คุณเป็นผู้ขายที่ผ่านการตรวจสอบแล้ว' : 'You are a verified seller.'}</p>
+          <h2 className="text-xl font-bold text-[#1e2235] mb-2">{t('seller.verifiedTitle')}</h2>
+          <p className="text-[#8b8fa6]">{t('seller.verifiedDesc')}</p>
         </div>
       </div>
     )
@@ -120,9 +118,9 @@ export default function SellerApplyPage() {
       <Navbar />
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#1e2235]">{isThai ? 'สมัครเป็นผู้ขาย' : 'Become a Seller'}</h1>
+          <h1 className="text-2xl font-bold text-[#1e2235]">{t('seller.applyTitle')}</h1>
           <p className="text-sm text-[#8b8fa6] mt-1">
-            {isThai ? 'กรอกข้อมูลเพื่อยืนยันตัวตน เราตรวจสอบเพื่อความปลอดภัยของลูกค้า' : 'Verify your identity to start selling. We verify for buyer safety.'}
+            {t('seller.applyDesc')}
           </p>
         </div>
 
@@ -132,19 +130,19 @@ export default function SellerApplyPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Identity */}
           <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6">
-            <h2 className="text-sm font-semibold text-[#8b8fa6] uppercase tracking-wider mb-4">{isThai ? 'ข้อมูลประจำตัว' : 'Identity'}</h2>
+            <h2 className="text-sm font-semibold text-[#8b8fa6] uppercase tracking-wider mb-4">{t('seller.identity')}</h2>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-[#5c6078] mb-1">{isThai ? 'ชื่อ-นามสกุลจริง' : 'Full Legal Name'} *</label>
-                <input type="text" value={form.real_name} onChange={e => handleChange('real_name', e.target.value)} required className={inputClass} placeholder={isThai ? 'ชื่อ นามสกุล ตามบัตรประชาชน' : 'Name as shown on ID card'} />
+                <label className="block text-sm font-medium text-[#5c6078] mb-1">{t('seller.fullLegalName')} *</label>
+                <input type="text" value={form.real_name} onChange={e => handleChange('real_name', e.target.value)} required className={inputClass} placeholder={t('seller.nameOnId')} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-[#5c6078] mb-1">{isThai ? 'วันเดือนปีเกิด' : 'Date of Birth'} *</label>
+                  <label className="block text-sm font-medium text-[#5c6078] mb-1">{t('seller.dateOfBirth')} *</label>
                   <input type="date" value={form.date_of_birth} onChange={e => handleChange('date_of_birth', e.target.value)} required className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#5c6078] mb-1">{isThai ? 'เลขบัตรประชาชน' : 'National ID'} *</label>
+                  <label className="block text-sm font-medium text-[#5c6078] mb-1">{t('seller.nationalId')} *</label>
                   <input type="text" value={form.national_id} onChange={e => handleChange('national_id', e.target.value.replace(/\D/g, '').slice(0, 13))} required maxLength={13} className={inputClass} placeholder="X XXXX XXXXX XX X" />
                 </div>
               </div>
@@ -153,36 +151,36 @@ export default function SellerApplyPage() {
 
           {/* Contact */}
           <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6">
-            <h2 className="text-sm font-semibold text-[#8b8fa6] uppercase tracking-wider mb-4">{isThai ? 'ข้อมูลติดต่อ' : 'Contact'}</h2>
+            <h2 className="text-sm font-semibold text-[#8b8fa6] uppercase tracking-wider mb-4">{t('seller.contact')}</h2>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-[#5c6078] mb-1">{isThai ? 'เบอร์โทรศัพท์' : 'Phone'} *</label>
+                <label className="block text-sm font-medium text-[#5c6078] mb-1">{t('seller.phone')} *</label>
                 <input type="tel" value={form.phone} onChange={e => handleChange('phone', e.target.value)} required className={inputClass} placeholder="08X-XXX-XXXX" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#5c6078] mb-1">{isThai ? 'ที่อยู่' : 'Address'} *</label>
-                <input type="text" value={form.address} onChange={e => handleChange('address', e.target.value)} required className={inputClass} placeholder={isThai ? 'บ้านเลขที่ ซอย ถนน' : 'House number, Soi, Road'} />
+                <label className="block text-sm font-medium text-[#5c6078] mb-1">{t('seller.address')} *</label>
+                <input type="text" value={form.address} onChange={e => handleChange('address', e.target.value)} required className={inputClass} placeholder={t('seller.addressPlaceholder')} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-[#5c6078] mb-1">{isThai ? 'ตำบล/แขวง' : 'District'} *</label>
+                  <label className="block text-sm font-medium text-[#5c6078] mb-1">{t('seller.district')} *</label>
                   <input type="text" value={form.district} onChange={e => handleChange('district', e.target.value)} required className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#5c6078] mb-1">{isThai ? 'อำเภอ/เขต' : 'City'} *</label>
+                  <label className="block text-sm font-medium text-[#5c6078] mb-1">{t('seller.city')} *</label>
                   <input type="text" value={form.city} onChange={e => handleChange('city', e.target.value)} required className={inputClass} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-[#5c6078] mb-1">{isThai ? 'จังหวัด' : 'Province'} *</label>
+                  <label className="block text-sm font-medium text-[#5c6078] mb-1">{t('seller.province')} *</label>
                   <select value={form.province} onChange={e => handleChange('province', e.target.value)} required className={inputClass}>
-                    <option value="">{isThai ? '-- เลือกจังหวัด --' : '-- Select --'}</option>
+                    <option value="">{t('seller.selectProvince')}</option>
                     {THAI_PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#5c6078] mb-1">{isThai ? 'รหัสไปรษณีย์' : 'Postal Code'} *</label>
+                  <label className="block text-sm font-medium text-[#5c6078] mb-1">{t('seller.postalCode')} *</label>
                   <input type="text" value={form.postal_code} onChange={e => handleChange('postal_code', e.target.value.replace(/\D/g, '').slice(0, 5))} required maxLength={5} className={inputClass} placeholder="XXXXX" />
                 </div>
               </div>
@@ -191,27 +189,27 @@ export default function SellerApplyPage() {
 
           {/* Verification Docs */}
           <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6">
-            <h2 className="text-sm font-semibold text-[#8b8fa6] uppercase tracking-wider mb-4">{isThai ? 'เอกสารยืนยันตัวตน' : 'Verification Documents'}</h2>
+            <h2 className="text-sm font-semibold text-[#8b8fa6] uppercase tracking-wider mb-4">{t('seller.verificationDocs')}</h2>
             <p className="text-xs text-[#8b8fa6] mb-4">
-              {isThai ? 'อัปโหลดรูปบัตรประชาชนและรูปถ่ายคู่บัตร' : 'Upload your ID card photo and selfie with ID.'}
+              {t('seller.verificationDocsDesc')}
             </p>
             <div className="space-y-4">
-              <ImageUpload value={form.id_card_image_url} onChange={url => handleChange('id_card_image_url', url)} label={isThai ? 'รูปบัตรประชาชน' : 'ID Card Photo'} placeholder={isThai ? 'อัปโหลดรูปบัตร' : 'Upload ID photo'} folder="seller-docs" required />
-              <ImageUpload value={form.selfie_with_id_url} onChange={url => handleChange('selfie_with_id_url', url)} label={isThai ? 'รูปถ่ายคู่บัตร' : 'Selfie with ID'} placeholder={isThai ? 'อัปโหลดรูปถ่ายคู่บัตร' : 'Upload selfie'} folder="seller-docs" required />
+              <ImageUpload value={form.id_card_image_url} onChange={url => handleChange('id_card_image_url', url)} label={t('seller.idCardPhoto')} placeholder={t('seller.uploadIdPhoto')} folder="seller-docs" required />
+              <ImageUpload value={form.selfie_with_id_url} onChange={url => handleChange('selfie_with_id_url', url)} label={t('seller.selfieWithId')} placeholder={t('seller.uploadSelfie')} folder="seller-docs" required />
             </div>
           </div>
 
           {/* Shop Info */}
           <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6">
-            <h2 className="text-sm font-semibold text-[#8b8fa6] uppercase tracking-wider mb-1">{isThai ? 'ข้อมูลร้านค้า' : 'Shop Info'} <span className="text-[#b5b8c8] normal-case font-normal">({isThai ? 'ไม่จำเป็น' : 'Optional'})</span></h2>
+            <h2 className="text-sm font-semibold text-[#8b8fa6] uppercase tracking-wider mb-1">{t('seller.shopInfo')} <span className="text-[#b5b8c8] normal-case font-normal">({t('seller.optional')})</span></h2>
             <div className="space-y-3 mt-4">
               <div>
-                <label className="block text-sm font-medium text-[#5c6078] mb-1">{isThai ? 'ชื่อร้าน' : 'Shop Name'}</label>
-                <input type="text" value={form.shop_name} onChange={e => handleChange('shop_name', e.target.value)} className={inputClass} placeholder={isThai ? 'ชื่อร้านค้า' : 'Your shop name'} />
+                <label className="block text-sm font-medium text-[#5c6078] mb-1">{t('seller.shopName')}</label>
+                <input type="text" value={form.shop_name} onChange={e => handleChange('shop_name', e.target.value)} className={inputClass} placeholder={t('seller.shopNamePlaceholder')} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#5c6078] mb-1">{isThai ? 'รายละเอียด' : 'Description'}</label>
-                <textarea value={form.shop_description} onChange={e => handleChange('shop_description', e.target.value)} rows={3} className={inputClass + " resize-none"} placeholder={isThai ? 'เกี่ยวกับร้านค้าของคุณ...' : 'About your shop...'} />
+                <label className="block text-sm font-medium text-[#5c6078] mb-1">{t('seller.description')}</label>
+                <textarea value={form.shop_description} onChange={e => handleChange('shop_description', e.target.value)} rows={3} className={inputClass + " resize-none"} placeholder={t('seller.shopDescPlaceholder')} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#5c6078] mb-1">LINE ID</label>
@@ -221,7 +219,7 @@ export default function SellerApplyPage() {
           </div>
 
           <button type="submit" disabled={loading} className="w-full py-3 bg-[#6366f1] text-white font-semibold rounded-xl hover:bg-[#4f46e5] transition-all disabled:opacity-40">
-            {loading ? (isThai ? 'กำลังส่ง...' : 'Submitting...') : (isThai ? 'ส่งใบสมัคร' : 'Submit Application')}
+            {loading ? t('seller.submitting') : t('seller.submitApplication')}
           </button>
         </form>
       </div>

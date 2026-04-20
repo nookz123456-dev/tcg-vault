@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useT, useLocale } from '@/lib/i18n'
+import { useT } from '@/lib/i18n'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
@@ -24,8 +24,6 @@ function getPasswordStrength(password: string): { score: number; label: string; 
 
 function ResetPasswordContent() {
   const t = useT()
-  const { locale } = useLocale()
-  const isThai = locale === 'th'
   const searchParams = useSearchParams()
 
   const [accessToken, setAccessToken] = useState('')
@@ -73,26 +71,26 @@ function ResetPasswordContent() {
       }
 
       // No valid token found
-      setError(isThai ? 'ลิงก์รีเซ็ตรหัสผ่านไม่ถูกต้อง กรุณาขอลิงก์ใหม่' : 'Invalid reset link. Please request a new one.')
+      setError(t('reset.invalidLink'))
     }
 
     checkTokens()
-  }, [searchParams, isThai])
+  }, [searchParams])
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
     if (newPassword.length < 8) {
-      setError(isThai ? 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร' : 'Password must be at least 8 characters')
+      setError(t('reset.passwordMin'))
       return
     }
     if (getPasswordStrength(newPassword).score < 3) {
-      setError(isThai ? 'รหัสผ่านไม่แข็งแกร่งพอ ต้องมีตัวพิมพ์ใหญ่ ตัวเลข หรือสัญลักษณ์' : 'Password is not strong enough. Add uppercase, numbers, or symbols.')
+      setError(t('reset.passwordWeak'))
       return
     }
     if (newPassword !== confirmPassword) {
-      setError(isThai ? 'รหัสผ่านไม่ตรงกัน' : 'Passwords do not match')
+      setError(t('reset.passwordMismatch'))
       return
     }
 
@@ -111,7 +109,7 @@ function ResetPasswordContent() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.msg || data.error_description || data.error || (isThai ? 'รีเซ็ตรหัสผ่านไม่สำเร็จ' : 'Failed to reset password'))
+        setError(data.msg || data.error_description || data.error || (t('reset.failed')))
         return
       }
 
@@ -131,7 +129,7 @@ function ResetPasswordContent() {
 
       setSuccess(true)
     } catch {
-      setError(isThai ? 'ข้อผิดพลาดเครือข่าย' : 'Network error')
+      setError(t('reset.networkError'))
     } finally {
       setLoading(false)
     }
@@ -145,7 +143,7 @@ function ResetPasswordContent() {
       <div className="min-h-screen flex items-center justify-center px-4 bg-[#f5f6fa]">
         <div className="text-center">
           <div className="text-4xl mb-4 animate-pulse">⏳</div>
-          <p className="text-[#5c6078]">{isThai ? 'กำลังตรวจสอบ...' : 'Verifying...'}</p>
+          <p className="text-[#5c6078]">{t('reset.verifying')}</p>
         </div>
       </div>
     )
@@ -158,11 +156,11 @@ function ResetPasswordContent() {
           <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6 text-center">
             <div className="text-5xl mb-4">😕</div>
             <h2 className="text-xl font-bold text-[#1e2235] mb-2">
-              {isThai ? 'ลิงก์ไม่ถูกต้อง' : 'Invalid Link'}
+              {t('reset.invalidLinkTitle')}
             </h2>
             <p className="text-sm text-[#8b8fa6] mb-4">{error}</p>
             <a href="/login" className="inline-block px-6 py-2.5 bg-[#6366f1] text-white font-bold rounded-xl hover:bg-[#4f46e5] transition-all">
-              {isThai ? 'กลับไปเข้าสู่ระบบ' : 'Back to Sign In'}
+              {t('reset.backToSignIn')}
             </a>
           </div>
         </div>
@@ -178,10 +176,10 @@ function ResetPasswordContent() {
           <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6 text-center">
             <div className="text-5xl mb-4">🎉</div>
             <h2 className="text-xl font-bold text-[#1e2235] mb-2">
-              {isThai ? 'รีเซ็ตรหัสผ่านสำเร็จ!' : 'Password Reset Successfully!'}
+              {t('reset.successTitle')}
             </h2>
             <p className="text-sm text-[#8b8fa6] mb-4">
-              {isThai ? 'กำลังเปลี่ยนหน้า...' : 'Redirecting...'}
+              {t('reset.redirecting')}
             </p>
           </div>
         </div>
@@ -197,7 +195,7 @@ function ResetPasswordContent() {
           <div className="text-5xl mb-3">🔐</div>
           <h1 className="text-3xl font-extrabold text-[#6366f1] tracking-tight">HoloCheck</h1>
           <p className="text-[#5c6078] mt-2">
-            {isThai ? 'ตั้งรหัสผ่านใหม่' : 'Set your new password'}
+            {t('reset.setNewPassword')}
           </p>
         </div>
 
@@ -212,7 +210,7 @@ function ResetPasswordContent() {
             {/* New Password */}
             <div>
               <label className="block text-sm text-[#5c6078] mb-1 font-medium">
-                {isThai ? 'รหัสผ่านใหม่' : 'New Password'}
+                {t('reset.newPassword')}
               </label>
               <div className="relative">
                 <input
@@ -222,7 +220,7 @@ function ResetPasswordContent() {
                   required
                   minLength={8}
                   className="w-full px-4 py-3 pr-10 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder-[#b5b8c8] focus:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
-                  placeholder={isThai ? 'อย่างน้อย 8 ตัวอักษร' : 'At least 8 characters'}
+                  placeholder={t('reset.atLeast8')}
                 />
                 <button
                   type="button"
@@ -246,12 +244,10 @@ function ResetPasswordContent() {
                     ))}
                   </div>
                   <p className="text-xs mt-1" style={{ color: pwStrength.color }}>
-                    {isThai ? (
-                      pwStrength.score <= 1 ? 'อ่อนมาก' :
-                      pwStrength.score === 2 ? 'อ่อน' :
-                      pwStrength.score === 3 ? 'พอใช้' :
-                      pwStrength.score === 4 ? 'แข็งแกร่ง' : 'แข็งแกร่งมาก'
-                    ) : pwStrength.label}
+                    {pwStrength.score <= 1 ? t('reset.veryWeak') :
+                      pwStrength.score === 2 ? t('reset.weak') :
+                      pwStrength.score === 3 ? t('reset.fair') :
+                      pwStrength.score === 4 ? t('reset.strong') : t('reset.veryStrong')}
                   </p>
                 </div>
               )}
@@ -260,7 +256,7 @@ function ResetPasswordContent() {
             {/* Confirm Password */}
             <div>
               <label className="block text-sm text-[#5c6078] mb-1 font-medium">
-                {isThai ? 'ยืนยันรหัสผ่าน' : 'Confirm Password'}
+                {t('reset.confirmPassword')}
               </label>
               <div className="relative">
                 <input
@@ -269,7 +265,7 @@ function ResetPasswordContent() {
                   onChange={e => setConfirmPassword(e.target.value)}
                   required
                   className="w-full px-4 py-3 pr-10 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder-[#b5b8c8] focus:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
-                  placeholder={isThai ? 'กรอกรหัสผ่านอีกครั้ง' : 'Enter password again'}
+                  placeholder={t('reset.enterPasswordAgain')}
                 />
                 <button
                   type="button"
@@ -281,11 +277,11 @@ function ResetPasswordContent() {
               </div>
               {confirmPassword && newPassword !== confirmPassword && (
                 <p className="text-xs text-red-400 mt-1">
-                  {isThai ? 'รหัสผ่านไม่ตรงกัน' : 'Passwords do not match'}
+                  {t('reset.passwordMismatch')}
                 </p>
               )}
               {confirmPassword && newPassword === confirmPassword && confirmPassword.length > 0 && (
-                <p className="text-xs text-emerald-500 mt-1">✓ {isThai ? 'รหัสผ่านตรงกัน' : 'Passwords match'}</p>
+                <p className="text-xs text-emerald-500 mt-1">✓ {t('reset.passwordsMatch')}</p>
               )}
             </div>
 
@@ -294,13 +290,13 @@ function ResetPasswordContent() {
               disabled={loading || !newPassword || !confirmPassword}
               className="w-full py-3 bg-[#6366f1] text-white font-bold rounded-xl hover:bg-[#4f46e5] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-[#6366f1]/25"
             >
-              {loading ? (isThai ? 'กรุณารอสักครู่...' : 'Please wait...') : (isThai ? 'ตั้งรหัสผ่านใหม่' : 'Reset Password')}
+              {loading ? t('reset.pleaseWait') : t('reset.resetPassword')}
             </button>
           </form>
         </div>
 
         <p className="text-center text-xs text-[#8b8fa6] mt-4">
-          {isThai ? 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร มีตัวพิมพ์ใหญ่ ตัวเลข หรือสัญลักษณ์' : 'Password must be at least 8 characters with uppercase, numbers, or symbols'}
+          {t('reset.passwordRequirement')}
         </p>
       </div>
     </div>

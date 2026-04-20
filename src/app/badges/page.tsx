@@ -39,7 +39,6 @@ export default function BadgesPage() {
  }).catch(() => setLoading(false))
  }, [])
 
- const isThai = t('common.ago') === 'ที่แล้ว'
  const badgesByCategory = badges.reduce((acc, b) => {
  if (!acc[b.category]) acc[b.category] = []
  acc[b.category].push(b)
@@ -79,7 +78,7 @@ export default function BadgesPage() {
  <div className="flex items-center gap-2 mb-4">
  <span className="text-xl">{CATEGORY_ICONS[category] || '🏅'}</span>
  <h2 className="text-lg font-bold text-[#6366f1] uppercase tracking-wider">
- {isThai ? CATEGORY_LABELS[category]?.th || category : CATEGORY_LABELS[category]?.en || category}
+ {t(`badges.category.${category}`) || category}
  </h2>
  </div>
  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -93,7 +92,7 @@ export default function BadgesPage() {
  <p className="text-xs text-[#8b8fa6] mt-1.5 leading-relaxed">{badge.description}</p>
  {badge.threshold > 0 && (
  <p className="text-[10px] text-[#b5b8c8] mt-2">
- {isThai ? `สะสม ${badge.threshold} เพื่อปลดล็อก` : `Reach ${badge.threshold} to unlock`}
+ {t('badges.unlock')}
  </p>
  )}
  </div>

@@ -26,7 +26,7 @@ function getPasswordStrength(password: string): { score: number; label: string; 
 export default function LoginPage() {
  const t = useT()
  const { locale } = useLocale()
- const isThai = locale === 'th'
+ 
  const [mode, setMode] = useState<'login' | 'signup' | 'magic' | 'forgot'>('login')
  const [email, setEmail] = useState('')
  const [password, setPassword] = useState('')
@@ -47,9 +47,9 @@ export default function LoginPage() {
  }, [])
 
  const handleCaptchaError = useCallback((err: string) => {
- setCaptchaError(isThai ? 'การยืนยันล้มเหลว กรุณาลองใหม่' : 'Captcha verification failed. Please try again.')
+ setCaptchaError(t('login.captchaFailed'))
  setCaptchaToken('')
- }, [isThai])
+ })
 
  const handleCaptchaExpire = useCallback(() => {
  setCaptchaToken('')
@@ -74,12 +74,12 @@ export default function LoginPage() {
  }
 
  const validateSignup = (): string | null => {
- if (!username.trim()) return isThai ? 'กรุณากรอกชื่อผู้ใช้' : 'Username is required'
- if (username.trim().length < 3) return isThai ? 'ชื่อผู้ใช้ต้องมีอย่างน้อย 3 ตัวอักษร' : 'Username must be at least 3 characters'
- if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) return isThai ? 'ชื่อผู้ใช้ใช้ได้เฉพาะตัวอักษร ตัวเลข และ _' : 'Username can only contain letters, numbers, and _'
- if (password.length < 8) return isThai ? 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร' : 'Password must be at least 8 characters'
- if (getPasswordStrength(password).score < 3) return isThai ? 'รหัสผ่านไม่แข็งแกร่งพอ ต้องมีตัวพิมพ์ใหญ่ ตัวเลข หรือสัญลักษณ์' : 'Password is not strong enough. Add uppercase, numbers, or symbols'
- if (password !== confirmPassword) return isThai ? 'รหัสผ่านไม่ตรงกัน' : 'Passwords do not match'
+ if (!username.trim()) return t('login.usernameRequired')
+ if (username.trim().length < 3) return t('login.usernameMin')
+ if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) return t('login.usernameChars')
+ if (password.length < 8) return t('login.passwordMin8')
+ if (getPasswordStrength(password).score < 3) return t('login.passwordWeak')
+ if (password !== confirmPassword) return t('login.passwordMismatch')
  return null
  }
 
@@ -98,12 +98,12 @@ export default function LoginPage() {
  })
  const data = await res.json()
  if (!res.ok) {
- setError(data.msg || data.error_description || data.error || (isThai ? 'ส่งลิงก์ไม่สำเร็จ' : 'Failed to send magic link'))
+ setError(data.msg || data.error_description || data.error || (t('login.magicLinkFailed')))
  return
  }
- setSuccess(isThai ? 'ส่งลิงก์เข้าอีเมลแล้ว! ตรวจสอบกล่องจดหมายของคุณ' : 'Magic link sent! Check your email.')
+ setSuccess(t('login.magicLinkSent'))
  } catch {
- setError(isThai ? 'ข้อผิดพลาดเครือข่าย' : 'Network error')
+ setError(t('common.networkError', 'th') ? 'ข้อผิดพลาดเครือข่าย' : 'Network error')
  } finally {
  setLoading(false)
  }
@@ -124,12 +124,12 @@ export default function LoginPage() {
  })
  const data = await res.json()
  if (!res.ok) {
- setError(data.msg || data.error_description || data.error || (isThai ? 'ส่งอีเมลรีเซ็ตไม่สำเร็จ' : 'Failed to send reset email'))
+ setError(data.msg || data.error_description || data.error || (t('login.resetEmailFailed')))
  return
  }
- setSuccess(isThai ? 'ส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลของคุณแล้ว' : 'Password reset link sent to your email.')
+ setSuccess(t('login.resetLinkSent'))
  } catch {
- setError(isThai ? 'ข้อผิดพลาดเครือข่าย' : 'Network error')
+ setError(t('login.networkError'))
  } finally {
  setLoading(false)
  }
@@ -142,7 +142,7 @@ export default function LoginPage() {
  setSuccess('')
 
  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
- setError(isThai ? 'ข้อผิดพลาดการตั้งค่า กรุณาลองใหม่ภายหลัง' : 'Configuration error. Please try again later.')
+ setError(t('login.configError'))
  setLoading(false)
  return
  }
@@ -156,7 +156,7 @@ export default function LoginPage() {
  return
  }
  if (TURNSTILE_SITE_KEY && !captchaToken) {
- setError(isThai ? 'กรุณายืนยัน Captcha' : 'Please complete the captcha verification.')
+ setError(t('login.completeCaptcha'))
  setLoading(false)
  return
  }
@@ -169,13 +169,13 @@ export default function LoginPage() {
  })
  const captchaData = await captchaRes.json()
  if (!captchaData.success) {
- setError(isThai ? 'การยืนยันล้มเหลว กรุณาลองใหม่' : 'Captcha verification failed.')
+ setError(t('login.captchaVerificationFailed'))
  setCaptchaToken('')
  setLoading(false)
  return
  }
  } catch {
- setError(isThai ? 'ไม่สามารถยืนยันได้ กรุณาลองใหม่ภายหลัง' : 'Captcha verification unavailable.')
+ setError(t('login.captchaUnavailable'))
  setLoading(false)
  return
  }
@@ -191,11 +191,11 @@ export default function LoginPage() {
  })
  const data = await res.json()
  if (!res.ok || data.error) {
- setError(data.error_description || data.msg || data.error || (isThai ? 'เข้าสู่ระบบไม่สำเร็จ' : 'Login failed.'))
+ setError(data.error_description || data.msg || data.error || (t('login.loginFailed')))
  return
  }
  localStorage.setItem('tcg-vault-session', JSON.stringify(data))
- setSuccess(isThai ? 'เข้าสู่ระบบสำเร็จ! กำลังเปลี่ยนหน้า...' : 'Logged in! Redirecting...')
+ setSuccess(t('login.loggedIn'))
  setTimeout(() => { window.location.href = '/collection' }, 500)
 
  } else if (mode === 'signup') {
@@ -209,36 +209,36 @@ export default function LoginPage() {
  if (!res.ok || data.error) {
  const msg = data.error || ''
  if (msg.includes('already registered')) {
- setError(isThai ? 'อีเมลนี้ถูกใช้งานแล้ว' : 'This email is already registered.')
+ setError(t('login.alreadyRegistered'))
  } else if (msg.includes('Too many')) {
- setError(isThai ? 'สมัครมากเกินไป กรุณาลองใหม่ภายหลัง' : 'Too many signup attempts. Please try again later.')
+ setError(t('login.tooManyAttempts'))
  } else {
- setError(msg || (isThai ? 'สมัครไม่สำเร็จ' : 'Signup failed.'))
+ setError(msg || (t('login.signupFailed')))
  }
  return
  }
  if (data.session?.access_token) {
  localStorage.setItem('tcg-vault-session', JSON.stringify(data.session))
- setSuccess(isThai ? 'สร้างบัญชีสำเร็จ! กำลังเปลี่ยนหน้า...' : 'Account created! Redirecting...')
+ setSuccess(t('login.accountCreated'))
  setTimeout(() => { window.location.href = '/collection' }, 500)
  } else {
- setSuccess(isThai ? 'สร้างบัญชีสำเร็จ! กรุณาเข้าสู่ระบบ' : 'Account created! You can now log in.')
+ setSuccess(t('login.accountCreatedLogin'))
  setMode('login')
  }
  }
  } catch (err) {
  console.error('Auth error:', err)
- setError(isThai ? 'ข้อผิดพลาดเครือข่าย กรุณาลองใหม่' : 'Network error. Please try again.')
+ setError(t('login.networkError'))
  } finally {
  setLoading(false)
  }
  }
 
  const pwStrength = mode === 'signup' && password ? getPasswordStrength(password) : null
- const title = mode === 'login' ? (isThai ? 'เข้าสู่ระบบ' : 'Sign In')
- : mode === 'signup' ? (isThai ? 'สร้างบัญชี' : 'Create Account')
- : mode === 'magic' ? (isThai ? 'เข้าสู่ระบบด้วยลิงก์' : 'Sign in with Magic Link')
- : (isThai ? 'รีเซ็ตรหัสผ่าน' : 'Reset Password')
+ const title = mode === 'login' ? (t('login.signIn'))
+ : mode === 'signup' ? (t('login.createAccount'))
+ : mode === 'magic' ? (t('login.magicLink'))
+ : (t('login.resetPassword'))
 
  return (
  <div className="min-h-screen flex items-center justify-center px-4 bg-[#fafbfc]">
@@ -248,7 +248,7 @@ export default function LoginPage() {
  <div className="text-5xl mb-3">🃏</div>
  <h1 className="text-3xl font-extrabold text-[#6366f1] tracking-tight">HoloCheck</h1>
  <p className="text-[#5c6078] mt-2">
- {isThai ? 'จัดการคอลเลกชันการ์ดของคุณ' : 'Your card collection, tracked.'}
+ {t('login.yourCardCollection')}
  </p>
  </div>
 
@@ -257,17 +257,17 @@ export default function LoginPage() {
  <h2 className="text-xl font-bold text-[#1e2235] mb-1">{title}</h2>
  {mode === 'login' && (
  <p className="text-sm text-[#8b8fa6] mb-6">
- {isThai ? 'ยังไม่มีบัญชี? ' : "Don't have an account? "}
+ {t('login.noAccountPrefix')}
  <button onClick={() => { setMode('signup'); setError(''); setSuccess('') }} className="text-[#6366f1] font-semibold hover:underline">
- {isThai ? 'สมัครใหม่' : 'Sign up'}
+ {t('login.signUpNew')}
  </button>
  </p>
  )}
  {mode === 'signup' && (
  <p className="text-sm text-[#8b8fa6] mb-6">
- {isThai ? 'มีบัญชีอยู่แล้ว? ' : 'Already have an account? '}
+ {t('login.hasAccountPrefix')}
  <button onClick={() => { setMode('login'); setError(''); setSuccess('') }} className="text-[#6366f1] font-semibold hover:underline">
- {isThai ? 'เข้าสู่ระบบ' : 'Sign in'}
+ {t('login.signIn')}
  </button>
  </p>
  )}
@@ -288,7 +288,7 @@ export default function LoginPage() {
  <form onSubmit={(e) => { e.preventDefault(); handleMagicLink() }} className="space-y-4">
  <div>
  <label className="block text-sm text-[#5c6078] mb-1 font-medium">
- {isThai ? 'อีเมล' : 'Email'}
+ {t('login.email')}
  </label>
  <input
  type="email"
@@ -300,21 +300,21 @@ export default function LoginPage() {
  />
  </div>
  <p className="text-xs text-[#8b8fa6]">
- {isThai ? 'เราจะส่งลิงก์เข้าอีเมลของคุณ — คลิกครั้งเดียวเข้าได้เลย ไม่ต้องจำรหัสผ่าน!' : "We'll send a login link to your email — click once and you're in. No password needed!"}
+ {t('login.magicLinkDesc')}
  </p>
  <button
  type="submit"
  disabled={loading || !email}
  className="w-full py-3 bg-[#6366f1] text-white font-bold rounded-xl hover:bg-[#4f46e5] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
- {loading ? (isThai ? 'กำลังส่ง...' : 'Sending...') : (isThai ? 'ส่งลิงก์เข้าระบบ' : 'Send Magic Link')}
+ {loading ? t('login.sending') : t('login.sendMagicLink')}
  </button>
  <button
  type="button"
  onClick={() => { setMode('login'); setError(''); setSuccess('') }}
  className="w-full py-2 text-[#5c6078] hover:text-[#1e2235] transition-colors text-sm"
  >
- {isThai ? '← กลับไปเข้าสู่ระบบ' : '← Back to sign in'}
+ {t('login.backToSignIn')}
  </button>
  </form>
  )}
@@ -324,7 +324,7 @@ export default function LoginPage() {
  <form onSubmit={(e) => { e.preventDefault(); handleForgotPassword() }} className="space-y-4">
  <div>
  <label className="block text-sm text-[#5c6078] mb-1 font-medium">
- {isThai ? 'อีเมลที่สมัครไว้' : 'Registered email'}
+ {t('login.registeredEmail')}
  </label>
  <input
  type="email"
@@ -340,14 +340,14 @@ export default function LoginPage() {
  disabled={loading || !email}
  className="w-full py-3 bg-[#6366f1] text-white font-bold rounded-xl hover:bg-[#4f46e5] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
- {loading ? (isThai ? 'กำลังส่ง...' : 'Sending...') : (isThai ? 'ส่งลิงก์รีเซ็ตรหัสผ่าน' : 'Send Reset Link')}
+ {loading ? t('login.sending') : t('login.sendResetLink')}
  </button>
  <button
  type="button"
  onClick={() => { setMode('login'); setError(''); setSuccess('') }}
  className="w-full py-2 text-[#5c6078] hover:text-[#1e2235] transition-colors text-sm"
  >
- {isThai ? '← กลับไปเข้าสู่ระบบ' : '← Back to sign in'}
+ {t('login.backToSignIn')}
  </button>
  </form>
  )}
@@ -359,7 +359,7 @@ export default function LoginPage() {
  {mode === 'signup' && (
  <div>
  <label className="block text-sm text-[#5c6078] mb-1 font-medium">
- {isThai ? 'ชื่อผู้ใช้' : 'Username'}
+ {t('login.username')}
  </label>
  <input
  type="text"
@@ -369,7 +369,7 @@ export default function LoginPage() {
  minLength={3}
  maxLength={20}
  className="w-full px-4 py-3 bg-[#fafbfc] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder-[#b5b8c8] focus:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
- placeholder={isThai ? 'ชื่อที่ต้องการใช้ (ตัวอักษร ตัวเลข _)' : 'Choose a username (letters, numbers, _)'}
+ placeholder={t('login.usernamePlaceholder')}
  />
  </div>
  )}
@@ -377,7 +377,7 @@ export default function LoginPage() {
  {/* Email */}
  <div>
  <label className="block text-sm text-[#5c6078] mb-1 font-medium">
- {isThai ? 'อีเมล' : 'Email'}
+ {t('login.email')}
  </label>
  <input
  type="email"
@@ -392,7 +392,7 @@ export default function LoginPage() {
  {/* Password */}
  <div>
  <label className="block text-sm text-[#5c6078] mb-1 font-medium">
- {isThai ? 'รหัสผ่าน' : 'Password'}
+ {t('login.password')}
  </label>
  <div className="relative">
  <input
@@ -402,7 +402,7 @@ export default function LoginPage() {
  required
  minLength={mode === 'signup' ? 8 : 6}
  className="w-full px-4 py-3 pr-10 bg-[#fafbfc] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder-[#b5b8c8] focus:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
- placeholder={mode === 'signup' ? (isThai ? 'อย่างน้อย 8 ตัวอักษร' : 'Min 8 characters') : '••••••••'}
+ placeholder={mode === 'signup' ? t('login.min8Chars') : '••••••••'}
  />
  <button
  type="button"
@@ -426,25 +426,23 @@ export default function LoginPage() {
  ))}
  </div>
  <p className="text-xs mt-1" style={{ color: pwStrength?.color || '#8b8fa6' }}>
- {isThai ? (
- !pwStrength || pwStrength.score <= 1 ? 'อ่อนมาก' :
- pwStrength.score === 2 ? 'อ่อน' :
- pwStrength.score === 3 ? 'พอใช้' :
- pwStrength.score === 4 ? 'แข็งแกร่ง' : 'แข็งแกร่งมาก'
- ) : (pwStrength?.label || 'Weak')}
+ {!pwStrength || pwStrength.score <= 1 ? t('login.veryWeak') :
+ pwStrength.score === 2 ? t('login.weak') :
+ pwStrength.score === 3 ? t('login.fair') :
+ pwStrength.score === 4 ? t('login.strongLabel') : t('login.veryStrong')}
  </p>
  <ul className="text-[10px] text-[#8b8fa6] mt-1 space-y-0.5">
  <li className={password.length >= 8 ? 'text-emerald-500' : ''}>
- {password.length >= 8 ? '✓' : '○'} {isThai ? 'อย่างน้อย 8 ตัวอักษร' : 'At least 8 characters'}
+ {password.length >= 8 ? '✓' : '○'} {t('login.min8Chars2')}
  </li>
  <li className={/[a-z]/.test(password) && /[A-Z]/.test(password) ? 'text-emerald-500' : ''}>
- {(/[a-z]/.test(password) && /[A-Z]/.test(password)) ? '✓' : '○'} {isThai ? 'ตัวพิมพ์ใหญ่และเล็ก' : 'Uppercase & lowercase'}
+ {(/[a-z]/.test(password) && /[A-Z]/.test(password)) ? '✓' : '○'} {t('login.upperLower')}
  </li>
  <li className={/\d/.test(password) ? 'text-emerald-500' : ''}>
- {/\d/.test(password) ? '✓' : '○'} {isThai ? 'ตัวเลข' : 'Number'}
+ {/\d/.test(password) ? '✓' : '○'} {t('login.number')}
  </li>
  <li className={/[^a-zA-Z0-9]/.test(password) ? 'text-emerald-500' : ''}>
- {/[^a-zA-Z0-9]/.test(password) ? '✓' : '○'} {isThai ? 'สัญลักษณ์พิเศษ (!@#$...)' : 'Special character (!@#$...)'}
+ {/[^a-zA-Z0-9]/.test(password) ? '✓' : '○'} {t('login.specialChar')}
  </li>
  </ul>
  </div>
@@ -455,7 +453,7 @@ export default function LoginPage() {
  {mode === 'signup' && (
  <div>
  <label className="block text-sm text-[#5c6078] mb-1 font-medium">
- {isThai ? 'ยืนยันรหัสผ่าน' : 'Confirm Password'}
+ {t('login.confirmPassword')}
  </label>
  <div className="relative">
  <input
@@ -464,7 +462,7 @@ export default function LoginPage() {
  onChange={e => setConfirmPassword(e.target.value)}
  required
  className="w-full px-4 py-3 pr-10 bg-[#fafbfc] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder-[#b5b8c8] focus:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
- placeholder={isThai ? 'กรอกรหัสผ่านอีกครั้ง' : 'Enter password again'}
+ placeholder={t('login.confirmPasswordPlaceholder')}
  />
  <button
  type="button"
@@ -476,11 +474,11 @@ export default function LoginPage() {
  </div>
  {confirmPassword && password !== confirmPassword && (
  <p className="text-xs text-red-400 mt-1">
- {isThai ? 'รหัสผ่านไม่ตรงกัน' : 'Passwords do not match'}
+ {t('login.passwordMismatch')}
  </p>
  )}
  {confirmPassword && password === confirmPassword && confirmPassword.length > 0 && (
- <p className="text-xs text-emerald-500 mt-1">✓ {isThai ? 'รหัสผ่านตรงกัน' : 'Passwords match'}</p>
+ <p className="text-xs text-emerald-500 mt-1">✓ {t('login.passwordsMatch')}</p>
  )}
  </div>
  )}
@@ -493,7 +491,7 @@ export default function LoginPage() {
  onClick={() => { setMode('forgot'); setError(''); setSuccess('') }}
  className="text-xs text-[#6366f1] hover:underline"
  >
- {isThai ? 'ลืมรหัสผ่าน?' : 'Forgot password?'}
+ {t('login.forgotPassword')}
  </button>
  </div>
  )}
@@ -521,21 +519,35 @@ export default function LoginPage() {
  disabled={loading || (mode === 'signup' && !!TURNSTILE_SITE_KEY && !captchaToken)}
  className="w-full py-3 bg-[#6366f1] text-white font-bold rounded-xl hover:bg-[#4f46e5] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
- {loading ? (isThai ? 'กรุณารอสักครู่...' : 'Please wait...') :
- mode === 'login' ? (isThai ? 'เข้าสู่ระบบ' : 'Sign In') :
- (isThai ? 'สร้างบัญชี' : 'Create Account')}
+ {loading ? t('login.pleaseWait') :
+ mode === 'login' ? t('login.signIn') :
+ t('login.createAccount')}
  </button>
  </form>
  )}
 
- {/* Google OAuth — disabled until credentials are ready */}
- {/* {(mode === 'login' || mode === 'signup') && (...)} */}
+ {/* Google OAuth */}
+ {(mode === 'login' || mode === 'signup') && (
+ <button
+ onClick={handleGoogleLogin}
+ disabled={oauthLoading}
+ className="w-full py-2.5 border border-[#e8eaf0] rounded-xl text-[#5c6078] hover:text-[#1e2235] hover:border-[#6366f1]/50 transition-all text-sm font-medium flex items-center justify-center gap-2"
+ >
+ <svg className="w-4 h-4" viewBox="0 0 24 24">
+ <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+ <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+ <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+ <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+ </svg>
+ {oauthLoading ? '...' : t('login.google')}
+ </button>
+ )}
 
  {/* Divider */}
  {mode !== 'magic' && mode !== 'forgot' && (
  <div className="relative my-4">
  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#e8eaf0]" /></div>
- <div className="relative flex justify-center text-xs"><span className="bg-white px-3 text-[#8b8fa6]">{isThai ? 'หรือ' : 'or'}</span></div>
+ <div className="relative flex justify-center text-xs"><span className="bg-white px-3 text-[#8b8fa6]">{t('login.or')}</span></div>
  </div>
  )}
 
@@ -545,7 +557,7 @@ export default function LoginPage() {
  onClick={() => { setMode('magic'); setError(''); setSuccess('') }}
  className="w-full py-2.5 border border-[#e8eaf0] rounded-xl text-[#5c6078] hover:text-[#1e2235] hover:border-[#6366f1]/50 transition-all text-sm font-medium flex items-center justify-center gap-2"
  >
- <span>✉️</span> {isThai ? 'เข้าสู่ระบบด้วยลิงก์อีเมล' : 'Sign in with Magic Link'}
+ <span>✉️</span> {t('login.signInWithMagicLink')}
  </button>
  )}
 
@@ -556,14 +568,14 @@ export default function LoginPage() {
  onClick={() => { localStorage.setItem('tcg-vault-guest', 'true'); window.location.href = '/collection' }}
  className="w-full py-2 text-[#8b8fa6] hover:text-[#1e2235] transition-colors text-sm"
  >
- {isThai ? 'เข้าชมแบบไม่ล็อกอิน (เก็บข้อมูลในเครื่อง)' : 'Continue as Guest (saved locally only)'}
+ {t('login.continueAsGuest')}
  </button>
  </div>
  )}
  </div>
 
  <p className="text-center text-xs text-[#8b8fa6] mt-4">
- {isThai ? 'ข้อมูลเก็บอย่างปลอดภัยบน Supabase · โหมดไม่ล็อกอินเก็บในเครื่อง' : 'Data stored securely on Supabase · Guest mode uses local storage'}
+ {t('login.dataSecure')}
  </p>
  </div>
  </div>

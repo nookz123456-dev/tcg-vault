@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import { useAuth } from '@/lib/useAuth'
-import { useT } from '@/lib/i18n'
+import { useT, useLocale } from '@/lib/i18n'
 
 interface Stats {
   totalUsers: number
@@ -83,6 +83,7 @@ type TabType = 'overview' | 'users' | 'sellers' | 'threads' | 'comments' | 'anno
 export default function AdminPage() {
   const { user } = useAuth()
   const t = useT()
+  const { locale } = useLocale()
   const [loading, setLoading] = useState(true)
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [stats, setStats] = useState<Stats | null>(null)
@@ -101,8 +102,6 @@ export default function AdminPage() {
   const [announceTitle, setAnnounceTitle] = useState('')
   const [announceContent, setAnnounceContent] = useState('')
   const [announcePriority, setAnnouncePriority] = useState('normal')
-
-  const isThai = t('common.ago') === 'ที่แล้ว'
 
   // Initial auth check + overview data
   useEffect(() => {
@@ -170,8 +169,8 @@ export default function AdminPage() {
       <div className="min-h-screen" style={{ background: 'var(--background)' }}>
         <Navbar />
         <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-          <p className="text-[#8b8fa6]">{isThai ? 'กรุณาเข้าสู่ระบบ' : 'Please sign in to access admin panel'}</p>
-          <a href="/login" className="inline-block mt-3 px-5 py-2 bg-[#6366f1] text-white rounded-xl text-sm font-bold hover:bg-[#4f46e5]">{isThai ? 'เข้าสู่ระบบ' : 'Sign In'}</a>
+          <p className="text-[#8b8fa6]">{t('admin.signInToAccess')}</p>
+          <a href="/login" className="inline-block mt-3 px-5 py-2 bg-[#6366f1] text-white rounded-xl text-sm font-bold hover:bg-[#4f46e5]">{t('common.signIn')}</a>
         </div>
       </div>
     )
@@ -197,22 +196,26 @@ export default function AdminPage() {
         <Navbar />
         <div className="max-w-4xl mx-auto px-4 py-20 text-center">
           <div className="text-5xl mb-4">🔒</div>
-          <h2 className="text-2xl font-bold text-[#1e2235] mb-2">{isThai ? 'ไม่มีสิทธิ์เข้าถึง' : 'Access Denied'}</h2>
-          <p className="text-[#8b8fa6]">{isThai ? 'ต้องมีสิทธิ์ผู้ดูแลระบบ' : 'You need admin privileges to access this page.'}</p>
-          <a href="/community" className="inline-block mt-4 px-5 py-2 bg-[#6366f1] text-white rounded-xl text-sm font-bold hover:bg-[#4f46e5]">{isThai ? 'กลับหน้าชุมชน' : 'Back to Community'}</a>
+          <h2 className="text-2xl font-bold text-[#1e2235] mb-2">{t('admin.accessDenied')}</h2>
+          <p className="text-[#8b8fa6]">{t('admin.needAdmin')}</p>
+          <a href="/community" className="inline-block mt-4 px-5 py-2 bg-[#6366f1] text-white rounded-xl text-sm font-bold hover:bg-[#4f46e5]">{t('admin.backToCommunity')}</a>
         </div>
       </div>
     )
   }
 
-  const tabs: { key: TabType; label: string; labelEn: string; icon: string }[] = [
-    { key: 'overview', label: 'ภาพรวม', labelEn: 'Overview', icon: '📊' },
-    { key: 'users', label: 'ผู้ใช้', labelEn: 'Users', icon: '👥' },
-    { key: 'sellers', label: 'ผู้ขาย', labelEn: 'Sellers', icon: '🏪' },
-    { key: 'threads', label: 'กระทู้', labelEn: 'Threads', icon: '💬' },
-    { key: 'comments', label: 'ความคิดเห็น', labelEn: 'Comments', icon: '💭' },
-    { key: 'announcements', label: 'ประกาศ', labelEn: 'Announcements', icon: '📢' },
+  const tabs: { key: TabType; label: string }[] = [
+    { key: 'overview', label: locale === 'th' ? 'ภาพรวม' : 'Overview' },
+    { key: 'users', label: t('admin.users') },
+    { key: 'sellers', label: t('admin.manageSellers') },
+    { key: 'threads', label: t('admin.threads') },
+    { key: 'comments', label: t('admin.comments') },
+    { key: 'announcements', label: t('admin.announcementsLabel') },
   ]
+
+  const tabIcons: Record<TabType, string> = {
+    overview: '📊', users: '👥', sellers: '🏪', threads: '💬', comments: '💭', announcements: '📢',
+  }
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--background)' }}>
@@ -222,10 +225,10 @@ export default function AdminPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-[#1e2235]">
-              🛡️ {isThai ? 'ผู้ดูแลระบบ' : 'Admin Panel'}
+              🛡️ {t('admin.panel')}
             </h1>
             <p className="text-xs sm:text-sm text-[#8b8fa6] mt-1">
-              {isThai ? 'จัดการผู้ใช้ ผู้ขาย เนื้อหา และประกาศ' : 'Manage users, sellers, content & announcements'}
+              {t('admin.manageDesc')}
             </p>
           </div>
           <span className="text-xs px-3 py-1.5 rounded-lg font-semibold bg-red-500/15 text-red-400 border border-red-500/30 self-start sm:self-auto">
@@ -243,8 +246,8 @@ export default function AdminPage() {
                 tab === tb.key ? 'bg-[#6366f1] text-white shadow-sm' : 'text-[#5c6078] hover:text-[#1e2235] hover:bg-white/50'
               }`}
             >
-              <span>{tb.icon}</span>
-              <span>{isThai ? tb.label : tb.labelEn}</span>
+              <span>{tabIcons[tb.key]}</span>
+              <span>{tb.label}</span>
             </button>
           ))}
         </div>
@@ -254,12 +257,12 @@ export default function AdminPage() {
           <div className="space-y-6">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               {[
-                { label: isThai ? 'ผู้ใช้' : 'Users', value: stats.totalUsers, icon: '👥', color: 'text-[#6366f1]' },
-                { label: isThai ? 'กระทู้' : 'Threads', value: stats.totalThreads, icon: '💬', color: 'text-emerald-500' },
-                { label: isThai ? 'ความคิดเห็น' : 'Comments', value: stats.totalComments, icon: '💭', color: 'text-amber-500' },
-                { label: isThai ? 'รอตรวจสอบ' : 'Pending', value: stats.pendingSellers, icon: '⏳', color: 'text-orange-500' },
-                { label: isThai ? 'ผู้ขายแล้ว' : 'Verified', value: stats.verifiedSellers, icon: '✅', color: 'text-emerald-500' },
-                { label: isThai ? 'เทรดสำเร็จ' : 'Trades', value: stats.completedTrades, icon: '🤝', color: 'text-blue-500' },
+                { label: t('admin.users'), value: stats.totalUsers, icon: '👥', color: 'text-[#6366f1]' },
+                { label: t('admin.threads'), value: stats.totalThreads, icon: '💬', color: 'text-emerald-500' },
+                { label: t('admin.comments'), value: stats.totalComments, icon: '💭', color: 'text-amber-500' },
+                { label: t('admin.pending'), value: stats.pendingSellers, icon: '⏳', color: 'text-orange-500' },
+                { label: t('admin.verified'), value: stats.verifiedSellers, icon: '✅', color: 'text-emerald-500' },
+                { label: t('admin.completedTrades'), value: stats.completedTrades, icon: '🤝', color: 'text-blue-500' },
               ].map(stat => (
                 <div key={stat.label} className="bg-white border border-[#e8eaf0] rounded-2xl p-3 sm:p-4 text-center">
                   <div className="text-lg sm:text-2xl mb-1">{stat.icon}</div>
@@ -271,9 +274,9 @@ export default function AdminPage() {
 
             {/* Recent Activity */}
             <div className="bg-white border border-[#e8eaf0] rounded-2xl p-4 sm:p-5">
-              <h2 className="text-lg font-bold text-[#1e2235] mb-3">📋 {isThai ? 'กิจกรรมล่าสุด' : 'Recent Activity'}</h2>
+              <h2 className="text-lg font-bold text-[#1e2235] mb-3">📋 {t('admin.recentActivity')}</h2>
               {recentActivities.length === 0 ? (
-                <p className="text-sm text-[#8b8fa6] text-center py-4">{isThai ? 'ยังไม่มีกิจกรรม' : 'No activity yet'}</p>
+                <p className="text-sm text-[#8b8fa6] text-center py-4">{t('admin.noActivity')}</p>
               ) : (
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {recentActivities.slice(0, 10).map(a => (
@@ -290,20 +293,20 @@ export default function AdminPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <button onClick={() => setTab('sellers')} className="bg-white border border-[#e8eaf0] rounded-xl p-4 text-center hover:border-[#6366f1]/30 transition-colors">
                 <div className="text-2xl mb-1">🏪</div>
-                <p className="text-xs font-semibold text-[#1e2235]">{isThai ? 'จัดการผู้ขาย' : 'Manage Sellers'}</p>
-                {stats.pendingSellers > 0 && <span className="text-[10px] text-amber-500 font-semibold">{stats.pendingSellers} {isThai ? 'รอตรวจสอบ' : 'pending'}</span>}
+                <p className="text-xs font-semibold text-[#1e2235]">{t('admin.manageSellers')}</p>
+                {stats.pendingSellers > 0 && <span className="text-[10px] text-amber-500 font-semibold">{stats.pendingSellers} {t('admin.pendingShort')}</span>}
               </button>
               <button onClick={() => setTab('users')} className="bg-white border border-[#e8eaf0] rounded-xl p-4 text-center hover:border-[#6366f1]/30 transition-colors">
                 <div className="text-2xl mb-1">👥</div>
-                <p className="text-xs font-semibold text-[#1e2235]">{isThai ? 'จัดการผู้ใช้' : 'Manage Users'}</p>
+                <p className="text-xs font-semibold text-[#1e2235]">{t('admin.manageUsers')}</p>
               </button>
               <button onClick={() => setTab('announcements')} className="bg-white border border-[#e8eaf0] rounded-xl p-4 text-center hover:border-[#6366f1]/30 transition-colors">
                 <div className="text-2xl mb-1">📢</div>
-                <p className="text-xs font-semibold text-[#1e2235]">{isThai ? 'ประกาศ' : 'Announcements'}</p>
+                <p className="text-xs font-semibold text-[#1e2235]">{t('admin.announcementsLabel')}</p>
               </button>
               <button onClick={() => setTab('comments')} className="bg-white border border-[#e8eaf0] rounded-xl p-4 text-center hover:border-[#6366f1]/30 transition-colors">
                 <div className="text-2xl mb-1">💭</div>
-                <p className="text-xs font-semibold text-[#1e2235]">{isThai ? 'ดูคอมเมนต์' : 'View Comments'}</p>
+                <p className="text-xs font-semibold text-[#1e2235]">{t('admin.viewComments')}</p>
               </button>
             </div>
           </div>
@@ -317,7 +320,7 @@ export default function AdminPage() {
                 type="text"
                 value={userSearch}
                 onChange={e => setUserSearch(e.target.value)}
-                placeholder={isThai ? 'ค้นหาผู้ใช้...' : 'Search users...'}
+                placeholder={t('admin.searchUsers')}
                 className="flex-1 px-4 py-2.5 bg-white border border-[#e8eaf0] rounded-xl text-sm text-[#1e2235] placeholder-[#b5b8c8] focus:border-[#6366f1] focus:outline-none"
               />
             </div>
@@ -325,7 +328,7 @@ export default function AdminPage() {
               {allUsers.length === 0 ? (
                 <div className="bg-white border border-[#e8eaf0] rounded-2xl p-8 text-center">
                   <div className="text-4xl mb-2 opacity-50">👥</div>
-                  <p className="text-[#8b8fa6]">{isThai ? 'ไม่พบผู้ใช้' : 'No users found'}</p>
+                  <p className="text-[#8b8fa6]">{t('admin.noUsersFound')}</p>
                 </div>
               ) : allUsers.map(u => (
                 <div key={u.id} className="bg-white border border-[#e8eaf0] rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -356,7 +359,7 @@ export default function AdminPage() {
                       <option value="user">User</option>
                       <option value="moderator">Moderator</option>
                       <option value="admin">Admin</option>
-                      <option value="suspended">{isThai ? 'ระงับ' : 'Suspended'}</option>
+                      <option value="suspended">{t('admin.suspended')}</option>
                     </select>
                     {u.role !== 'suspended' ? (
                       <button onClick={() => { adminAction({ action: 'suspendUser', userId: u.id }); setAllUsers(prev => prev.map(x => x.id === u.id ? { ...x, role: 'suspended' } : x)) }} className="text-xs px-2 py-1 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors" disabled={actionLoading}>
@@ -386,11 +389,11 @@ export default function AdminPage() {
                     sellerFilter === status ? 'bg-[#6366f1] text-white' : 'bg-white border border-[#e8eaf0] text-[#5c6078] hover:border-[#6366f1]/30'
                   }`}
                 >
-                  {status === 'all' ? (isThai ? 'ทั้งหมด' : 'All')
-                    : status === 'pending' ? (isThai ? 'รอตรวจสอบ' : 'Pending')
-                    : status === 'verified' ? (isThai ? 'ผ่านแล้ว' : 'Verified')
-                    : status === 'rejected' ? (isThai ? 'ปฏิเสธ' : 'Rejected')
-                    : (isThai ? 'ระงับ' : 'Suspended')}
+                  {status === 'all' ? t('admin.all')
+                    : status === 'pending' ? t('admin.pending')
+                    : status === 'verified' ? t('admin.verified')
+                    : status === 'rejected' ? t('admin.rejected')
+                    : t('admin.suspended')}
                 </button>
               ))}
             </div>
@@ -398,7 +401,7 @@ export default function AdminPage() {
               {sellerApps.length === 0 ? (
                 <div className="bg-white border border-[#e8eaf0] rounded-2xl p-8 text-center">
                   <div className="text-4xl mb-2 opacity-50">🏪</div>
-                  <p className="text-[#8b8fa6]">{isThai ? 'ไม่มีผู้ขายในหมวดนี้' : 'No sellers in this category'}</p>
+                  <p className="text-[#8b8fa6]">{t('admin.noSellers')}</p>
                 </div>
               ) : sellerApps.map(app => (
                 <div key={app.id} className="bg-white border border-[#e8eaf0] rounded-xl p-3 sm:p-4">
@@ -414,19 +417,19 @@ export default function AdminPage() {
                         : 'bg-gray-500/15 text-gray-400 border border-gray-500/30'
                     }`}>
                       {app.status === 'pending' ? '⏳' : app.status === 'verified' ? '✅' : app.status === 'rejected' ? '❌' : '🚫'}
-                      {' '}{app.status === 'pending' ? (isThai ? 'รอตรวจสอบ' : 'Pending')
-                        : app.status === 'verified' ? (isThai ? 'ผ่านแล้ว' : 'Verified')
-                        : app.status === 'rejected' ? (isThai ? 'ปฏิเสธ' : 'Rejected')
-                        : (isThai ? 'ระงับ' : 'Suspended')}
+                      {' '}{app.status === 'pending' ? t('admin.pending')
+                        : app.status === 'verified' ? t('admin.verified')
+                        : app.status === 'rejected' ? t('admin.rejected')
+                        : t('admin.suspended')}
                     </span>
                   </div>
                   {app.status === 'pending' && (
                     <div className="flex gap-2">
                       <button onClick={() => { adminAction({ action: 'approveSeller', sellerId: app.id }); setSellerApps(prev => prev.map(s => s.id === app.id ? { ...s, status: 'verified' } : s)) }} className="px-3 py-1.5 text-xs rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors font-semibold" disabled={actionLoading}>
-                        ✅ {isThai ? 'อนุมัติ' : 'Approve'}
+                        ✅ {t('admin.approve')}
                       </button>
-                      <button onClick={() => { const reason = prompt(isThai ? 'เหตุผลที่ปฏิเสธ:' : 'Rejection reason:'); if (reason) { adminAction({ action: 'rejectSeller', sellerId: app.id, reason }); setSellerApps(prev => prev.map(s => s.id === app.id ? { ...s, status: 'rejected' } : s)) }}} className="px-3 py-1.5 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors font-semibold" disabled={actionLoading}>
-                        ❌ {isThai ? 'ปฏิเสธ' : 'Reject'}
+                      <button onClick={() => { const reason = prompt(t('admin.rejectionReason')); if (reason) { adminAction({ action: 'rejectSeller', sellerId: app.id, reason }); setSellerApps(prev => prev.map(s => s.id === app.id ? { ...s, status: 'rejected' } : s)) }}} className="px-3 py-1.5 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors font-semibold" disabled={actionLoading}>
+                        ❌ {t('admin.reject')}
                       </button>
                     </div>
                   )}
@@ -443,7 +446,7 @@ export default function AdminPage() {
             {recentThreads.length === 0 ? (
               <div className="bg-white border border-[#e8eaf0] rounded-2xl p-8 text-center">
                 <div className="text-4xl mb-2 opacity-50">💬</div>
-                <p className="text-[#8b8fa6]">{isThai ? 'ไม่มีกระทู้' : 'No threads'}</p>
+                <p className="text-[#8b8fa6]">{t('admin.noThreads')}</p>
               </div>
             ) : recentThreads.map(th => (
               <div key={th.id} className="bg-white border border-[#e8eaf0] rounded-xl p-3 sm:p-4">
@@ -454,10 +457,10 @@ export default function AdminPage() {
                   </div>
                   <div className="flex gap-1 shrink-0">
                     <button onClick={() => { adminAction({ action: 'togglePin', threadId: th.id }); setRecentThreads(prev => prev.map(x => x.id === th.id ? { ...x, is_pinned: !x.is_pinned } : x)) }} className="px-3 py-1.5 text-xs rounded-lg bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 transition-colors font-semibold" disabled={actionLoading}>
-                      {th.is_pinned ? (isThai ? 'ยกเลิกปักหมุด' : 'Unpin') : (isThai ? 'ปักหมุด' : 'Pin')}
+                      {th.is_pinned ? t('admin.unpin') : t('admin.pin')}
                     </button>
-                    <button onClick={() => { if (confirm(isThai ? 'ลบกระทู้นี้?' : 'Delete this thread?')) { adminAction({ action: 'deleteThread', threadId: th.id }); setRecentThreads(prev => prev.filter(x => x.id !== th.id)) }}} className="px-3 py-1.5 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors font-semibold" disabled={actionLoading}>
-                      {isThai ? 'ลบ' : 'Delete'}
+                    <button onClick={() => { if (confirm(t('admin.deleteThreadConfirm'))) { adminAction({ action: 'deleteThread', threadId: th.id }); setRecentThreads(prev => prev.filter(x => x.id !== th.id)) }}} className="px-3 py-1.5 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors font-semibold" disabled={actionLoading}>
+                      {t('admin.deleteThread')}
                     </button>
                   </div>
                 </div>
@@ -473,7 +476,7 @@ export default function AdminPage() {
             {comments.length === 0 ? (
               <div className="bg-white border border-[#e8eaf0] rounded-2xl p-8 text-center">
                 <div className="text-4xl mb-2 opacity-50">💭</div>
-                <p className="text-[#8b8fa6]">{isThai ? 'ไม่มีความคิดเห็น' : 'No comments'}</p>
+                <p className="text-[#8b8fa6]">{t('admin.noComments')}</p>
               </div>
             ) : comments.map(c => (
               <div key={c.id} className="bg-white border border-[#e8eaf0] rounded-xl p-3 sm:p-4">
@@ -485,7 +488,7 @@ export default function AdminPage() {
                     </div>
                     <p className="text-sm text-[#1e2235] line-clamp-2">{c.content}</p>
                   </div>
-                  <button onClick={() => { if (confirm(isThai ? 'ลบความคิดเห็นนี้?' : 'Delete this comment?')) { adminAction({ action: 'deleteReply', replyId: c.id }); setComments(prev => prev.filter(x => x.id !== c.id)) }}} className="px-2 py-1 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors shrink-0" disabled={actionLoading}>
+                  <button onClick={() => { if (confirm(t('admin.deleteCommentConfirm'))) { adminAction({ action: 'deleteReply', replyId: c.id }); setComments(prev => prev.filter(x => x.id !== c.id)) }}} className="px-2 py-1 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors shrink-0" disabled={actionLoading}>
                     🗑️
                   </button>
                 </div>
@@ -498,40 +501,40 @@ export default function AdminPage() {
         {tab === 'announcements' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-[#1e2235]">📢 {isThai ? 'ประกาศ' : 'Announcements'}</h2>
+              <h2 className="text-lg font-bold text-[#1e2235]">📢 {t('admin.announcementsLabel')}</h2>
               <button onClick={() => setShowAnnounceForm(!showAnnounceForm)} className="px-4 py-2 text-xs font-semibold bg-[#6366f1] text-white rounded-lg hover:bg-[#4f46e5] transition-colors">
-                + {isThai ? 'สร้างประกาศ' : 'New'}
+                + {t('admin.newAnnouncement')}
               </button>
             </div>
 
             {showAnnounceForm && (
               <div className="bg-white border border-[#6366f1]/30 rounded-2xl p-4 sm:p-5">
-                <h3 className="text-sm font-bold text-[#1e2235] mb-3">{isThai ? 'สร้างประกาศใหม่' : 'New Announcement'}</h3>
+                <h3 className="text-sm font-bold text-[#1e2235] mb-3">{t('admin.newAnnouncement')}</h3>
                 <div className="space-y-3">
                   <input
                     type="text"
                     value={announceTitle}
                     onChange={e => setAnnounceTitle(e.target.value)}
-                    placeholder={isThai ? 'หัวข้อประกาศ' : 'Announcement title'}
+                    placeholder={t('admin.announcementTitle')}
                     className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder-[#b5b8c8] focus:border-[#6366f1] focus:outline-none"
                   />
                   <textarea
                     value={announceContent}
                     onChange={e => setAnnounceContent(e.target.value)}
-                    placeholder={isThai ? 'เนื้อหาประกาศ...' : 'Announcement content...'}
+                    placeholder={t('admin.announcementContent')}
                     rows={3}
                     className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder-[#b5b8c8] focus:border-[#6366f1] focus:outline-none resize-none"
                   />
                   <div className="flex flex-col sm:flex-row gap-3">
                     <select value={announcePriority} onChange={e => setAnnouncePriority(e.target.value)} className="px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] focus:border-[#6366f1] focus:outline-none">
-                      <option value="low">{isThai ? 'ต่ำ' : 'Low'}</option>
-                      <option value="normal">{isThai ? 'ปกติ' : 'Normal'}</option>
-                      <option value="high">{isThai ? 'สูง' : 'High'}</option>
-                      <option value="urgent">{isThai ? 'เร่งด่วน' : 'Urgent'}</option>
+                      <option value="low">{t('admin.low')}</option>
+                      <option value="normal">{t('admin.normal')}</option>
+                      <option value="high">{t('admin.high')}</option>
+                      <option value="urgent">{t('admin.urgent')}</option>
                     </select>
                     <div className="flex gap-2 flex-1 justify-end">
                       <button onClick={() => setShowAnnounceForm(false)} className="px-4 py-2.5 text-xs font-semibold bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#5c6078] hover:text-[#1e2235]">
-                        {isThai ? 'ยกเลิก' : 'Cancel'}
+                        {t('common.cancel')}
                       </button>
                       <button
                         onClick={async () => {
@@ -542,7 +545,7 @@ export default function AdminPage() {
                         disabled={actionLoading || !announceTitle.trim() || !announceContent.trim()}
                         className="px-4 py-2.5 text-xs font-semibold bg-[#6366f1] text-white rounded-xl hover:bg-[#4f46e5] transition-colors disabled:opacity-50"
                       >
-                        {isThai ? 'เผยแพร่' : 'Publish'}
+                        {t('admin.publish')}
                       </button>
                     </div>
                   </div>
@@ -554,7 +557,7 @@ export default function AdminPage() {
               {announcements.length === 0 ? (
                 <div className="bg-white border border-[#e8eaf0] rounded-2xl p-8 text-center">
                   <div className="text-4xl mb-2 opacity-50">📢</div>
-                  <p className="text-[#8b8fa6]">{isThai ? 'ยังไม่มีประกาศ' : 'No announcements yet'}</p>
+                  <p className="text-[#8b8fa6]">{t('admin.noAnnouncements')}</p>
                 </div>
               ) : announcements.map(a => (
                 <div key={a.id} className="bg-white border border-[#e8eaf0] rounded-xl p-3 sm:p-4">
@@ -569,7 +572,7 @@ export default function AdminPage() {
                       <h3 className="text-sm font-bold text-[#1e2235]">{a.title}</h3>
                       <p className="text-xs text-[#5c6078] mt-1 line-clamp-2">{a.content}</p>
                     </div>
-                    <button onClick={() => { if (confirm(isThai ? 'ลบประกาศนี้?' : 'Delete this announcement?')) { adminAction({ action: 'deleteAnnouncement', announcementId: a.id }); setAnnouncements(prev => prev.filter(x => x.id !== a.id)) }}} className="px-2 py-1 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors shrink-0" disabled={actionLoading}>
+                    <button onClick={() => { if (confirm(t('admin.deleteAnnouncementConfirm'))) { adminAction({ action: 'deleteAnnouncement', announcementId: a.id }); setAnnouncements(prev => prev.filter(x => x.id !== a.id)) }}} className="px-2 py-1 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors shrink-0" disabled={actionLoading}>
                       🗑️
                     </button>
                   </div>

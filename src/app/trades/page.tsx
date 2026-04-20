@@ -74,7 +74,6 @@ export default function TradesPage() {
  setOffers(prev => prev.map(o => o.id === offerId ? { ...o, status } : o))
  }
 
- const isThai = t('common.ago') === 'ที่แล้ว'
 
  if (!user) {
  return (
@@ -109,7 +108,7 @@ export default function TradesPage() {
  filter === f ? 'bg-[#6366f1] text-[#1e2235]' : 'bg-[#fafbfc] text-[#5c6078] border border-[#e8eaf0] hover:text-[#1e2235]'
  }`}
  >
- {STATUS_LABELS[f] ? (isThai ? STATUS_LABELS[f].th : STATUS_LABELS[f].en) : f.charAt(0).toUpperCase() + f.slice(1)}
+ {t(`trades.status.${f}`) || (f.charAt(0).toUpperCase() + f.slice(1))}
  </button>
  ))}
  </div>
@@ -133,10 +132,10 @@ export default function TradesPage() {
  <div className="flex items-center justify-between mb-4">
  <div className="flex items-center gap-2">
  <span className={`text-xs px-2.5 py-1 rounded-lg font-semibold ${STATUS_COLORS[offer.status] || ''}`}>
- {STATUS_LABELS[offer.status] ? (isThai ? STATUS_LABELS[offer.status].th : STATUS_LABELS[offer.status].en) : offer.status}
+ {t(`trades.status.${offer.status}`) || offer.status}
  </span>
  <span className="text-xs text-[#8b8fa6]">
- {isThai ? 'จาก' : 'from'}{' '}
+ {t('common.from')}{' '}
  <a href={`/u/${otherUser?.username || ''}`} className="text-[#6366f1] hover:text-[#4f46e5] font-semibold">
  {otherUser?.username || 'Unknown'}
  </a>

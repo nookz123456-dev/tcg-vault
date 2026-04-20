@@ -21,7 +21,6 @@ export default function PriceAlertsPage() {
  const { user } = useAuth()
  const t = useT()
  const { locale } = useLocale()
- const isThai = locale === 'th'
 
  const [alerts, setAlerts] = useState<PriceAlert[]>([])
  const [loading, setLoading] = useState(true)
@@ -72,9 +71,9 @@ export default function PriceAlertsPage() {
  <Navbar />
  <div className="max-w-2xl mx-auto px-4 py-20 text-center">
  <div className="text-5xl mb-4 opacity-50">🔔</div>
- <h1 className="text-xl font-bold text-[#1e2235] mb-2">{isThai ? 'กรุณาเข้าสู่ระบบ' : 'Sign in required'}</h1>
+ <h1 className="text-xl font-bold text-[#1e2235] mb-2">{t('alerts.signInRequired')}</h1>
  <a href="/login" className="inline-block mt-3 px-6 py-3 bg-[#6366f1] text-white font-bold rounded-xl">
- {isThai ? 'เข้าสู่ระบบ' : 'Sign In'}
+ {t('common.signIn')}
  </a>
  </div>
  </div>
@@ -88,14 +87,12 @@ export default function PriceAlertsPage() {
  <div className="flex items-center gap-3 mb-6">
  <span className="text-2xl">🔔</span>
  <h1 className="text-2xl font-extrabold text-[#1e2235]">
- {isThai ? 'การแจ้งเตือนราคา' : 'Price Alerts'}
+ {t('alerts.title')}
  </h1>
  </div>
 
  <p className="text-sm text-[#5c6078] mb-6">
- {isThai
- ? 'ตั้งค่าราคาเป้าหมาย เราจะแจ้งเมื่อราคาการ์ดถึงเป้าที่คุณตั้งไว้ (สูงสุด 20 รายการ)'
- : 'Set target prices and get notified when a card reaches your price. (Max 20 active alerts)'}
+ {t('alerts.description')}
  </p>
 
  {loading ? (
@@ -106,15 +103,13 @@ export default function PriceAlertsPage() {
  <div className="bg-white border border-[#e8eaf0] rounded-2xl p-12 text-center">
  <div className="text-5xl mb-4 opacity-50">🔕</div>
  <h3 className="text-lg font-bold text-[#1e2235] mb-2">
- {isThai ? 'ยังไม่มีการแจ้งเตือน' : 'No alerts yet'}
+ {t('alerts.noAlerts')}
  </h3>
  <p className="text-sm text-[#8b8fa6] mb-4">
- {isThai
- ? 'ไปที่หน้ารายละเอียดการ์ดแล้วกดปุ่ม 🔔 เพื่อตั้งราคาเป้าหมาย'
- : 'Visit a card detail page and click 🔔 to set a price alert'}
+ {t('alerts.noAlertsDescFull')}
  </p>
  <a href="/search" className="inline-block px-5 py-2 bg-[#6366f1] text-white font-bold rounded-xl text-sm">
- {isThai ? 'ค้นหาการ์ด' : 'Search Cards'}
+ {t('alerts.searchCards')}
  </a>
  </div>
  ) : (
@@ -136,14 +131,14 @@ export default function PriceAlertsPage() {
  <span>·</span>
  <span>
  {alert.direction === 'below'
- ? (isThai ? 'ต่ำกว่า' : 'Below')
- : (isThai ? 'สูงกว่า' : 'Above')} ${alert.target_price.toFixed(2)}
+ ? t('alerts.below')
+ : t('alerts.above')} ${alert.target_price.toFixed(2)}
  </span>
  {alert.triggered_at && (
  <>
  <span>·</span>
  <span className="text-[#6366f1] font-semibold">
- ✅ {isThai ? 'ทริกเกอร์แล้ว' : 'Triggered'}
+ ✅ {t('alerts.triggered')}
  </span>
  </>
  )}
@@ -158,7 +153,7 @@ export default function PriceAlertsPage() {
  : 'bg-[#fafbfc] text-[#8b8fa6] hover:bg-[#e8eaf0]'
  }`}
  >
- {alert.is_active ? (isThai ? 'เปิด' : 'On') : (isThai ? 'ปิด' : 'Off')}
+ {alert.is_active ? t('alerts.on') : t('alerts.off')}
  </button>
  <button
  onClick={() => deleteAlert(alert.id)}
@@ -175,7 +170,7 @@ export default function PriceAlertsPage() {
 
  <div className="mt-6 text-center">
  <a href="/search" className="text-sm text-[#6366f1] font-semibold hover:underline">
- + {isThai ? 'เพิ่มการแจ้งเตือนใหม่' : 'Add new alert'}
+ + {t('alerts.addNewAlert')}
  </a>
  </div>
  </div>

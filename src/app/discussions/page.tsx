@@ -35,7 +35,6 @@ export default function DiscussionsPage() {
  const { user } = useAuth()
  const t = useT()
  const { locale } = useLocale()
- const isThai = locale === 'th'
  const [boards, setBoards] = useState<Board[]>([])
  const [threads, setThreads] = useState<Thread[]>([])
  const [selectedBoard, setSelectedBoard] = useState<string | null>(null)
@@ -233,7 +232,7 @@ export default function DiscussionsPage() {
  <ImageUpload
  value={newImage}
  onChange={url => setNewImage(url)}
- label={isThai ? 'รูปภาพประกอบ' : 'Attach Image'}
+ label={t('discuss.attachImage')}
  folder="discussion-images"
  />
  <div className="flex justify-between items-center mt-3">

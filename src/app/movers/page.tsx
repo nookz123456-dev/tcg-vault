@@ -22,7 +22,6 @@ interface MoverCard {
 export default function MoversPage() {
   const t = useT()
   const { locale } = useLocale()
-  const isThai = locale === 'th'
   const [movers, setMovers] = useState<{ gainers: MoverCard[]; losers: MoverCard[] }>({ gainers: [], losers: [] })
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'gainers' | 'losers' | 'all'>('gainers')
@@ -85,7 +84,7 @@ export default function MoversPage() {
   ]
 
   const gameTabs: { key: 'all' | 'pokemon'; label: string }[] = [
-    { key: 'all', label: isThai ? 'ทั้งหมด' : 'All' },
+    { key: 'all', label: t('movers.all') || 'All' },
     { key: 'pokemon', label: 'Pokémon' },
   ]
 

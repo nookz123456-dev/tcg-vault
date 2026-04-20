@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useT, useLocale } from '@/lib/i18n'
+import { useT } from '@/lib/i18n'
 import { useExchangeRates } from '@/lib/useExchangeRates'
 import Link from 'next/link'
 
@@ -21,8 +21,6 @@ interface MoverCard {
 
 export default function TopMovers() {
   const t = useT()
-  const { locale } = useLocale()
-  const isThai = locale === 'th'
   const [movers, setMovers] = useState<{ gainers: MoverCard[]; losers: MoverCard[] }>({ gainers: [], losers: [] })
   const [activeTab, setActiveTab] = useState<'gainers' | 'losers'>('gainers')
   const [loading, setLoading] = useState(true)
@@ -64,7 +62,7 @@ export default function TopMovers() {
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-extrabold text-[#1e2235]">
-            📈 {isThai ? 'การ์ดเคลื่อนไหววันนี้' : 'Top Movers Today'}
+            📈 {t('movers.title')}
           </h2>
           {/* Currency toggle */}
           <button
@@ -84,7 +82,7 @@ export default function TopMovers() {
                 activeTab === 'gainers' ? 'bg-emerald-500 text-white shadow-sm' : 'text-[#5c6078] hover:text-emerald-600'
               }`}
             >
-              ▲ {isThai ? 'ขึ้น' : 'Gainers'}
+              ▲ {t('movers.gainersShort')}
             </button>
             <button
               onClick={() => setActiveTab('losers')}
@@ -92,7 +90,7 @@ export default function TopMovers() {
                 activeTab === 'losers' ? 'bg-red-500 text-white shadow-sm' : 'text-[#5c6078] hover:text-red-600'
               }`}
             >
-              ▼ {isThai ? 'ลง' : 'Losers'}
+              ▼ {t('movers.losersShort')}
             </button>
           </div>
         </div>
@@ -103,7 +101,7 @@ export default function TopMovers() {
           {[1,2,3,4].map(i => <div key={i} className="flex-shrink-0 w-[160px] shimmer h-48 rounded-xl" />)}
         </div>
       ) : cards.length === 0 ? (
-        <p className="text-sm text-[#8b8fa6]">{isThai ? 'ยังไม่มีข้อมูล' : 'No data yet'}</p>
+        <p className="text-sm text-[#8b8fa6]">{t('movers.noData')}</p>
       ) : (
         <div className="relative">
           <div
@@ -157,7 +155,7 @@ export default function TopMovers() {
             href="/movers"
             className="block mt-3 text-center text-sm text-[#6366f1] font-semibold hover:text-[#4f46e5] transition-colors"
           >
-            {isThai ? 'ดูทั้งหมด →' : 'View All →'}
+            {t('movers.viewAllArrow')}
           </Link>
         </div>
       )}

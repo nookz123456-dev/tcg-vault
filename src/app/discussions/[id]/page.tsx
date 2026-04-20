@@ -38,7 +38,6 @@ export default function ThreadPage() {
   const { user } = useAuth()
   const t = useT()
   const { locale } = useLocale()
-  const isThai = locale === 'th'
 
   const [thread, setThread] = useState<Thread | null>(null)
   const [replies, setReplies] = useState<Reply[]>([])
@@ -183,15 +182,15 @@ export default function ThreadPage() {
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime()
     const mins = Math.floor(diff / 60000)
-    if (mins < 60) return `${mins}m ${isThai ? 'ที่แล้ว' : 'ago'}`
+    if (mins < 60) return `${mins}m ${t('common.ago')}`
     const hours = Math.floor(mins / 60)
-    if (hours < 24) return `${hours}h ${isThai ? 'ที่แล้ว' : 'ago'}`
+    if (hours < 24) return `${hours}h ${t('common.ago')}`
     const days = Math.floor(hours / 24)
-    return `${days}d ${isThai ? 'ที่แล้ว' : 'ago'}`
+    return `${days}d ${t('common.ago')}`
   }
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString(isThai ? 'th-TH' : undefined, {
+    return new Date(dateStr).toLocaleDateString(locale === 'th' ? 'th-TH' : undefined, {
       month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
     })
   }
@@ -216,10 +215,10 @@ export default function ThreadPage() {
         <div className="max-w-3xl mx-auto px-4 py-20 text-center">
           <div className="text-5xl mb-4 opacity-50">🔍</div>
           <h1 className="text-xl font-bold text-[#1e2235] mb-2">
-            {isThai ? 'ไม่พบกระทู้' : 'Thread not found'}
+            {t('discuss.threadNotFound')}
           </h1>
           <button onClick={() => router.push('/discussions')} className="text-[#6366f1] text-sm font-semibold">
-            ← {isThai ? 'กลับไปกระดานสนทนา' : 'Back to Discussions'}
+            ← {t('discuss.backToDiscussions')}
           </button>
         </div>
       </div>
@@ -233,7 +232,7 @@ export default function ThreadPage() {
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs text-[#8b8fa6] mb-4">
           <button onClick={() => router.push('/discussions')} className="hover:text-[#6366f1] transition-colors">
-            {isThai ? 'กระดานสนทนา' : 'Discussions'}
+            {t('discuss.discussionsBreadcrumb')}
           </button>
           <span>/</span>
           <span>{thread.discussion_boards?.icon} {thread.discussion_boards?.name}</span>
@@ -279,7 +278,7 @@ export default function ThreadPage() {
                   : 'bg-[#f5f6fa] text-[#5c6078] border border-[#e8eaf0] hover:text-red-500 hover:border-red-200'
               } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              {threadLikes.liked ? '❤️' : '🤍'} {threadLikes.count > 0 ? threadLikes.count : isThai ? 'ถูกใจ' : 'Like'}
+              {threadLikes.liked ? '❤️' : '🤍'} {threadLikes.count > 0 ? threadLikes.count : t('discuss.like')}
             </button>
           </div>
         </div>
@@ -287,7 +286,7 @@ export default function ThreadPage() {
         {/* Replies */}
         <div className="mb-4">
           <h2 className="text-lg font-bold text-[#1e2235]">
-            {isThai ? 'ความคิดเห็น' : 'Replies'} ({replies.length})
+            {t('discuss.repliesHeading')} ({replies.length})
           </h2>
         </div>
 
@@ -339,12 +338,12 @@ export default function ThreadPage() {
           user ? (
             <div className="bg-white border border-[#e8eaf0] rounded-2xl p-5">
               <h3 className="text-sm font-bold text-[#1e2235] mb-3">
-                {isThai ? 'เขียนความคิดเห็น' : 'Post a Reply'}
+                {t('discuss.postReply')}
               </h3>
               <textarea
                 value={newReply}
                 onChange={e => setNewReply(e.target.value)}
-                placeholder={isThai ? 'เขียนความคิดเห็นของคุณ...' : 'Write your reply...'}
+                placeholder={t('discuss.writeReplyPlaceholder')}
                 maxLength={3000}
                 rows={3}
                 className="w-full px-4 py-2.5 bg-[#f5f6fa] border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-[#6366f1]/50 resize-none text-sm"
@@ -352,7 +351,7 @@ export default function ThreadPage() {
               <ImageUpload
                 value={replyImage}
                 onChange={url => setReplyImage(url)}
-                label={isThai ? 'แนบรูปภาพ' : 'Attach Image'}
+                label={t('discuss.attachImageShort')}
                 folder="discussion-images"
               />
               <div className="flex justify-between items-center mt-2">
@@ -362,21 +361,21 @@ export default function ThreadPage() {
                   disabled={submitting || !newReply.trim()}
                   className="px-5 py-2 bg-[#6366f1] text-white rounded-xl text-xs font-bold hover:bg-[#4f46e5] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 >
-                  {submitting ? (isThai ? 'กำลังส่ง...' : 'Posting...') : (isThai ? 'ส่งความคิดเห็น' : 'Reply')}
+                  {submitting ? t('discuss.postingShort') : t('discuss.sendReply')}
                 </button>
               </div>
             </div>
           ) : (
             <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6 text-center">
-              <p className="text-sm text-[#8b8fa6]">{isThai ? 'เข้าสู่ระบบเพื่อร่วมสนทนา' : 'Sign in to join the discussion'}</p>
+              <p className="text-sm text-[#8b8fa6]">{t('discuss.signInToDiscuss')}</p>
               <a href="/login" className="inline-block mt-3 px-5 py-2 bg-[#6366f1] text-white rounded-xl text-xs font-bold hover:bg-[#4f46e5] transition-all">
-                {isThai ? 'เข้าสู่ระบบ' : 'Sign In'}
+                {t('common.signIn')}
               </a>
             </div>
           )
         ) : (
           <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6 text-center">
-            <p className="text-sm text-red-400">🔒 {isThai ? 'กระทู้นี้ถูกล็อก' : 'This thread is locked'}</p>
+            <p className="text-sm text-red-400">🔒 {t('discuss.threadLocked')}</p>
           </div>
         )}
       </div>

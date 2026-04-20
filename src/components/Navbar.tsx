@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
-import { useT, useLocale } from '@/lib/i18n'
+import { useT } from '@/lib/i18n'
 import { LangToggle } from '@/components/LangToggle'
 import { useState, useEffect } from 'react'
 
@@ -11,8 +11,6 @@ export default function Navbar() {
   const pathname = usePathname()
   const { user, isGuest, isAuthenticated, logout } = useAuth()
   const t = useT()
-  const { locale } = useLocale()
-  const isThai = locale === 'th'
   const [unreadCount, setUnreadCount] = useState(0)
   const [isAdmin, setIsAdmin] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -96,7 +94,7 @@ export default function Navbar() {
                   ? 'bg-white text-[#6366f1] shadow-sm'
                   : 'text-[#8b8fa6] hover:text-[#1e2235] hover:bg-white/60'
               }`}>
-                {isThai ? 'เพิ่มเติม' : 'More'}
+                {t('common.more')}
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -152,7 +150,7 @@ export default function Navbar() {
                     <Link
                       href="/seller/apply"
                       className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full hover:bg-[#f5f6fa] transition-colors"
-                      title={isThai ? 'สมัครเป็นผู้ขาย' : 'Seller'}
+                      title={t('nav.sellerApply')}
                     >
                       <span className="text-sm">🏪</span>
                       </Link>
@@ -245,10 +243,10 @@ export default function Navbar() {
                   </Link>
                 )}
                 <Link href="/seller/apply" className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#5c6078] hover:text-[#6366f1] hover:bg-[#6366f1]/5 transition-all">
-                  <span>🏪</span> {isThai ? 'สมัครเป็นผู้ขาย' : 'Seller'}
+                  <span>🏪</span> {t('nav.sellerApply')}
                 </Link>
                 <Link href={`/u/${user?.email?.split('@')[0] || ''}`} className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#5c6078] hover:text-[#6366f1] hover:bg-[#6366f1]/5 transition-all">
-                  <span>👤</span> {isThai ? 'โปรไฟล์' : 'Profile'}
+                  <span>👤</span> {t('nav.profile')}
                 </Link>
               </>
             )}
