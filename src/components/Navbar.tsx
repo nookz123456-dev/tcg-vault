@@ -50,6 +50,7 @@ export default function Navbar() {
     { href: '/discussions', labelKey: 'nav.discuss' as const, icon: '💬' },
     { href: '/collection', labelKey: 'nav.collection' as const, icon: '🃏' },
     { href: '/alerts', labelKey: 'nav.alerts' as const, icon: '🔔' },
+    { href: '/marketplace', labelKey: 'nav.marketplace' as const, icon: '🛒' },
   ]
 
   return (

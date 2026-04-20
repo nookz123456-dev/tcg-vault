@@ -49,7 +49,7 @@ export default function LoginPage() {
  const handleCaptchaError = useCallback((err: string) => {
  setCaptchaError(t('login.captchaFailed'))
  setCaptchaToken('')
- })
+ }, [])
 
  const handleCaptchaExpire = useCallback(() => {
  setCaptchaToken('')
@@ -103,7 +103,7 @@ export default function LoginPage() {
  }
  setSuccess(t('login.magicLinkSent'))
  } catch {
- setError(t('common.networkError', 'th') ? 'ข้อผิดพลาดเครือข่าย' : 'Network error')
+ setError(t('login.networkError'))
  } finally {
  setLoading(false)
  }
@@ -433,7 +433,7 @@ export default function LoginPage() {
  </p>
  <ul className="text-[10px] text-[#8b8fa6] mt-1 space-y-0.5">
  <li className={password.length >= 8 ? 'text-emerald-500' : ''}>
- {password.length >= 8 ? '✓' : '○'} {t('login.min8Chars2')}
+ {password.length >= 8 ? '✓' : '○'} {t('login.min8Chars')}
  </li>
  <li className={/[a-z]/.test(password) && /[A-Z]/.test(password) ? 'text-emerald-500' : ''}>
  {(/[a-z]/.test(password) && /[A-Z]/.test(password)) ? '✓' : '○'} {t('login.upperLower')}

@@ -108,7 +108,7 @@ export default function TradesPage() {
  filter === f ? 'bg-[#6366f1] text-[#1e2235]' : 'bg-[#fafbfc] text-[#5c6078] border border-[#e8eaf0] hover:text-[#1e2235]'
  }`}
  >
- {t(`trades.status.${f}`) || (f.charAt(0).toUpperCase() + f.slice(1))}
+ {t(`trades.status.${f}` as any) || (f.charAt(0).toUpperCase() + f.slice(1))}
  </button>
  ))}
  </div>
@@ -132,7 +132,7 @@ export default function TradesPage() {
  <div className="flex items-center justify-between mb-4">
  <div className="flex items-center gap-2">
  <span className={`text-xs px-2.5 py-1 rounded-lg font-semibold ${STATUS_COLORS[offer.status] || ''}`}>
- {t(`trades.status.${offer.status}`) || offer.status}
+ {t(`trades.status.${offer.status}` as any) || offer.status}
  </span>
  <span className="text-xs text-[#8b8fa6]">
  {t('common.from')}{' '}
