@@ -212,6 +212,11 @@ export default function CardDetailPage() {
  return CONDITION_CONFIG.some(c => getConditionData(c.key) !== null)
  }
 
+ const hasAnyVariantPrices = () => {
+ if (!card?.priceBreakdown) return false
+ return card.priceBreakdown.some(v => v.prices.market !== null || v.prices.low !== null || v.prices.mid !== null || v.prices.high !== null)
+ }
+
  if (loading) {
  return (
  <div className="min-h-screen" style={{ background: '#f5f6fa' }}>
@@ -332,6 +337,61 @@ export default function CardDetailPage() {
  {card.artist && (
  <div className="text-sm text-[#8b8fa6]">
  {t("card.illustratedBy")} <span className="text-[#5c6078] font-medium">{card.artist}</span>
+ </div>
+ )}
+
+ {/* ========== VARIANT PRICES TABLE ========== */}
+ {hasAnyVariantPrices() && (
+ <div className="bg-white border border-[#e8eaf0] rounded-xl overflow-hidden shadow-sm">
+ <div className="px-5 py-4 border-b border-[#e8eaf0] bg-gray-50/50">
+ <h2 className="text-base font-semibold text-[#1e2235]">{t("card.priceByVariant")}</h2>
+ <p className="text-xs text-[#8b8fa6] mt-0.5">
+ {t("card.variantPrices")}
+ {card.tcgplayer?.updatedAt && ` · ${new Date(card.tcgplayer.updatedAt).toLocaleDateString()}`}
+ </p>
+ </div>
+ <div className="overflow-x-auto">
+ <table className="w-full text-sm">
+ <thead>
+ <tr className="bg-gray-50/50">
+ <th className="text-left px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{t("card.variant")}</th>
+ <th className="text-right px-4 py-3 text-xs font-semibold text-[#6366f1] uppercase tracking-wider">{t("card.market")}</th>
+ <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{t("card.low")}</th>
+ <th className="text-right px-4 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{t("card.mid")}</th>
+ <th className="text-right px-5 py-3 text-xs font-semibold text-[#5c6078] uppercase tracking-wider">{t("card.high")}</th>
+ </tr>
+ </thead>
+ <tbody>
+ {card.priceBreakdown.map((variant) => (
+ <tr key={variant.key} className="border-t border-[#e8eaf0] hover:bg-[#f5f6fa]/50 transition-colors">
+ <td className="px-5 py-3.5">
+ <span className="text-[#1e2235] font-medium">{variant.label}</span>
+ </td>
+ <td className="text-right px-4 py-3.5">
+ <span className="text-[#6366f1] font-semibold text-base">
+ {fmtPrice(variant.prices.market)}
+ </span>
+ </td>
+ <td className="text-right px-4 py-3.5 text-[#5c6078]">{fmtPrice(variant.prices.low)}</td>
+ <td className="text-right px-4 py-3.5 text-[#5c6078]">{fmtPrice(variant.prices.mid)}</td>
+ <td className="text-right px-5 py-3.5 text-[#5c6078]">{fmtPrice(variant.prices.high)}</td>
+ </tr>
+ ))}
+ </tbody>
+ </table>
+ </div>
+ {card.tcgplayer?.url && (
+ <div className="px-5 py-3 border-t border-[#e8eaf0] bg-gray-50/30">
+ <a
+ href={card.tcgplayer.url}
+ target="_blank"
+ rel="noopener noreferrer"
+ className="text-xs text-[#6366f1] hover:text-[#4f46e5] font-medium flex items-center gap-1"
+ >
+ {t("card.viewOnTCGplayer")} →
+ </a>
+ </div>
+ )}
  </div>
  )}
 
@@ -499,7 +559,7 @@ export default function CardDetailPage() {
  <PriceHistoryChart cardId={id} game="pokemon" height={280} />
 
  {/* No prices message */}
- {!hasAnyConditionPrices() && !hasAnyGradedPrices() && !card.cardmarket?.trendPrice && (
+ {!hasAnyVariantPrices() && !hasAnyConditionPrices() && !hasAnyGradedPrices() && !card.cardmarket?.trendPrice && (
  <div className="bg-white border border-[#e8eaf0] rounded-xl p-8 text-center shadow-sm">
  <div className="text-4xl mb-3">📊</div>
  <p className="text-[#5c6078] font-medium">{t("card.noPriceData")}</p>

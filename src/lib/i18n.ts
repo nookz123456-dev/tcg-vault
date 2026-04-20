@@ -236,6 +236,8 @@ const translations = {
   'common.admin': { th: 'ผู้ดูแลระบบ', en: 'Admin' },
 
   // Card detail - extra
+  'card.priceByVariant': { th: 'ราคาตามรุ่น', en: 'Price by Variant' },
+  'card.variantPrices': { th: 'ราคา TCGplayer ตามรุ่นการ์ด', en: 'TCGplayer market prices by variant' },
   'card.priceByCondition': { th: 'ราคาตามสภาพ', en: 'Price by Condition' },
   'card.tcgplayerPrices': { th: 'ราคา TCGplayer', en: 'TCGplayer market prices' },
   'card.market': { th: 'ราคาตลาด', en: 'Market' },
@@ -253,6 +255,7 @@ const translations = {
   'card.30dayAvg': { th: 'เฉลี่ย 30 วัน', en: '30-Day Avg' },
   'card.viewOnTCGplayer': { th: 'ดูบน TCGplayer', en: 'View on TCGplayer' },
   'card.viewOnCardMarket': { th: 'ดูบน CardMarket', en: 'View on CardMarket' },
+  'card.variant': { th: 'รุ่น', en: 'Variant' },
   'card.noPriceData': { th: 'ยังไม่มีข้อมูลราคา', en: 'No price data available' },
   'card.noPriceDesc': { th: 'การ์ดใบนี้ยังไม่มีราคาตลาด', en: "This card doesn't have market prices yet" },
   'card.series': { th: 'ซีรีส์', en: 'Series' },
