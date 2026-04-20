@@ -75,6 +75,16 @@ export default function Home() {
                 <div className="text-[10px] sm:text-xs text-[#8b8fa6] mt-0.5">{t('home.stats.prices')}</div>
               </div>
             </div>
+
+            {/* PWA Install Hint */}
+            <div id="pwa-install-hint" className="mt-4 hidden" style={{ display: 'none' }}>
+              <button
+                id="pwa-install-btn"
+                className="px-4 py-2 bg-[#6366f1] text-white text-xs font-semibold rounded-lg hover:bg-[#4f46e5] transition-all"
+              >
+                📱 {t('pwa.install')}
+              </button>
+            </div>
           </div>
         </div>
       </section>

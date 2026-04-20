@@ -768,6 +768,12 @@ const translations = {
   'badges.nextLevel': { th: 'ระดับถัดไป', en: 'Next level' },
   'badges.howToEarn': { th: 'วิธีหา XP', en: 'How to earn XP' },
   'badges.unlock': { th: 'บรรลุเพื่อปลดล็อก', en: 'Reach to unlock' },
+
+  // PWA
+  'pwa.install': { th: 'ติดตั้ง HoloCheck', en: 'Install HoloCheck' },
+  'pwa.installDesc': { th: 'เพิ่มเข้าหน้าจอหลักเพื่อใช้งานเร็วขึ้น', en: 'Add to home screen for faster access' },
+  'pwa.installBtn': { th: 'ติดตั้ง', en: 'Install' },
+  'pwa.dismiss': { th: 'ไม่ใช่ตอนนี้', en: 'Not now' },
 } as const
 
 export type Locale = 'th' | 'en'
