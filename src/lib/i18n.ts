@@ -686,6 +686,26 @@ const translations = {
   'marketplace.confirmReceived': { th: 'ยืนยันได้รับแล้ว', en: 'Confirm Received' },
   'marketplace.signInToViewOrders': { th: 'เข้าสู่ระบบเพื่อดูคำสั่งซื้อ', en: 'Sign in to view orders' },
   'marketplace.descriptionPlaceholder': { th: 'รายละเอียดเพิ่มเติม สภาพการ์ด ฯลฯ', en: 'Additional details, card condition notes, etc.' },
+
+  // Me (Dashboard)
+  'me.title': { th: 'โปรไฟล์ของฉัน', en: 'My Profile' },
+  'me.signInDesc': { th: 'เข้าสู่ระบบเพื่อจัดการคอลเลกชัน แจ้งเตือน และคำสั่งซื้อ', en: 'Sign in to manage your collection, alerts, and orders' },
+  'me.viewProfile': { th: 'ดูโปรไฟล์', en: 'View Profile' },
+  'me.collection': { th: 'คอลเลกชัน', en: 'Collection' },
+  'me.watchlist': { th: 'วิชลิสต์', en: 'Watchlist' },
+  'me.alerts': { th: 'แจ้งเตือน', en: 'Alerts' },
+  'me.notifications': { th: 'แจ้งเตือน', en: 'Notifications' },
+  'me.trades': { th: 'แลกเปลี่ยน', en: 'Trades' },
+  'me.orders': { th: 'คำสั่งซื้อ', en: 'Orders' },
+  'me.badges': { th: 'เหรียญตรา', en: 'Badges' },
+  'me.noWatchlist': { th: 'วิชลิสต์ว่างเปล่า', en: 'Your watchlist is empty' },
+  'me.noWatchlistDesc': { th: 'กด ⭐ ที่หน้ารายละเอียดการ์ดเพื่อเพิ่มในวิชลิสต์', en: 'Tap ⭐ on any card detail page to add it to your watchlist' },
+
+  // Community (consolidated)
+  'community.feed': { th: 'ฟีด', en: 'Feed' },
+  'community.discussions': { th: 'กระดานสนทนา', en: 'Discussions' },
+  'community.board': { th: 'บอร์ด', en: 'Board' },
+  'community.leaderboardTab': { th: 'อันดับ', en: 'Leaderboard' },
 } as const
 
 export type Locale = 'th' | 'en'

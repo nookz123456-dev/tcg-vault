@@ -47,9 +47,7 @@ export default function Navbar() {
   ]
 
   const moreItems = [
-    { href: '/discussions', labelKey: 'nav.discuss' as const, icon: '💬' },
-    { href: '/collection', labelKey: 'nav.collection' as const, icon: '🃏' },
-    { href: '/alerts', labelKey: 'nav.alerts' as const, icon: '🔔' },
+    { href: '/me', labelKey: 'nav.profile' as const, icon: '👤' },
     { href: '/marketplace', labelKey: 'nav.marketplace' as const, icon: '🛒' },
   ]
 
@@ -155,9 +153,9 @@ export default function Navbar() {
                     >
                       <span className="text-sm">🏪</span>
                       </Link>
-                    {/* Notifications */}
+                    {/* Notifications → /me */}
                     <Link
-                      href="/notifications"
+                      href="/me"
                       className="relative flex items-center justify-center w-8 h-8 rounded-full hover:bg-[#f5f6fa] transition-colors"
                     >
                       <span className="text-sm">🔔</span>
