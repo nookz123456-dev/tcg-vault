@@ -700,6 +700,7 @@ const translations = {
   'me.badges': { th: 'เหรียญตรา', en: 'Badges' },
   'me.noWatchlist': { th: 'วิชลิสต์ว่างเปล่า', en: 'Your watchlist is empty' },
   'me.noWatchlistDesc': { th: 'กด ⭐ ที่หน้ารายละเอียดการ์ดเพื่อเพิ่มในวิชลิสต์', en: 'Tap ⭐ on any card detail page to add it to your watchlist' },
+  'me.cards': { th: 'การ์ด', en: 'cards' },
 
   // Community (consolidated)
   'community.feed': { th: 'ฟีด', en: 'Feed' },

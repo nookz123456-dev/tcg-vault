@@ -334,22 +334,33 @@ function WatchlistTab({ items, loading, t }: any) {
     if (game === 'pokemon-jp') return `/card/pokemon-jp/${encodeURIComponent(cardId)}`
     return '#'
   }
+  const getGameIcon = (game: string) => {
+    if (game === 'pokemon') return '🔴'
+    if (game === 'onepiece') return '🏴‍☠️'
+    if (game === 'pokemon-jp') return '🇯🇵'
+    return '🃏'
+  }
   return (
-    <div className="space-y-2.5">
-      {items.map((item: any) => (
-        <Link key={item.id} href={getCardLink(item.card_id, item.game)} className="bg-white border border-[#e8eaf0] rounded-xl p-3.5 flex items-center gap-3 hover:shadow-md hover:shadow-[#6366f1]/5 transition-all group">
-          <div className="w-10 h-10 rounded-lg bg-[#f5f6fa] flex items-center justify-center text-lg">⭐</div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-bold text-[#1e2235] group-hover:text-[#6366f1] transition-colors truncate">{item.card_id}</h3>
-            <p className="text-xs text-[#8b8fa6]">{GAME_LABELS[item.game as keyof typeof GAME_LABELS] || item.game}</p>
-          </div>
-          <span className={`text-[10px] px-2 py-0.5 rounded-lg font-medium ${
-            item.priority === 'high' ? 'bg-red-500/10 text-red-400' :
-            item.priority === 'low' ? 'bg-[#e8eaf0] text-[#8b8fa6]' :
-            'bg-[#6366f1]/10 text-[#6366f1]'
-          }`}>{item.priority}</span>
-        </Link>
-      ))}
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-xs text-[#8b8fa6]">{items.length} {t('me.cards')}</p>
+      </div>
+      <div className="space-y-2.5">
+        {items.map((item: any) => (
+          <Link key={item.id} href={getCardLink(item.card_id, item.game)} className="bg-white border border-[#e8eaf0] rounded-xl p-3.5 flex items-center gap-3 hover:shadow-md hover:shadow-[#6366f1]/5 transition-all group">
+            <div className="w-10 h-10 rounded-lg bg-[#f5f6fa] flex items-center justify-center text-lg">{getGameIcon(item.game)}</div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-bold text-[#1e2235] group-hover:text-[#6366f1] transition-colors truncate">{item.card_name || item.card_id}</h3>
+              <p className="text-xs text-[#8b8fa6]">{GAME_LABELS[item.game as keyof typeof GAME_LABELS] || item.game}{item.notes ? ` · ${item.notes}` : ''}</p>
+            </div>
+            <span className={`text-[10px] px-2 py-0.5 rounded-lg font-medium ${
+              item.priority === 'high' ? 'bg-red-500/10 text-red-400' :
+              item.priority === 'low' ? 'bg-[#e8eaf0] text-[#8b8fa6]' :
+              'bg-[#6366f1]/10 text-[#6366f1]'
+            }`}>{item.priority}</span>
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }
