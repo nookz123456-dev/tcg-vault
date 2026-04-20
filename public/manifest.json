@@ -41,7 +41,7 @@
     {
       "name": "Grading Calculator",
       "short_name": "Grade",
-      "url": "/grade",
+      "url": "/grading",
       "icons": [{ "src": "/icon.svg", "sizes": "any" }]
     }
   ]
