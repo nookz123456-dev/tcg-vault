@@ -706,6 +706,13 @@ const translations = {
   'community.discussions': { th: 'กระดานสนทนา', en: 'Discussions' },
   'community.board': { th: 'บอร์ด', en: 'Board' },
   'community.leaderboardTab': { th: 'อันดับ', en: 'Leaderboard' },
+
+  // Cmd+K
+  'cmdk.typeToSearch': { th: 'พิมพ์เพื่อค้นหาการ์ด...', en: 'Type to search cards...' },
+  'cmdk.shortcutHint': { th: 'เปิดปิดได้ทุกที่', en: 'open from anywhere' },
+  'cmdk.navigate': { th: 'เลือก', en: 'navigate' },
+  'cmdk.open': { th: 'เปิด', en: 'open' },
+  'cmdk.close': { th: 'ปิด', en: 'close' },
 } as const
 
 export type Locale = 'th' | 'en'

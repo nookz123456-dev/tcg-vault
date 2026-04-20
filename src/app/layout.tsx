@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ClientLayout } from "@/components/ClientLayout";
+import { CmdKSearch } from "@/components/CmdKSearch";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -43,7 +44,10 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon.svg" />
       </head>
       <body className="antialiased">
-        <ClientLayout>{children}</ClientLayout>
+        <ClientLayout>
+          {children}
+          <CmdKSearch />
+        </ClientLayout>
       </body>
     </html>
   );
