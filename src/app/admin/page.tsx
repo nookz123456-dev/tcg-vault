@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import { useAuth } from '@/lib/useAuth'
@@ -13,15 +13,22 @@ interface Stats {
   pendingSellers: number
   verifiedSellers: number
   completedTrades: number
+  totalListings: number
+  totalOrders: number
+  disputedOrders: number
+  newUsersToday: number
+  newUsersThisWeek: number
 }
 
 interface User {
   id: string
   username: string
   display_name: string
+  email?: string
   role: string
   created_at: string
   seller_status?: string
+  ban_reason?: string
 }
 
 interface Thread {
@@ -64,6 +71,38 @@ interface Activity {
   created_at: string
 }
 
+interface Listing {
+  id: string
+  seller_id: string
+  game: string
+  card_id: string
+  card_name: string
+  condition: string
+  price: number
+  currency: string
+  is_active: boolean
+  created_at: string
+  seller: { id: string; username: string; display_name: string }
+}
+
+interface Order {
+  id: string
+  buyer_id: string
+  seller_id: string
+  status: string
+  price: number
+  currency: string
+  created_at: string
+  listing: { card_name: string }
+  buyer: { username: string; display_name: string }
+  seller: { username: string; display_name: string }
+}
+
+interface DailyCount {
+  date: string
+  count: number
+}
+
 const ROLE_COLORS: Record<string, string> = {
   admin: 'bg-red-500/15 text-red-400 border border-red-500/30',
   moderator: 'bg-amber-500/15 text-amber-400 border border-amber-500/30',
@@ -78,7 +117,7 @@ const PRIORITY_COLORS: Record<string, string> = {
   urgent: 'bg-red-500/15 text-red-400 border border-red-500/30',
 }
 
-type TabType = 'overview' | 'users' | 'sellers' | 'threads' | 'comments' | 'announcements'
+type TabType = 'overview' | 'users' | 'sellers' | 'threads' | 'comments' | 'announcements' | 'marketplace'
 
 export default function AdminPage() {
   const { user } = useAuth()
@@ -90,11 +129,15 @@ export default function AdminPage() {
   const [recentUsers, setRecentUsers] = useState<User[]>([])
   const [recentThreads, setRecentThreads] = useState<Thread[]>([])
   const [recentActivities, setRecentActivities] = useState<Activity[]>([])
+  const [signupTrend, setSignupTrend] = useState<DailyCount[]>([])
   const [allUsers, setAllUsers] = useState<User[]>([])
   const [sellerApps, setSellerApps] = useState<SellerApp[]>([])
   const [sellerFilter, setSellerFilter] = useState('all')
   const [comments, setComments] = useState<Comment[]>([])
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
+  const [listings, setListings] = useState<Listing[]>([])
+  const [orders, setOrders] = useState<Order[]>([])
+  const [marketplaceFilter, setMarketplaceFilter] = useState<'listings' | 'disputed'>('disputed')
   const [tab, setTab] = useState<TabType>('overview')
   const [actionLoading, setActionLoading] = useState(false)
   const [userSearch, setUserSearch] = useState('')
@@ -102,6 +145,7 @@ export default function AdminPage() {
   const [announceTitle, setAnnounceTitle] = useState('')
   const [announceContent, setAnnounceContent] = useState('')
   const [announcePriority, setAnnouncePriority] = useState('normal')
+  const [exportLoading, setExportLoading] = useState(false)
 
   // Initial auth check + overview data
   useEffect(() => {
@@ -120,6 +164,7 @@ export default function AdminPage() {
           setRecentUsers(data.recentUsers || [])
           setRecentThreads(data.recentThreads || [])
           setRecentActivities(data.recentActivities || [])
+          setSignupTrend(data.signupTrend || [])
         }
         setLoading(false)
       })
@@ -147,7 +192,24 @@ export default function AdminPage() {
       fetch('/api/admin?section=announcements', { headers })
         .then(r => r.json()).then(data => setAnnouncements(data.announcements || [])).catch(() => {})
     }
-  }, [tab, user, isAuthorized, userSearch, sellerFilter])
+    if (tab === 'marketplace') {
+      loadMarketplaceData()
+    }
+  }, [tab, user, isAuthorized, userSearch, sellerFilter, marketplaceFilter])
+
+  const loadMarketplaceData = async () => {
+    if (!user) return
+    const headers = { 'Authorization': `Bearer ${user.access_token}` }
+    if (marketplaceFilter === 'disputed') {
+      const res = await fetch('/api/admin?section=disputed-orders', { headers })
+      const data = await res.json()
+      setOrders(data.orders || [])
+    } else {
+      const res = await fetch('/api/admin?section=all-listings', { headers })
+      const data = await res.json()
+      setListings(data.listings || [])
+    }
+  }
 
   const adminAction = async (body: Record<string, unknown>) => {
     if (!user) return false
@@ -162,6 +224,31 @@ export default function AdminPage() {
       setActionLoading(false)
       return data.success
     } catch { setActionLoading(false); return false }
+  }
+
+  const exportCSV = async (type: 'users' | 'orders' | 'listings') => {
+    if (!user) return
+    setExportLoading(true)
+    try {
+      const res = await fetch(`/api/admin?section=export-${type}`, {
+        headers: { 'Authorization': `Bearer ${user.access_token}` },
+      })
+      const data = await res.json()
+      if (data.csv) {
+        const blob = new Blob([data.csv], { type: 'text/csv' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `holocheck-${type}-${new Date().toISOString().slice(0, 10)}.csv`
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+    } catch {}
+    setExportLoading(false)
+  }
+
+  const formatPrice = (price: number, currency: string) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD', minimumFractionDigits: 2 }).format(price)
   }
 
   if (!user) {
@@ -208,14 +295,18 @@ export default function AdminPage() {
     { key: 'overview', label: locale === 'th' ? 'ภาพรวม' : 'Overview' },
     { key: 'users', label: t('admin.users') },
     { key: 'sellers', label: t('admin.manageSellers') },
+    { key: 'marketplace', label: t('admin.marketplaceTab') },
     { key: 'threads', label: t('admin.threads') },
     { key: 'comments', label: t('admin.comments') },
     { key: 'announcements', label: t('admin.announcementsLabel') },
   ]
 
   const tabIcons: Record<TabType, string> = {
-    overview: '📊', users: '👥', sellers: '🏪', threads: '💬', comments: '💭', announcements: '📢',
+    overview: '📊', users: '👥', sellers: '🏪', marketplace: '🛒', threads: '💬', comments: '💭', announcements: '📢',
   }
+
+  // Mini bar chart for signup trend
+  const maxSignupCount = Math.max(...signupTrend.map(d => d.count), 1)
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--background)' }}>
@@ -231,9 +322,22 @@ export default function AdminPage() {
               {t('admin.manageDesc')}
             </p>
           </div>
-          <span className="text-xs px-3 py-1.5 rounded-lg font-semibold bg-red-500/15 text-red-400 border border-red-500/30 self-start sm:self-auto">
-            ADMIN
-          </span>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <span className="text-xs px-3 py-1.5 rounded-lg font-semibold bg-red-500/15 text-red-400 border border-red-500/30">
+              ADMIN
+            </span>
+            {/* Export buttons */}
+            <div className="relative group">
+              <button className="text-xs px-3 py-1.5 rounded-lg font-semibold bg-white border border-[#e8eaf0] text-[#5c6078] hover:border-[#6366f1]/30 transition-colors">
+                📥 {t('admin.export')}
+              </button>
+              <div className="absolute right-0 top-full mt-1 bg-white border border-[#e8eaf0] rounded-xl shadow-lg p-1 hidden group-hover:block z-10 min-w-[140px]">
+                <button onClick={() => exportCSV('users')} disabled={exportLoading} className="w-full text-left px-3 py-2 text-xs text-[#1e2235] hover:bg-[#f5f6fa] rounded-lg">👥 {t('admin.exportUsers')}</button>
+                <button onClick={() => exportCSV('orders')} disabled={exportLoading} className="w-full text-left px-3 py-2 text-xs text-[#1e2235] hover:bg-[#f5f6fa] rounded-lg">📋 {t('admin.exportOrders')}</button>
+                <button onClick={() => exportCSV('listings')} disabled={exportLoading} className="w-full text-left px-3 py-2 text-xs text-[#1e2235] hover:bg-[#f5f6fa] rounded-lg">🛒 {t('admin.exportListings')}</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Tabs — scrollable on mobile */}
@@ -247,6 +351,10 @@ export default function AdminPage() {
               }`}
             >
               <span>{tabIcons[tb.key]}</span>
+              {/* Notification badge for disputed orders */}
+              {tb.key === 'marketplace' && stats && stats.disputedOrders > 0 && (
+                <span className="ml-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-bold">{stats.disputedOrders}</span>
+              )}
               <span>{tb.label}</span>
             </button>
           ))}
@@ -255,22 +363,49 @@ export default function AdminPage() {
         {/* ===================== OVERVIEW ===================== */}
         {tab === 'overview' && stats && (
           <div className="space-y-6">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {[
-                { label: t('admin.users'), value: stats.totalUsers, icon: '👥', color: 'text-[#6366f1]' },
+                { label: t('admin.users'), value: stats.totalUsers, icon: '👥', color: 'text-[#6366f1]', sub: stats.newUsersToday > 0 ? `+${stats.newUsersToday} ${t('admin.today')}` : undefined },
                 { label: t('admin.threads'), value: stats.totalThreads, icon: '💬', color: 'text-emerald-500' },
                 { label: t('admin.comments'), value: stats.totalComments, icon: '💭', color: 'text-amber-500' },
                 { label: t('admin.pending'), value: stats.pendingSellers, icon: '⏳', color: 'text-orange-500' },
                 { label: t('admin.verified'), value: stats.verifiedSellers, icon: '✅', color: 'text-emerald-500' },
                 { label: t('admin.completedTrades'), value: stats.completedTrades, icon: '🤝', color: 'text-blue-500' },
+                { label: t('admin.marketplaceTab'), value: stats.totalListings, icon: '🛒', color: 'text-purple-500' },
+                { label: t('admin.totalOrders'), value: stats.totalOrders, icon: '📋', color: 'text-cyan-500' },
+                { label: t('admin.disputed'), value: stats.disputedOrders, icon: '⚠️', color: 'text-red-500' },
+                { label: t('admin.newThisWeek'), value: stats.newUsersThisWeek, icon: '📈', color: 'text-emerald-500' },
               ].map(stat => (
                 <div key={stat.label} className="bg-white border border-[#e8eaf0] rounded-2xl p-3 sm:p-4 text-center">
                   <div className="text-lg sm:text-2xl mb-1">{stat.icon}</div>
                   <p className={`text-xl sm:text-2xl font-extrabold ${stat.color}`}>{stat.value}</p>
                   <p className="text-[10px] sm:text-xs text-[#8b8fa6] mt-0.5">{stat.label}</p>
+                  {stat.sub && <p className="text-[10px] text-emerald-500 font-semibold mt-0.5">{stat.sub}</p>}
                 </div>
               ))}
             </div>
+
+            {/* Signup Trend (7 days) */}
+            {signupTrend.length > 0 && (
+              <div className="bg-white border border-[#e8eaf0] rounded-2xl p-4 sm:p-5">
+                <h2 className="text-lg font-bold text-[#1e2235] mb-3">📈 {t('admin.signupTrend')}</h2>
+                <div className="flex items-end gap-1.5 h-24">
+                  {signupTrend.map((d, i) => {
+                    const height = Math.max((d.count / maxSignupCount) * 100, 4)
+                    const dayLabel = new Date(d.date).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', { weekday: 'short' })
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                        <span className="text-[10px] font-semibold text-[#6366f1]">{d.count}</span>
+                        <div className="w-full bg-[#6366f1]/20 rounded-t-md transition-all" style={{ height: `${height}%`, minHeight: '4px' }}>
+                          <div className="w-full h-full bg-[#6366f1] rounded-t-md opacity-80" style={{ height: '100%' }} />
+                        </div>
+                        <span className="text-[9px] text-[#8b8fa6]">{dayLabel}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Recent Activity */}
             <div className="bg-white border border-[#e8eaf0] rounded-2xl p-4 sm:p-5">
@@ -290,7 +425,7 @@ export default function AdminPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               <button onClick={() => setTab('sellers')} className="bg-white border border-[#e8eaf0] rounded-xl p-4 text-center hover:border-[#6366f1]/30 transition-colors">
                 <div className="text-2xl mb-1">🏪</div>
                 <p className="text-xs font-semibold text-[#1e2235]">{t('admin.manageSellers')}</p>
@@ -299,6 +434,11 @@ export default function AdminPage() {
               <button onClick={() => setTab('users')} className="bg-white border border-[#e8eaf0] rounded-xl p-4 text-center hover:border-[#6366f1]/30 transition-colors">
                 <div className="text-2xl mb-1">👥</div>
                 <p className="text-xs font-semibold text-[#1e2235]">{t('admin.manageUsers')}</p>
+              </button>
+              <button onClick={() => setTab('marketplace')} className="bg-white border border-[#e8eaf0] rounded-xl p-4 text-center hover:border-[#6366f1]/30 transition-colors relative">
+                <div className="text-2xl mb-1">🛒</div>
+                <p className="text-xs font-semibold text-[#1e2235]">{t('admin.marketplaceTab')}</p>
+                {stats.disputedOrders > 0 && <span className="absolute top-2 right-2 text-[10px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-bold">{stats.disputedOrders}</span>}
               </button>
               <button onClick={() => setTab('announcements')} className="bg-white border border-[#e8eaf0] rounded-xl p-4 text-center hover:border-[#6366f1]/30 transition-colors">
                 <div className="text-2xl mb-1">📢</div>
@@ -338,7 +478,8 @@ export default function AdminPage() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-[#1e2235] truncate">{u.display_name || u.username || 'Unknown'}</p>
-                      <p className="text-xs text-[#8b8fa6]">@{u.username} · {u.id.slice(0, 8)}...</p>
+                      <p className="text-xs text-[#8b8fa6]">@{u.username}{u.email ? ` · ${u.email}` : ''} · {u.id.slice(0, 8)}...</p>
+                      {u.ban_reason && <p className="text-[10px] text-red-400 mt-0.5">🚫 {u.ban_reason}</p>}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -362,11 +503,14 @@ export default function AdminPage() {
                       <option value="suspended">{t('admin.suspended')}</option>
                     </select>
                     {u.role !== 'suspended' ? (
-                      <button onClick={() => { adminAction({ action: 'suspendUser', userId: u.id }); setAllUsers(prev => prev.map(x => x.id === u.id ? { ...x, role: 'suspended' } : x)) }} className="text-xs px-2 py-1 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors" disabled={actionLoading}>
+                      <button onClick={() => {
+                        const reason = prompt(t('admin.banReasonPrompt'))
+                        if (reason) { adminAction({ action: 'suspendUser', userId: u.id, ban_reason: reason }); setAllUsers(prev => prev.map(x => x.id === u.id ? { ...x, role: 'suspended', ban_reason: reason } : x)) }
+                      }} className="text-xs px-2 py-1 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors" disabled={actionLoading}>
                         🚫
                       </button>
                     ) : (
-                      <button onClick={() => { adminAction({ action: 'reactivateUser', userId: u.id }); setAllUsers(prev => prev.map(x => x.id === u.id ? { ...x, role: 'user' } : x)) }} className="text-xs px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors" disabled={actionLoading}>
+                      <button onClick={() => { adminAction({ action: 'reactivateUser', userId: u.id }); setAllUsers(prev => prev.map(x => x.id === u.id ? { ...x, role: 'user', ban_reason: undefined } : x)) }} className="text-xs px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors" disabled={actionLoading}>
                         ✅
                       </button>
                     )}
@@ -437,6 +581,99 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* ===================== MARKETPLACE ===================== */}
+        {tab === 'marketplace' && (
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setMarketplaceFilter('disputed')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  marketplaceFilter === 'disputed' ? 'bg-red-500 text-white' : 'bg-white border border-[#e8eaf0] text-[#5c6078] hover:border-red-500/30'
+                }`}
+              >
+                ⚠️ {t('admin.disputedOrders')} {stats && stats.disputedOrders > 0 && `(${stats.disputedOrders})`}
+              </button>
+              <button
+                onClick={() => setMarketplaceFilter('listings')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  marketplaceFilter === 'listings' ? 'bg-[#6366f1] text-white' : 'bg-white border border-[#e8eaf0] text-[#5c6078] hover:border-[#6366f1]/30'
+                }`}
+              >
+                🛒 {t('admin.allListings')}
+              </button>
+            </div>
+
+            {/* Disputed Orders */}
+            {marketplaceFilter === 'disputed' && (
+              <div className="space-y-2">
+                {orders.length === 0 ? (
+                  <div className="bg-white border border-[#e8eaf0] rounded-2xl p-8 text-center">
+                    <div className="text-4xl mb-2 opacity-50">✅</div>
+                    <p className="text-[#8b8fa6]">{t('admin.noDisputedOrders')}</p>
+                  </div>
+                ) : orders.map(o => (
+                  <div key={o.id} className="bg-white border border-red-500/20 rounded-xl p-3 sm:p-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                      <div>
+                        <h3 className="text-sm font-bold text-[#1e2235]">{o.listing?.card_name || t('admin.unknownCard')}</h3>
+                        <p className="text-xs text-[#8b8fa6]">
+                          {t('admin.buyer')}: @{o.buyer?.username || '?'} → {t('admin.seller')}: @{o.seller?.username || '?'} · {formatPrice(o.price, o.currency)}
+                        </p>
+                      </div>
+                      <span className="text-xs px-2 py-1 rounded-lg font-semibold bg-red-500/15 text-red-500 border border-red-500/30 self-start sm:self-auto">
+                        ⚠️ {t('admin.disputed')}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => { adminAction({ action: 'resolveOrder', orderId: o.id, resolution: 'completed' }); setOrders(prev => prev.filter(x => x.id !== o.id)) }} className="px-3 py-1.5 text-xs rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-colors font-semibold" disabled={actionLoading}>
+                        ✅ {t('admin.resolveCompleted')}
+                      </button>
+                      <button onClick={() => { adminAction({ action: 'resolveOrder', orderId: o.id, resolution: 'cancelled' }); setOrders(prev => prev.filter(x => x.id !== o.id)) }} className="px-3 py-1.5 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors font-semibold" disabled={actionLoading}>
+                        ❌ {t('admin.resolveCancelled')}
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-[#b5b8c8] mt-2">{o.id.slice(0, 12)}... · {new Date(o.created_at).toLocaleDateString()}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* All Listings */}
+            {marketplaceFilter === 'listings' && (
+              <div className="space-y-2">
+                {listings.length === 0 ? (
+                  <div className="bg-white border border-[#e8eaf0] rounded-2xl p-8 text-center">
+                    <div className="text-4xl mb-2 opacity-50">🛒</div>
+                    <p className="text-[#8b8fa6]">{t('admin.noListings')}</p>
+                  </div>
+                ) : listings.map(l => (
+                  <div key={l.id} className="bg-white border border-[#e8eaf0] rounded-xl p-3 sm:p-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-semibold text-[#1e2235] truncate">{l.card_name}</h3>
+                        <p className="text-xs text-[#8b8fa6]">
+                          @{l.seller?.username || '?'} · {l.game} · {l.condition} · {formatPrice(l.price, l.currency)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className={`text-[10px] px-2 py-0.5 rounded-lg font-semibold ${l.is_active ? 'bg-emerald-500/15 text-emerald-500' : 'bg-gray-500/15 text-gray-400'}`}>
+                          {l.is_active ? '● Active' : '○ Inactive'}
+                        </span>
+                        <button onClick={() => { adminAction({ action: 'toggleListing', listingId: l.id, isActive: !l.is_active }); setListings(prev => prev.map(x => x.id === l.id ? { ...x, is_active: !l.is_active } : x)) }} className="text-xs px-2 py-1 rounded-lg bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 transition-colors font-semibold" disabled={actionLoading}>
+                          {l.is_active ? t('admin.deactivate') : t('admin.activate')}
+                        </button>
+                        <button onClick={() => { if (confirm(t('admin.deleteListingConfirm'))) { adminAction({ action: 'deleteListing', listingId: l.id }); setListings(prev => prev.filter(x => x.id !== l.id)) }}} className="text-xs px-2 py-1 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors font-semibold" disabled={actionLoading}>
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -540,7 +777,7 @@ export default function AdminPage() {
                         onClick={async () => {
                           if (!announceTitle.trim() || !announceContent.trim()) return
                           const success = await adminAction({ action: 'createAnnouncement', title: announceTitle, content: announceContent, priority: announcePriority })
-                          if (success) { setAnnounceTitle(''); setAnnounceContent(''); setShowAnnounceForm(false); /* refresh */ fetch('/api/admin?section=announcements', { headers: { 'Authorization': `Bearer ${user!.access_token}` } }).then(r => r.json()).then(d => setAnnouncements(d.announcements || [])) }
+                          if (success) { setAnnounceTitle(''); setAnnounceContent(''); setShowAnnounceForm(false); fetch('/api/admin?section=announcements', { headers: { 'Authorization': `Bearer ${user!.access_token}` } }).then(r => r.json()).then(d => setAnnouncements(d.announcements || [])) }
                         }}
                         disabled={actionLoading || !announceTitle.trim() || !announceContent.trim()}
                         className="px-4 py-2.5 text-xs font-semibold bg-[#6366f1] text-white rounded-xl hover:bg-[#4f46e5] transition-colors disabled:opacity-50"
