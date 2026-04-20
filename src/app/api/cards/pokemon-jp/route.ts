@@ -4,7 +4,7 @@ import { getJPCardImage } from '@/lib/jp-card-image-source'
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
-  const keyword = searchParams.get('q') || ''
+  const keyword = searchParams.get('q') || searchParams.get('search') || ''
   const page = parseInt(searchParams.get('page') || '1', 10)
 
   if (!keyword.trim()) {

@@ -19,7 +19,7 @@ export const POKEMON_RARITIES: Record<string, string> = {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const query = searchParams.get('q') || ''
+  const query = searchParams.get('q') || searchParams.get('search') || ''
   const page = parseInt(searchParams.get('page') || '1')
   const pageSize = parseInt(searchParams.get('pageSize') || '20')
   const supertype = searchParams.get('supertype') || 'all'
