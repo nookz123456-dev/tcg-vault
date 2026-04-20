@@ -713,6 +713,20 @@ const translations = {
   'cmdk.navigate': { th: 'เลือก', en: 'navigate' },
   'cmdk.open': { th: 'เปิด', en: 'open' },
   'cmdk.close': { th: 'ปิด', en: 'close' },
+
+  // Holo Score
+  'holoscore.title': { th: 'Holo Score™', en: 'Holo Score™' },
+  'holoscore.subtitle': { th: 'คะแนนคุณค่าการ์ด คำนวณจากราคา ความหายาก และแนวโน้ม', en: 'Card value score based on price, rarity, and momentum' },
+  'holoscore.disclaimer': { th: 'AI ประเมิน', en: 'AI assessed' },
+  'holoscore.hot': { th: '🔥 ร้อนแรง', en: '🔥 Hot' },
+  'holoscore.strong': { th: '💪 แข็งแกร่ง', en: '💪 Strong' },
+  'holoscore.moderate': { th: '⚖️ ปานกลาง', en: '⚖️ Moderate' },
+  'holoscore.cool': { th: '❄️ เย็น', en: '❄️ Cool' },
+  'holoscore.trend': { th: 'แนวโน้ม', en: 'Trend' },
+  'holoscore.liquidity': { th: 'สภาพคล่อง', en: 'Liquidity' },
+  'holoscore.gradingROI': { th: 'คุ้มจัดเกรด', en: 'Grading ROI' },
+  'holoscore.rarity': { th: 'ความหายาก', en: 'Rarity' },
+  'holoscore.momentum': { th: 'โมเมนตัม', en: 'Momentum' },
 } as const
 
 export type Locale = 'th' | 'en'

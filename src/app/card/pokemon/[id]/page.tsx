@@ -10,6 +10,7 @@ import { useLocale } from '@/lib/i18n'
 import { useComments } from '@/lib/useComments'
 import { useAuth } from '@/lib/useAuth'
 import PriceHistoryChart from '@/components/PriceHistoryChart'
+import { HoloScore } from '@/components/HoloScore'
 
 interface PriceVariant {
  key: string
@@ -339,6 +340,22 @@ export default function CardDetailPage() {
  {t("card.illustratedBy")} <span className="text-[#5c6078] font-medium">{card.artist}</span>
  </div>
  )}
+
+ {/* Holo Score */}
+ <HoloScore
+ marketPrice={card.priceBreakdown?.[0]?.prices?.market ?? null}
+ lowPrice={card.priceBreakdown?.[0]?.prices?.low ?? null}
+ highPrice={card.priceBreakdown?.[0]?.prices?.high ?? null}
+ avg7d={card.cardmarket?.avg7 ?? null}
+ avg30d={card.cardmarket?.avg30 ?? null}
+ trendPrice={card.cardmarket?.trendPrice ?? null}
+ psa10={getGradedPrice('psa10')}
+ psa9={getGradedPrice('psa9')}
+ rarity={card.rarity}
+ setTotal={card.set.printedTotal || card.set.total || 0}
+ cardNumber={card.number}
+ game="pokemon"
+ />
 
  {/* ========== VARIANT PRICES TABLE ========== */}
  {hasAnyVariantPrices() && (
