@@ -13,16 +13,33 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id: cardId } = await params
+  let { id: cardId } = await params
   
-  // cardId from URL is the TCGdex card ID (e.g., "SV2D-017")
-  // Or it could be a card name from old URLs
+  // Normalize card ID for TCGdex: ensure zero-padded localId
+  // TCGdex expects format like "SV2D-017" (3-digit localId)
+  // URLs may come in as "SV2D-17" or "sv2d-17" etc.
+  const normalizeCardId = (id: string): string => {
+    const match = id.match(/^([a-zA-Z]+\d+[a-zA-Z]?)-(\d+)$/i)
+    if (match) {
+      const prefix = match[1].toUpperCase()
+      const num = match[2].padStart(3, '0')
+      return `${prefix}-${num}`
+    }
+    return id
+  }
+  
+  const normalizedId = normalizeCardId(cardId)
 
   try {
     // Step 1: Fetch card details from TCGdex JP API
-    let cardData = await getPokemonJPCardTCGdex(cardId)
+    let cardData = await getPokemonJPCardTCGdex(normalizedId)
     
-    // If not found by ID, it might be a name-based URL (old format)
+    // If not found by ID, try the original cardId as-is
+    if (!cardData && normalizedId !== cardId) {
+      cardData = await getPokemonJPCardTCGdex(cardId)
+    }
+    
+    // If still not found, it might be a name-based URL (old format)
     // Try to search by name instead
     if (!cardData) {
       const { searchPokemonJPCardsTCGdex } = await import('@/lib/tcgdex-jp-api')

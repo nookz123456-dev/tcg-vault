@@ -8,7 +8,9 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ setId: string }> }
 ) {
-  const { setId } = await params
+  const { setId: rawSetId } = await params
+  // TCGdex uses uppercase set IDs (e.g., "SV2D", "SV3")
+  const setId = rawSetId.toUpperCase()
 
   try {
     // Fetch set info + cards
@@ -21,7 +23,14 @@ export async function GET(
     })
 
     if (!setRes.ok) {
-      throw new Error(`TCGdex JP set error: ${setRes.status}`)
+      // If set not found in TCGdex, return empty result instead of 500
+      console.error(`JP set ${setId} not found in TCGdex (HTTP ${setRes.status})`)
+      return NextResponse.json({
+        set: { id: setId, name: setId, cardCount: 0, releaseDate: null },
+        data: [],
+        totalCount: 0,
+        error: 'Set not found in Japanese database'
+      }, { status: 404 })
     }
 
     const setData = await setRes.json()

@@ -13,6 +13,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "HoloCheck — ตรวจราคาการ์ดโปเกม่อน | Card Price Tracker",
   description: "ฐานข้อมูลการ์ดโปเกม่อน ครบทุกเซ็ต พร้อมราคาอัปเดต จัดการคอลเลกชัน พูดคุยกับนักสะสมคนอื่น",
+  metadataBase: new URL('https://tcg-vault-sandy.vercel.app'),
   icons: {
     icon: "/icon.svg",
   },
