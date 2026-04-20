@@ -178,9 +178,7 @@ const translations = {
   'notif.signIn': { th: 'เข้าสู่ระบบเพื่อดูการแจ้งเตือน', en: 'Sign in to see notifications' },
 
   // Badges
-  'badges.title': { th: 'เหรียญตรา', en: 'Badges' },
-  'badges.subtitle': { th: 'สะสมเหรียญตราจากการสะสม แลกเปลี่ยน และมีส่วนร่วม', en: 'Earn badges by collecting, trading, and participating in the community' },
-  'badges.unlock': { th: 'บรรลุเพื่อปลดล็อก', en: 'Reach to unlock' },
+
 
   // Community extras
   'community.noActivity': { th: 'ยังไม่มีกิจกรรม', en: 'No activity yet' },
@@ -762,6 +760,14 @@ const translations = {
   'grade.totalCost': { th: 'ต้นทุนรวม', en: 'Total Cost' },
   'grade.disclaimer': { th: 'ค่าโดยประมาณเท่านั้น ผลลัพธ์จริงอาจแตกต่างตามตลาด', en: 'Estimates only. Actual results may vary by market conditions.' },
   'grade.enterPrice': { th: 'ใส่ราคาการ์ดเพื่อเริ่มคำนวณ', en: 'Enter a card price to calculate' },
+
+  // Badges / Gamification
+  'badges.title': { th: 'เหรียญตราและระดับ', en: 'Badges & Levels' },
+  'badges.subtitle': { th: 'รวบรวมเหรียญตรา เพิ่มระดับ ปลดล็อกความสำเร็จ', en: 'Collect badges, level up, and unlock achievements' },
+  'badges.earned': { th: 'ได้รับแล้ว', en: 'Earned' },
+  'badges.nextLevel': { th: 'ระดับถัดไป', en: 'Next level' },
+  'badges.howToEarn': { th: 'วิธีหา XP', en: 'How to earn XP' },
+  'badges.unlock': { th: 'บรรลุเพื่อปลดล็อก', en: 'Reach to unlock' },
 } as const
 
 export type Locale = 'th' | 'en'
