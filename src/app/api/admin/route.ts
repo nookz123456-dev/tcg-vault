@@ -102,7 +102,8 @@ export async function GET(request: NextRequest) {
     ])
     const recentUsers = await recentUsersRes.json()
     const recentThreads = await recentThreadsRes.json()
-    const recentActivities = Array.isArray(await recentActivitiesRes.json?.()) ? (await recentActivitiesRes.json()) : []
+    const recentActivitiesRaw = await (recentActivitiesRes as any).json?.() ?? await (recentActivitiesRes as any).json()
+    const recentActivities = Array.isArray(recentActivitiesRaw) ? recentActivitiesRaw : []
 
     return NextResponse.json({
       stats: { totalUsers, totalThreads, totalComments, pendingSellers, verifiedSellers, completedTrades, totalListings, totalOrders, disputedOrders, newUsersToday, newUsersThisWeek },
