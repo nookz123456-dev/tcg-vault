@@ -73,7 +73,7 @@ export function marvelSameCharacter(card: MarvelCard, limit = 10): MarvelCard[] 
 // ---- Display metadata ----
 
 // Rarity order (low -> high) and colors for chips.
-export const RARITY_ORDER = ['C', 'R', 'SR', 'UR', 'MR', 'GR', 'SEC'] as const
+export const RARITY_ORDER = ['C', 'R', 'SR', 'GR', 'UR', 'MR', 'SEC'] as const
 export const RARITY_META: Record<string, { label: string; cls: string }> = {
   C:   { label: 'Common',        cls: 'text-body border-line bg-white/5' },
   R:   { label: 'Rare',          cls: 'text-cosmic-cyan border-cosmic-cyan/40 bg-cosmic-cyan/10' },
