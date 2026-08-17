@@ -45,6 +45,10 @@ export async function POST(req: NextRequest) {
       if (Number.isFinite(n) && n >= 0) clean[id] = n
     }
   }
-  const store = await saveMarvelPrices(clean)
-  return NextResponse.json({ success: true, count: Object.keys(clean).length, updatedAt: store.updatedAt })
+  try {
+    const store = await saveMarvelPrices(clean)
+    return NextResponse.json({ success: true, count: Object.keys(clean).length, updatedAt: store.updatedAt })
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message || 'บันทึกไม่สำเร็จ' }, { status: 500 })
+  }
 }

@@ -1,41 +1,37 @@
 // Server-only price store for Marvel Hero Rush cards.
 //
-// Adapter: uses Vercel KV (Redis) in production when its env vars are present,
-// otherwise falls back to a local JSON file (data/marvel-prices.json) for dev.
-// The rest of the app calls getMarvelPrices() / saveMarvelPrices() and is
-// agnostic to where prices live.
+// Adapter: uses Vercel Edge Config in production (reads at the edge, writes via
+// the Vercel API), and falls back to a local JSON file for dev. The rest of the
+// app calls getMarvelPrices() / saveMarvelPrices() and is storage-agnostic.
 //
-// On Vercel: add a KV / Upstash Redis store and connect it to the project —
-// Vercel injects KV_REST_API_URL + KV_REST_API_TOKEN (or the UPSTASH_* names),
-// and this file switches to KV automatically. Local dev keeps using the file.
+// Env (set on Vercel):
+//   EDGE_CONFIG              read connection string (auto-used by the SDK)
+//   EDGE_CONFIG_ID           the edge config id (for writes)
+//   VERCEL_TEAM_ID           team id (for the write API)
+//   VERCEL_EDGE_WRITE_TOKEN  Vercel token used to PATCH items (write path only)
 //
 // NOTE: server-only — import from server components / route handlers only.
 import { promises as fs } from 'fs'
 import path from 'path'
 
 const FILE = path.join(process.cwd(), 'data', 'marvel-prices.json')
-const KV_KEY = 'marvel:prices:v1'
+const EDGE_KEY = 'prices'
 
-const KV_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL
-const KV_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
-const useKV = Boolean(KV_URL && KV_TOKEN)
+const EDGE_ID = process.env.EDGE_CONFIG_ID
+const EDGE_TEAM = process.env.VERCEL_TEAM_ID
+const EDGE_WRITE_TOKEN = process.env.VERCEL_EDGE_WRITE_TOKEN
+const useEdge = Boolean(process.env.EDGE_CONFIG && EDGE_ID)
 
 export interface PriceStore {
   updatedAt: string | null
   prices: Record<string, number> // card id -> median price (THB)
 }
 
-// Lazily create the KV client only when needed (keeps it out of dev bundles).
-async function kvClient() {
-  const { createClient } = await import('@vercel/kv')
-  return createClient({ url: KV_URL!, token: KV_TOKEN! })
-}
-
 async function readStore(): Promise<PriceStore> {
-  if (useKV) {
+  if (useEdge) {
     try {
-      const kv = await kvClient()
-      const data = await kv.get<PriceStore>(KV_KEY)
+      const { get } = await import('@vercel/edge-config')
+      const data = (await get(EDGE_KEY)) as PriceStore | undefined
       return { updatedAt: data?.updatedAt ?? null, prices: data?.prices ?? {} }
     } catch {
       return { updatedAt: null, prices: {} }
@@ -51,18 +47,27 @@ async function readStore(): Promise<PriceStore> {
 }
 
 async function writeStore(store: PriceStore): Promise<void> {
-  if (useKV) {
-    const kv = await kvClient()
-    await kv.set(KV_KEY, store)
+  if (useEdge) {
+    if (!EDGE_WRITE_TOKEN) {
+      throw new Error('ยังตั้งค่าการบันทึกบนเว็บจริงไม่ครบ (ไม่มี write token)')
+    }
+    const res = await fetch(
+      `https://api.vercel.com/v1/edge-config/${EDGE_ID}/items?teamId=${EDGE_TEAM}`,
+      {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${EDGE_WRITE_TOKEN}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: [{ operation: 'upsert', key: EDGE_KEY, value: store }] }),
+      }
+    )
+    if (!res.ok) {
+      throw new Error(`บันทึกไม่สำเร็จ (Edge Config ${res.status})`)
+    }
     return
   }
   try {
     await fs.writeFile(FILE, JSON.stringify(store, null, 0))
   } catch {
-    // Vercel's filesystem is read-only — writing needs a KV store.
-    throw new Error(
-      'บันทึกบนเว็บจริงยังไม่ได้ — ต้องตั้งค่า Vercel KV ก่อน (หรือแก้ราคาที่ localhost แล้ว redeploy)'
-    )
+    throw new Error('บันทึกบนเซิร์ฟเวอร์ไม่ได้ (ไฟล์อ่านอย่างเดียว)')
   }
 }
 
