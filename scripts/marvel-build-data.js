@@ -42,14 +42,9 @@ async function main() {
     imageKey: c.image?.key || null,
   }))
 
-  // Manual additions: SEC variants of the 4 Infinity Stone RUSH POINT cards
-  // (REALITY/MIND/SPACE/TIME). Not in the official API — added for the price hub.
-  // Cloned from their Common counterpart (new id + rarity SEC), reusing the art.
-  const SEC_ADDITIONS = ['BP01-121', 'BP01-147', 'BP01-148', 'BP01-149', 'BP01-150']
-  for (const no of SEC_ADDITIONS) {
-    const base = cards.find((c) => c.cardNo === no && c.rarity === 'C')
-    if (base) cards.push({ ...base, id: base.id + 'sec', rarity: 'SEC' })
-  }
+  // NOTE: extra rarity variants (e.g. SEC prints) are now managed dynamically
+  // by admins (see marvel-variants.server.ts + /admin/marvel-variants), merged
+  // at request time — no longer hardcoded here.
 
   // Per-set counts
   const setCounts = {}

@@ -2,14 +2,16 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Navbar from '@/components/Navbar'
+import Link from 'next/link'
 import {
   marvelCards, marvelSets, RARITY_ORDER, RARITY_META, ATTR_META, ATTRIBUTES,
-  cleanMarvelName, formatTHB,
+  cleanMarvelName, formatTHB, type MarvelCard,
 } from '@/lib/marvel'
 
 const KEY_LS = 'vaultverse_admin_key'
 
 export default function AdminMarvelPrices() {
+  const [cards, setCards] = useState<MarvelCard[]>(marvelCards)
   const [prices, setPrices] = useState<Record<string, number>>({})
   const [drafts, setDrafts] = useState<Record<string, string>>({}) // id -> raw input
   const [adminKey, setAdminKey] = useState('')
@@ -49,6 +51,11 @@ export default function AdminMarvelPrices() {
       .then((d) => setPrices(d.prices || {}))
       .catch(() => {})
       .finally(() => setLoading(false))
+    // merged card list (base + admin variants) so variants are priceable too
+    fetch('/api/marvel/cards')
+      .then((r) => r.json())
+      .then((d) => { if (Array.isArray(d.cards) && d.cards.length) setCards(d.cards) })
+      .catch(() => {})
   }, [])
 
   async function doLogin(e: React.FormEvent) {
@@ -95,7 +102,7 @@ export default function AdminMarvelPrices() {
 
   const filtered = useMemo(() => {
     const ql = q.trim().toLowerCase()
-    return marvelCards.filter((c) => {
+    return cards.filter((c) => {
       if (series !== 'all' && c.series !== series) return false
       if (rarity !== 'all' && c.rarity !== rarity) return false
       if (onlyUnpriced && prices[c.id] != null && drafts[c.id] === undefined) return false
@@ -199,13 +206,14 @@ export default function AdminMarvelPrices() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-end mb-2">
-          <button onClick={logout} className="text-xs font-semibold text-muted hover:text-marvel-bright transition-colors">
+        <div className="flex items-center justify-between mb-2 text-xs">
+          <Link href="/admin/marvel-variants" className="text-cosmic hover:text-cosmic-cyan font-semibold">จัดการเรตการ์ด →</Link>
+          <button onClick={logout} className="font-semibold text-muted hover:text-marvel-bright transition-colors">
             ออกจากระบบ ✕
           </button>
         </div>
         <div className="text-center mb-6">
-          <div className="section-eyebrow mb-2">🛡️ Admin · Official Pricing</div>
+          <div className="section-eyebrow mb-2">🛡️ Admin · ราคากลาง</div>
           <h1 className="section-title neon-title text-3xl sm:text-4xl font-extrabold">ตั้งราคากลาง</h1>
           <p className="text-sm text-muted mt-2">Marvel Hero Rush · ราคาหน่วยเป็นบาท</p>
 
@@ -214,14 +222,14 @@ export default function AdminMarvelPrices() {
             <div className="flex items-center justify-between text-xs mb-1.5">
               <span className="text-muted">ตั้งราคาแล้ว</span>
               <span className="text-hero font-bold">
-                <span className="text-gold-bright">{pricedCount}</span> / {marvelCards.length} ใบ
-                <span className="text-faint font-normal ml-1">({Math.round((pricedCount / marvelCards.length) * 100)}%)</span>
+                <span className="text-gold-bright">{pricedCount}</span> / {cards.length} ใบ
+                <span className="text-faint font-normal ml-1">({Math.round((pricedCount / cards.length) * 100)}%)</span>
               </span>
             </div>
             <div className="h-2 rounded-full bg-surface border border-line overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${(pricedCount / marvelCards.length) * 100}%`, background: 'linear-gradient(90deg, var(--color-marvel), var(--color-gold-bright))' }}
+                style={{ width: `${(pricedCount / cards.length) * 100}%`, background: 'linear-gradient(90deg, var(--color-marvel), var(--color-gold-bright))' }}
               />
             </div>
           </div>
@@ -289,26 +297,26 @@ export default function AdminMarvelPrices() {
               const isDirty = dirty[c.id] !== undefined
               const rar = RARITY_META[c.rarity]
               return (
-                <div key={c.id} className={`flex items-center gap-3 px-3 py-2 ${isDirty ? 'bg-cosmic/5' : ''}`}>
+                <div key={c.id} className={`flex items-center gap-4 px-4 py-3.5 ${isDirty ? 'bg-cosmic/5' : ''}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={c.image} alt="" className="w-9 h-12 object-cover rounded-md border border-line shrink-0" loading="lazy" />
+                  <img src={c.image} alt="" className="w-14 h-20 object-cover rounded-lg border border-line shrink-0" loading="lazy" />
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold text-hero truncate">{cleanMarvelName(c.name)}</div>
-                    <div className="flex items-center gap-2 text-[11px] text-faint">
+                    <div className="text-base font-semibold text-hero truncate">{cleanMarvelName(c.name)}</div>
+                    <div className="flex items-center gap-2 text-xs text-faint mt-1">
                       <span>{c.cardNo}</span>
-                      <span className={`rarity-chip px-1 rounded border text-[10px] ${rar?.cls || ''}`}>{c.rarity}</span>
-                      {c.attribute && <span className={`w-2 h-2 rounded-full ${ATTR_META[c.attribute]?.dot}`} />}
+                      <span className={`rarity-chip px-1.5 py-0.5 rounded border text-[11px] ${rar?.cls || ''}`}>{c.rarity}</span>
+                      {c.attribute && <span className={`w-2.5 h-2.5 rounded-full ${ATTR_META[c.attribute]?.dot}`} />}
                     </div>
                   </div>
                   <div className="text-right shrink-0">
                     <div className="relative">
-                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-faint">฿</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-faint">฿</span>
                       <input
                         type="number" inputMode="numeric" min={0}
                         value={shownVal}
                         onChange={(e) => setDraft(c.id, e.target.value)}
                         placeholder="—"
-                        className={`w-28 pl-6 pr-2 py-1.5 rounded-lg bg-surface border text-sm text-right text-hero focus:outline-none ${isDirty ? 'border-cosmic/60' : 'border-line'}`}
+                        className={`w-36 pl-7 pr-3 py-2.5 rounded-lg bg-surface border text-base text-right text-hero focus:outline-none ${isDirty ? 'border-cosmic/60' : 'border-line'}`}
                       />
                     </div>
                   </div>

@@ -5,8 +5,9 @@ import MarvelBrowser from '@/components/MarvelBrowser'
 import MarvelFeaturedCarousel from '@/components/MarvelFeaturedCarousel'
 import EnergyBolts from '@/components/EnergyBolts'
 import Reveal from '@/components/Reveal'
-import { marvelCards, marvelSets, getMarvelCardsBySet, RARITY_ORDER } from '@/lib/marvel'
+import { marvelSets, RARITY_ORDER } from '@/lib/marvel'
 import { getMarvelPrices } from '@/lib/marvel-prices.server'
+import { getMergedCards } from '@/lib/marvel-variants.server'
 import products from '@/lib/marvel-products.json'
 
 const SET_STYLE: Record<string, { emoji: string; glow: string; accent: string; sub: string; tagline: string }> = {
@@ -32,7 +33,8 @@ export default async function MarvelSetPage({ params }: { params: Promise<{ setI
   const st = SET_STYLE[set.id] || { emoji: '🃏', glow: 'rgba(139,92,246,0.3)', accent: 'from-cosmic to-cosmic-blue', sub: '', tagline: '' }
   const product = products.find((p) => p.series === set.id)
 
-  const setCards = getMarvelCardsBySet(set.id)
+  const merged = await getMergedCards()
+  const setCards = merged.filter((c) => c.series === set.id)
   const rIdx = (r: string) => RARITY_ORDER.indexOf(r as typeof RARITY_ORDER[number])
   // Featured = the set's rarest cards (SR and up), most valuable first.
   const featured = setCards
@@ -77,7 +79,7 @@ export default async function MarvelSetPage({ params }: { params: Promise<{ setI
           <h1 className="font-display text-4xl sm:text-6xl font-extrabold text-hero leading-none">{set.name}</h1>
           {st.tagline && <p className="text-body text-sm sm:text-base mt-4 max-w-xl mx-auto">{st.tagline}</p>}
           <div className="flex items-center justify-center gap-8 mt-7">
-            <div><div className="font-display text-2xl font-extrabold text-hero">{set.total}</div><div className="text-[11px] text-muted mt-0.5">การ์ดในเซ็ต</div></div>
+            <div><div className="font-display text-2xl font-extrabold text-hero">{setCards.length}</div><div className="text-[11px] text-muted mt-0.5">การ์ดในเซ็ต</div></div>
             <div className="w-px h-9 bg-line" />
             <div><div className="font-display text-2xl font-extrabold text-gold-bright">{featured.length}</div><div className="text-[11px] text-muted mt-0.5">การ์ดเรตสูง</div></div>
           </div>
@@ -120,9 +122,9 @@ export default async function MarvelSetPage({ params }: { params: Promise<{ setI
       <section id="all" className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-12 pb-16 scroll-mt-28">
         <Reveal className="text-center mb-8">
           <div className="section-eyebrow mb-2">All Cards</div>
-          <h2 className="section-title neon-title text-4xl sm:text-5xl font-extrabold">การ์ดทั้งหมด {set.total} ใบ</h2>
+          <h2 className="section-title neon-title text-4xl sm:text-5xl font-extrabold">การ์ดทั้งหมด {setCards.length} ใบ</h2>
         </Reveal>
-        <MarvelBrowser cards={marvelCards} sets={marvelSets} prices={prices} initialSeries={set.id} />
+        <MarvelBrowser cards={merged} sets={marvelSets} prices={prices} initialSeries={set.id} />
       </section>
     </div>
   )

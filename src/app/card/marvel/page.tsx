@@ -1,11 +1,12 @@
 import Navbar from '@/components/Navbar'
 import MarvelBrowser from '@/components/MarvelBrowser'
-import { marvelCards, marvelSets, MARVEL } from '@/lib/marvel'
+import { marvelSets, MARVEL } from '@/lib/marvel'
 import { getMarvelPrices } from '@/lib/marvel-prices.server'
+import { getMergedCards } from '@/lib/marvel-variants.server'
 
 export const metadata = {
-  title: 'การ์ดทั้งหมด · Marvel Hero Rush | Vaultverse',
-  description: 'เรียกดูการ์ด Marvel Hero Rush ครบทุกใบ พร้อมราคากลางอย่างเป็นทางการ',
+  title: 'การ์ดทั้งหมด · Marvel Hero Rush | Marvel Hero Rush Thailand',
+  description: 'เรียกดูการ์ด Marvel Hero Rush ครบทุกใบ พร้อมราคากลาง',
 }
 
 export default async function MarvelCardsPage({
@@ -13,7 +14,7 @@ export default async function MarvelCardsPage({
 }: {
   searchParams: Promise<{ q?: string; attr?: string; series?: string }>
 }) {
-  const [prices, sp] = await Promise.all([getMarvelPrices(), searchParams])
+  const [prices, sp, cards] = await Promise.all([getMarvelPrices(), searchParams, getMergedCards()])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -24,12 +25,12 @@ export default async function MarvelCardsPage({
           <div className="section-eyebrow mb-2">Marvel Hero Rush · Official TH</div>
           <h2 className="section-title neon-title text-4xl sm:text-5xl font-extrabold">การ์ดทั้งหมด</h2>
           <p className="text-sm text-muted mt-3">
-            ราคากลางครบ {MARVEL.total} ใบจาก {marvelSets.length} เซ็ต · อัปเดตล่าสุด {MARVEL.updatedAt}
+            ราคากลางครบ {cards.length} ใบจาก {marvelSets.length} เซ็ต · อัปเดตล่าสุด {MARVEL.updatedAt}
           </p>
         </div>
 
         <MarvelBrowser
-          cards={marvelCards}
+          cards={cards}
           sets={marvelSets}
           prices={prices}
           initialQuery={sp.q}

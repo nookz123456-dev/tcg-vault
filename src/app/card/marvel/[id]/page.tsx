@@ -2,34 +2,35 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import {
-  getMarvelCard, marvelCards, cleanMarvelName, formatTHB,
+  cleanMarvelName, formatTHB,
   RARITY_META, RARITY_ORDER, ATTR_META, marvelSets,
   marvelCharacterOf, marvelSameCharacter,
 } from '@/lib/marvel'
 import { getMarvelPrices } from '@/lib/marvel-prices.server'
+import { getMergedCard, getMergedCards } from '@/lib/marvel-variants.server'
 import TiltCard from '@/components/TiltCard'
 import ShareButton from '@/components/ShareButton'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const card = getMarvelCard(id)
-  if (!card) return { title: 'ไม่พบการ์ด | Vaultverse' }
-  return { title: `${cleanMarvelName(card.name)} (${card.cardNo}) · ราคากลาง | Vaultverse` }
+  const card = await getMergedCard(id)
+  if (!card) return { title: 'ไม่พบการ์ด | Marvel Hero Rush Thailand' }
+  return { title: `${cleanMarvelName(card.name)} (${card.cardNo}) · ราคากลาง | Marvel Hero Rush Thailand` }
 }
 
 export default async function MarvelCardDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const card = getMarvelCard(id)
+  const card = await getMergedCard(id)
   if (!card) notFound()
 
-  const prices = await getMarvelPrices()
+  const [prices, allCards] = await Promise.all([getMarvelPrices(), getMergedCards()])
   const price = prices[card.id]
   const rar = RARITY_META[card.rarity]
   const set = marvelSets.find((s) => s.id === card.series)
   const attr = card.attribute ? ATTR_META[card.attribute] : null
   const features = (card.feature || '').split('/').map((f) => f.trim()).filter(Boolean)
   // other printings/rarities of the same card number
-  const variants = marvelCards.filter((c) => c.cardNo === card.cardNo && c.id !== card.id)
+  const variants = allCards.filter((c) => c.cardNo === card.cardNo && c.id !== card.id)
   const character = marvelCharacterOf(card.name)
   // other cards of the same character, excluding the variants already shown
   const variantIds = new Set(variants.map((v) => v.id))
