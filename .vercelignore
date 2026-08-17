@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.claude
+op-sample.html
+output.html
+*.html
+jp-bw-xy-*.json
+jp-*-images
+jp-*-resized
+data/marvel/cards-en-raw.json

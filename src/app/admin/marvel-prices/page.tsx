@@ -21,18 +21,62 @@ export default function AdminMarvelPrices() {
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
 
+  // login gate
+  const [authed, setAuthed] = useState<boolean | null>(null)
+  const [loginInput, setLoginInput] = useState('')
+  const [loginError, setLoginError] = useState('')
+  const [loggingIn, setLoggingIn] = useState(false)
+
   // bulk-by-rarity helper
   const [bulkRarity, setBulkRarity] = useState('R')
   const [bulkValue, setBulkValue] = useState('')
 
+  const verify = (key: string) =>
+    fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key }),
+    }).then((r) => r.ok)
+
   useEffect(() => {
-    setAdminKey(localStorage.getItem(KEY_LS) || '')
+    const stored = localStorage.getItem(KEY_LS) || ''
+    setAdminKey(stored)
+    // verify the stored key (or empty → server allows localhost in dev)
+    verify(stored).then(setAuthed).catch(() => setAuthed(false))
+    // prices are public; load regardless
     fetch('/api/admin/marvel-prices')
       .then((r) => r.json())
       .then((d) => setPrices(d.prices || {}))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
+
+  async function doLogin(e: React.FormEvent) {
+    e.preventDefault()
+    setLoggingIn(true)
+    setLoginError('')
+    try {
+      const ok = await verify(loginInput)
+      if (ok) {
+        localStorage.setItem(KEY_LS, loginInput)
+        setAdminKey(loginInput)
+        setAuthed(true)
+      } else {
+        setLoginError('รหัสผ่านไม่ถูกต้อง')
+      }
+    } catch {
+      setLoginError('เชื่อมต่อไม่ได้ ลองใหม่')
+    } finally {
+      setLoggingIn(false)
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem(KEY_LS)
+    setAdminKey('')
+    setLoginInput('')
+    setAuthed(false)
+  }
 
   const dirty = useMemo(() => {
     const out: Record<string, number | null> = {}
@@ -111,10 +155,55 @@ export default function AdminMarvelPrices() {
     }
   }
 
+  // ---- login gate ----
+  if (authed === null) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 grid place-items-center text-muted">กำลังโหลด…</div>
+      </div>
+    )
+  }
+  if (!authed) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 grid place-items-center px-4 py-16">
+          <form onSubmit={doLogin} className="mv-panel rounded-2xl p-8 w-full max-w-sm text-center">
+            <div className="text-4xl mb-3">🛡️</div>
+            <h1 className="font-display text-2xl font-extrabold text-hero mb-1">เข้าสู่ระบบแอดมิน</h1>
+            <p className="text-sm text-muted mb-6">ใส่รหัสผ่านเพื่อจัดการราคากลาง</p>
+            <input
+              type="password"
+              value={loginInput}
+              onChange={(e) => setLoginInput(e.target.value)}
+              placeholder="รหัสผ่านแอดมิน"
+              autoFocus
+              className="w-full px-4 py-2.5 rounded-xl bg-surface border border-line text-hero placeholder:text-faint focus:outline-none focus:border-cosmic/60 mb-3"
+            />
+            {loginError && <p className="text-sm text-marvel-bright mb-3">{loginError}</p>}
+            <button
+              type="submit"
+              disabled={loggingIn || !loginInput}
+              className={`w-full py-2.5 rounded-xl font-bold text-sm ${loggingIn || !loginInput ? 'btn-ghost opacity-50 cursor-not-allowed' : 'btn-primary'}`}
+            >
+              {loggingIn ? 'กำลังตรวจสอบ…' : 'เข้าสู่ระบบ'}
+            </button>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-end mb-2">
+          <button onClick={logout} className="text-xs font-semibold text-muted hover:text-marvel-bright transition-colors">
+            ออกจากระบบ ✕
+          </button>
+        </div>
         <div className="text-center mb-6">
           <div className="section-eyebrow mb-2">🛡️ Admin · Official Pricing</div>
           <h1 className="section-title neon-title text-3xl sm:text-4xl font-extrabold">ตั้งราคากลาง</h1>

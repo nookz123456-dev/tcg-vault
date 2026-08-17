@@ -58,3 +58,4 @@ public/jp-card-images/
 # IDE
 .vscode/
 .idea/
+.vercel

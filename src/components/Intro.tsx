@@ -9,12 +9,12 @@ export default function Intro({ cards = [] }: { cards?: string[] }) {
   const [phase, setPhase] = useState<'hidden' | 'playing' | 'out'>('hidden')
 
   useEffect(() => {
-    if (sessionStorage.getItem('vv_intro_seen')) return
+    if (sessionStorage.getItem('mhr_intro_seen')) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      sessionStorage.setItem('vv_intro_seen', '1')
+      sessionStorage.setItem('mhr_intro_seen', '1')
       return
     }
-    sessionStorage.setItem('vv_intro_seen', '1')
+    sessionStorage.setItem('mhr_intro_seen', '1')
     setPhase('playing')
     document.body.style.overflow = 'hidden'
     const tOut = setTimeout(() => setPhase('out'), 3200)

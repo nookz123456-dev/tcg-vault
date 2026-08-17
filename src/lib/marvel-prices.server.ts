@@ -56,7 +56,14 @@ async function writeStore(store: PriceStore): Promise<void> {
     await kv.set(KV_KEY, store)
     return
   }
-  await fs.writeFile(FILE, JSON.stringify(store, null, 0))
+  try {
+    await fs.writeFile(FILE, JSON.stringify(store, null, 0))
+  } catch {
+    // Vercel's filesystem is read-only — writing needs a KV store.
+    throw new Error(
+      'บันทึกบนเว็บจริงยังไม่ได้ — ต้องตั้งค่า Vercel KV ก่อน (หรือแก้ราคาที่ localhost แล้ว redeploy)'
+    )
+  }
 }
 
 // Public: map of card id -> price. Read fresh each call so admin edits show up.
