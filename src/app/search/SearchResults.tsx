@@ -229,7 +229,7 @@ export default function SearchResults() {
   useEffect(() => { if (page > 1) fetchCards() }, [page])
 
   return (
-    <div className="min-h-screen bg-[#fafbfc]">
+    <div className="min-h-screen">
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -241,26 +241,26 @@ export default function SearchResults() {
         {/* Results header */}
         {query && (
           <div className="flex items-center justify-between mb-6">
-            <p className="text-sm text-[#8b8fa6]">
+            <p className="text-sm text-muted">
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 border-2 border-[#6366f1] border-t-transparent rounded-full animate-spin" />
-                  {t('search.searching') || 'Searching...'}
+                  <span className="w-4 h-4 border-2 border-cosmic border-t-transparent rounded-full animate-spin" />
+                  {t('search.searching') || 'กำลังค้นหา…'}
                 </span>
               ) : (
                 <>
-                  <span className="text-[#1e2235] font-semibold">{totalCount.toLocaleString()}</span>{' '}
-                  {t('search.results') || 'results'} &ldquo;{query}&rdquo;
+                  <span className="text-hero font-semibold">{totalCount.toLocaleString()}</span>{' '}
+                  {t('search.results') || 'ผลลัพธ์'} &ldquo;{query}&rdquo;
                 </>
               )}
             </p>
             <button
               onClick={() => setShowTHB(!showTHB)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#e8eaf0] rounded-lg text-xs font-medium transition-all hover:border-[#6366f1]/30"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-surface border border-line rounded-lg text-xs font-medium transition-all hover:border-cosmic/40"
             >
-              <span className={showTHB ? 'text-[#8b8fa6]' : 'text-[#6366f1]'}>$</span>
-              <span className="text-[#b5b8c8]">/</span>
-              <span className={showTHB ? 'text-[#6366f1]' : 'text-[#8b8fa6]'}>฿</span>
+              <span className={showTHB ? 'text-muted' : 'text-cosmic'}>$</span>
+              <span className="text-faint">/</span>
+              <span className={showTHB ? 'text-cosmic' : 'text-muted'}>฿</span>
             </button>
           </div>
         )}
@@ -273,10 +273,10 @@ export default function SearchResults() {
               href={card.game === 'pokemon'
                 ? (pokeLang === 'jp' ? `/card/pokemon-jp/${card.id}` : `/card/pokemon/${card.id}`)
                 : `/card/onepiece/${encodeURIComponent(card.id)}`}
-              className="group bg-white rounded-xl overflow-hidden border border-transparent hover:border-[#6366f1]/20 hover:shadow-md hover:shadow-[#6366f1]/5 transition-all duration-200"
+              className="mv-card group rounded-xl overflow-hidden"
             >
               {/* Image */}
-              <div className="aspect-[2.5/3.5] relative overflow-hidden bg-[#f5f6fa]">
+              <div className="aspect-[2.5/3.5] relative overflow-hidden bg-abyss">
                 {card.image ? (
                   <img
                     src={card.image}
@@ -285,23 +285,23 @@ export default function SearchResults() {
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-[#b5b8c8]">
+                  <div className="w-full h-full flex flex-col items-center justify-center text-faint">
                     <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
                     </svg>
-                    <span className="text-[10px] mt-1">{t('common.noImage') || 'No image'}</span>
+                    <span className="text-[10px] mt-1">{t('common.noImage') || 'ไม่มีรูป'}</span>
                   </div>
                 )}
               </div>
 
               {/* Info */}
               <div className="p-3">
-                <h3 className="text-sm font-medium text-[#1e2235] truncate leading-tight">{card.name}</h3>
-                <p className="text-xs text-[#8b8fa6] truncate mt-0.5">{card.setName}</p>
+                <h3 className="text-sm font-medium text-hero truncate leading-tight">{card.name}</h3>
+                <p className="text-xs text-muted truncate mt-0.5">{card.setName}</p>
                 {card.marketPrice ? (
-                  <p className="text-sm font-semibold text-[#6366f1] mt-1.5">{fmtPrice(card.marketPrice)}</p>
+                  <p className="text-sm font-semibold text-gold-bright mt-1.5">{fmtPrice(card.marketPrice)}</p>
                 ) : card.game === 'onepiece' && card.cost ? (
-                  <p className="text-xs text-[#8b8fa6] mt-1.5">Cost {card.cost}{card.power ? ` · ${card.power}` : ''}</p>
+                  <p className="text-xs text-muted mt-1.5">Cost {card.cost}{card.power ? ` · ${card.power}` : ''}</p>
                 ) : null}
               </div>
             </a>
@@ -312,11 +312,11 @@ export default function SearchResults() {
         {loading && cards.length === 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {[...Array(12)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl overflow-hidden animate-pulse">
-                <div className="aspect-[2.5/3.5] bg-[#f0f1f3]" />
+              <div key={i} className="mv-card rounded-xl overflow-hidden">
+                <div className="aspect-[2.5/3.5] shimmer" />
                 <div className="p-3 space-y-2">
-                  <div className="h-4 bg-[#f0f1f3] rounded w-3/4" />
-                  <div className="h-3 bg-[#f0f1f3] rounded w-1/2" />
+                  <div className="h-4 shimmer rounded w-3/4" />
+                  <div className="h-3 shimmer rounded w-1/2" />
                 </div>
               </div>
             ))}
@@ -328,9 +328,9 @@ export default function SearchResults() {
           <div className="text-center mt-8">
             <button
               onClick={() => setPage(p => p + 1)}
-              className="px-6 py-2.5 bg-white border border-[#e8eaf0] text-[#5c6078] rounded-full hover:border-[#6366f1]/30 hover:text-[#6366f1] transition-all text-sm font-medium"
+              className="px-6 py-2.5 btn-ghost rounded-full transition-all text-sm font-semibold"
             >
-              {t('search.loadMore') || 'Load more'}
+              {t('search.loadMore') || 'โหลดเพิ่ม'}
             </button>
           </div>
         )}
@@ -338,12 +338,12 @@ export default function SearchResults() {
         {/* No results */}
         {!loading && query && cards.length === 0 && (
           <div className="text-center py-20">
-            <div className="text-5xl mb-4 opacity-30">🔍</div>
-            <p className="text-[#5c6078] text-lg font-medium">
-              {t('search.noResults') || 'No results'} &ldquo;{query}&rdquo;
+            <div className="text-5xl mb-4 opacity-40">🕸️</div>
+            <p className="text-body text-lg font-medium">
+              {t('search.noResults') || 'ไม่พบผลลัพธ์'} &ldquo;{query}&rdquo;
             </p>
-            <p className="text-[#8b8fa6] text-sm mt-1">
-              {t('search.tryDifferent') || 'Try a different search'}
+            <p className="text-muted text-sm mt-1">
+              {t('search.tryDifferent') || 'ลองค้นคำอื่น'}
             </p>
           </div>
         )}

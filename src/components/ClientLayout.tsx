@@ -15,6 +15,14 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     // Register service worker for PWA
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(() => {})
+      // When a new SW takes control (updated content), refresh once so the
+      // user never gets stuck on a stale cached page.
+      let refreshing = false
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return
+        refreshing = true
+        window.location.reload()
+      })
     }
 
     // PWA install prompt

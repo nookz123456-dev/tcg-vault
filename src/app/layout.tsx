@@ -2,18 +2,19 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ClientLayout } from "@/components/ClientLayout";
 import { CmdKSearch } from "@/components/CmdKSearch";
+import CosmicBackground from "@/components/CosmicBackground";
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: '#6366f1',
+  themeColor: '#08080f',
 };
 
 export const metadata: Metadata = {
-  title: "HoloCheck — ตรวจราคาการ์ดโปเกม่อน | Card Price Tracker",
-  description: "ฐานข้อมูลการ์ดโปเกม่อน ครบทุกเซ็ต พร้อมราคาอัปเดต จัดการคอลเลกชัน พูดคุยกับนักสะสมคนอื่น",
+  title: "Vaultverse — ราคากลางการ์ด Marvel Hero Rush อย่างเป็นทางการ (ไทย)",
+  description: "ศูนย์กลางเช็คราคากลางการ์ด Marvel Hero Rush อย่างเป็นทางการในไทย ครบทุกใบทุกเซ็ต พร้อมจัดการคอลเลกชันและมาร์เก็ตเพลส",
   metadataBase: new URL('https://tcg-vault-sandy.vercel.app'),
   icons: {
     icon: "/icon.svg",
@@ -21,13 +22,13 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
-    title: "HoloCheck",
+    statusBarStyle: "black-translucent",
+    title: "Vaultverse",
   },
   openGraph: {
-    title: "HoloCheck — Card Price Tracker & Community",
-    description: "Track Pokemon TCG card prices, manage your collection, and connect with collectors",
-    siteName: "HoloCheck",
+    title: "Vaultverse — Marvel Hero Rush Official Price Hub (TH)",
+    description: "ราคากลางการ์ด Marvel Hero Rush อย่างเป็นทางการ ครบทุกใบ พร้อมคอลเลกชันและมาร์เก็ตเพลส",
+    siteName: "Vaultverse",
     type: "website",
     images: ["/icon-512.png"],
   },
@@ -44,6 +45,10 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon.svg" />
       </head>
       <body className="antialiased">
+        {/* global animated cosmic backdrop behind every page */}
+        <div className="fixed inset-0 -z-10 pointer-events-none">
+          <CosmicBackground />
+        </div>
         <ClientLayout>
           {children}
           <CmdKSearch />

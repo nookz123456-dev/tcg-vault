@@ -81,7 +81,7 @@ function Select({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="bg-white border border-[#e8eaf0] text-[#3b3f56] text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1]/20 transition-all cursor-pointer appearance-none min-w-[110px]"
+      className="bg-surface border border-line text-body text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-cosmic/60 transition-all cursor-pointer appearance-none min-w-[110px]"
       style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E")`,
         backgroundRepeat: 'no-repeat',
@@ -152,7 +152,7 @@ export default function SearchBar() {
   return (
     <form onSubmit={handleSearch} className="w-full max-w-2xl mx-auto space-y-5">
       {/* Game tabs */}
-      <div className="flex items-center gap-1 bg-[#f5f6fa] rounded-full p-1 w-fit">
+      <div className="flex items-center gap-1 bg-surface border border-line rounded-full p-1 w-fit">
         {(['pokemon'] as CardGame[]).map((g) => (
           <button
             key={g}
@@ -160,8 +160,8 @@ export default function SearchBar() {
             onClick={() => setGame(g)}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
               game === g
-                ? 'bg-white text-[#6366f1] shadow-sm'
-                : 'text-[#8b8fa6] hover:text-[#1e2235]'
+                ? 'bg-surface-2 text-hero shadow-sm ring-1 ring-cosmic/30'
+                : 'text-muted hover:text-hero'
             }`}
           >
             {GAME_LABELS[g]}
@@ -172,7 +172,7 @@ export default function SearchBar() {
       {/* Search input */}
       <div className="relative">
         <svg
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#b5b8c8]"
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-faint"
           fill="none" stroke="currentColor" viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -181,14 +181,14 @@ export default function SearchBar() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={game === 'pokemon' ? (pokeLang === 'jp' ? 'ค้นหาการ์ด Pokemon JP...' : 'Search Pokemon cards...') : 'Search One Piece cards...'}
-          className="w-full pl-12 pr-24 py-3.5 bg-white border border-[#e8eaf0] rounded-xl text-[#1e2235] placeholder:text-[#b5b8c8] focus:outline-none focus:border-[#6366f1] focus:ring-2 focus:ring-[#6366f1]/10 transition-all text-sm"
+          placeholder={game === 'pokemon' ? (pokeLang === 'jp' ? 'ค้นหาการ์ด Pokémon JP…' : 'ค้นหาการ์ด Pokémon…') : 'ค้นหาการ์ด One Piece…'}
+          className="w-full pl-12 pr-24 py-3.5 bg-surface border border-line rounded-xl text-hero placeholder:text-faint focus:outline-none focus:border-cosmic/60 transition-all text-sm"
         />
         <button
           type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2 bg-[#6366f1] text-white rounded-lg text-sm font-semibold hover:bg-[#4f46e5] transition-all"
+          className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2 btn-primary rounded-lg text-sm font-semibold"
         >
-          Search
+          ค้นหา
         </button>
       </div>
 
@@ -197,9 +197,9 @@ export default function SearchBar() {
         {game === 'pokemon' && (
           <>
             {/* Language toggle */}
-            <div className="flex gap-1 bg-[#f5f6fa] rounded-lg p-0.5">
-              <button type="button" onClick={() => setPokeLang('en')} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${pokeLang === 'en' ? 'bg-white text-[#6366f1] shadow-sm' : 'text-[#8b8fa6]'}`}>EN</button>
-              <button type="button" onClick={() => setPokeLang('jp')} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${pokeLang === 'jp' ? 'bg-white text-[#6366f1] shadow-sm' : 'text-[#8b8fa6]'}`}>JP</button>
+            <div className="flex gap-1 bg-surface border border-line rounded-lg p-0.5">
+              <button type="button" onClick={() => setPokeLang('en')} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${pokeLang === 'en' ? 'bg-surface-2 text-hero shadow-sm ring-1 ring-cosmic/30' : 'text-muted hover:text-hero'}`}>EN</button>
+              <button type="button" onClick={() => setPokeLang('jp')} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${pokeLang === 'jp' ? 'bg-surface-2 text-hero shadow-sm ring-1 ring-cosmic/30' : 'text-muted hover:text-hero'}`}>JP</button>
             </div>
             {pokeLang === 'en' ? (
               <>
@@ -220,17 +220,17 @@ export default function SearchBar() {
         {/* One Piece filters temporarily disabled */}
         {/* {game === 'onepiece' && (
           <>
-            <div className="flex gap-1 bg-[#f5f6fa] rounded-lg p-0.5">
-              <button type="button" onClick={() => setOpLang('en')} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${opLang === 'en' ? 'bg-white text-[#6366f1] shadow-sm' : 'text-[#8b8fa6]'}`}>EN</button>
-              <button type="button" onClick={() => setOpLang('jp')} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${opLang === 'jp' ? 'bg-white text-[#6366f1] shadow-sm' : 'text-[#8b8fa6]'}`}>JP</button>
+            <div className="flex gap-1 bg-surface border border-line rounded-lg p-0.5">
+              <button type="button" onClick={() => setOpLang('en')} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${opLang === 'en' ? 'bg-surface-2 text-hero shadow-sm ring-1 ring-cosmic/30' : 'text-muted hover:text-hero'}`}>EN</button>
+              <button type="button" onClick={() => setOpLang('jp')} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${opLang === 'jp' ? 'bg-surface-2 text-hero shadow-sm ring-1 ring-cosmic/30' : 'text-muted hover:text-hero'}`}>JP</button>
             </div>
             <Select value={opType} onChange={setOpType} options={OP_CARD_TYPES} />
             <Select value={opRarity} onChange={setOpRarity} options={OP_RARITIES} />
           </>
         )} */}
         {hasActiveFilters && (
-          <button type="button" onClick={clearFilters} className="text-xs text-[#8b8fa6] hover:text-[#6366f1] font-medium transition-colors underline underline-offset-2">
-            Clear
+          <button type="button" onClick={clearFilters} className="text-xs text-muted hover:text-cosmic font-medium transition-colors underline underline-offset-2">
+            ล้างตัวกรอง
           </button>
         )}
       </div>

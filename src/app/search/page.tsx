@@ -1,14 +1,12 @@
-import { Suspense } from 'react'
-import SearchResults from './SearchResults'
+import { redirect } from 'next/navigation'
 
-export default function SearchPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-[#5c6078]">Loading...</div>
-      </div>
-    }>
-      <SearchResults />
-    </Suspense>
-  )
+// Vaultverse is a Marvel Hero Rush–only site now. The old multi-game search
+// (Pokémon / One Piece) is retired; forward any query to the Marvel browser.
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
+  const { q } = await searchParams
+  redirect(q ? `/card/marvel?q=${encodeURIComponent(q)}` : '/card/marvel')
 }

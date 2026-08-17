@@ -3,15 +3,12 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
-import { useT } from '@/lib/i18n'
 import { LangToggle } from '@/components/LangToggle'
 import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const pathname = usePathname()
-  const { user, isGuest, isAuthenticated, logout } = useAuth()
-  const t = useT()
-  const [unreadCount, setUnreadCount] = useState(0)
+  const { user } = useAuth()
   const [isAdmin, setIsAdmin] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -27,95 +24,55 @@ export default function Navbar() {
       .catch(() => setIsAdmin(false))
   }, [user])
 
-  useEffect(() => {
-    if (!user) return
-    fetch('/api/notifications', {
-      headers: { 'Authorization': `Bearer ${user.access_token}` },
-    })
-      .then(r => r.json())
-      .then(data => setUnreadCount(data.unread_count || 0))
-      .catch(() => {})
-  }, [user])
-
   useEffect(() => { setMenuOpen(false) }, [pathname])
 
   const navItems = [
-    { href: '/search', labelKey: 'nav.search' as const, icon: '🔍' },
-    { href: '/sets', labelKey: 'nav.sets' as const, icon: '📂' },
-    { href: '/sealed', labelKey: 'nav.sealed' as const, icon: '📦' },
-    { href: '/community', labelKey: 'nav.community' as const, icon: '👥' },
+    { href: '/card/marvel', icon: '🃏', fallback: 'การ์ดทั้งหมด' },
+    { href: '/sets', icon: '📂', fallback: 'เซ็ต' },
   ]
 
-  const moreItems = [
-    { href: '/me', labelKey: 'nav.profile' as const, icon: '👤' },
-    { href: '/marketplace', labelKey: 'nav.marketplace' as const, icon: '🛒' },
-  ]
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
 
   return (
-    <nav className="border-b border-[#e8eaf0]/60 bg-white/90 backdrop-blur-xl sticky top-0 z-50">
+    <nav className="border-b border-line/70 bg-abyss/80 backdrop-blur-xl sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6366f1] to-[#a78bfa] flex items-center justify-center shadow-sm shadow-[#6366f1]/20 relative overflow-hidden">
-              {/* HoloCheck Logo SVG */}
-              <svg viewBox="0 0 32 32" className="w-5 h-5" fill="none">
-                <path d="M8 8h10v2H10v6h6v2H8V8z" fill="white"/>
-                <path d="M14 16h10v2H16v6h8v2H14V16z" fill="white" opacity="0.7"/>
-                <circle cx="24" cy="8" r="3" fill="white" opacity="0.5"/>
+            <div className="relative w-9 h-9 grid place-items-center">
+              <svg viewBox="0 0 40 40" className="w-9 h-9" fill="none">
+                <defs>
+                  <linearGradient id="vv" x1="0" y1="0" x2="40" y2="40">
+                    <stop offset="0" stopColor="#ff2b39" />
+                    <stop offset="0.55" stopColor="#8b5cf6" />
+                    <stop offset="1" stopColor="#22d3ee" />
+                  </linearGradient>
+                </defs>
+                <path d="M20 3l14.7 8.5v17L20 37 5.3 28.5v-17L20 3z" stroke="url(#vv)" strokeWidth="2" fill="rgba(139,92,246,0.08)" />
+                <path d="M13 14l7 13 7-13" stroke="url(#vv)" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               </svg>
             </div>
-            <span className="text-lg font-bold text-[#1e2235] tracking-tight hidden sm:block">
-              HoloCheck
-            </span>
+            <div className="hidden sm:flex flex-col leading-none">
+              <span className="text-[17px] font-extrabold text-hero tracking-tight font-display">VAULT<span className="text-cosmic">VERSE</span></span>
+              <span className="text-[9px] font-semibold text-marvel tracking-[0.18em] uppercase">Hero Rush · Official TH</span>
+            </div>
           </Link>
 
           {/* Center nav - pill style */}
-          <div className="hidden md:flex items-center bg-[#f5f6fa] rounded-full p-1 gap-0.5">
+          <div className="hidden md:flex items-center bg-surface/70 border border-line-soft rounded-full p-1 gap-0.5">
             {navItems.map(link => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                  pathname === link.href
-                    ? 'bg-white text-[#6366f1] shadow-sm'
-                    : 'text-[#8b8fa6] hover:text-[#1e2235] hover:bg-white/60'
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
+                  isActive(link.href)
+                    ? 'bg-surface-2 text-hero shadow-sm ring-1 ring-cosmic/30'
+                    : 'text-muted hover:text-hero hover:bg-white/5'
                 }`}
               >
-                {t(link.labelKey)}
+                {link.fallback}
               </Link>
             ))}
-
-            {/* More dropdown */}
-            <div className="relative group">
-              <button className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1 ${
-                moreItems.some(i => i.href === pathname)
-                  ? 'bg-white text-[#6366f1] shadow-sm'
-                  : 'text-[#8b8fa6] hover:text-[#1e2235] hover:bg-white/60'
-              }`}>
-                {t('common.more')}
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {/* Dropdown */}
-              <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-[#e8eaf0] rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-1.5 z-50">
-                {moreItems.map(link => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${
-                      pathname === link.href
-                        ? 'text-[#6366f1] bg-[#6366f1]/5'
-                        : 'text-[#5c6078] hover:text-[#1e2235] hover:bg-[#f5f6fa]'
-                    }`}
-                  >
-                    <span>{link.icon}</span>
-                    {t(link.labelKey)}
-                  </Link>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* Right side */}
@@ -124,85 +81,15 @@ export default function Navbar() {
               <LangToggle />
             </div>
 
-            {isAuthenticated ? (
-              <div className="flex items-center gap-1.5">
-                {isGuest ? (
-                  <Link
-                    href="/login"
-                    className="text-xs px-4 py-2 bg-[#6366f1] text-white rounded-full hover:bg-[#4f46e5] transition-all font-semibold shadow-sm shadow-[#6366f1]/20"
-                  >
-                    {t('nav.signIn')}
-                  </Link>
-                ) : (
-                  <>
-                    {/* Admin */}
-                    {isAdmin && (
-                      <Link
-                        href="/admin"
-                        className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full hover:bg-[#f5f6fa] transition-colors"
-                        title="Admin"
-                      >
-                        <span className="text-sm">🛡️</span>
-                      </Link>
-                    )}
-                    {/* Seller */}
-                    <Link
-                      href="/seller/apply"
-                      className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full hover:bg-[#f5f6fa] transition-colors"
-                      title={t('nav.sellerApply')}
-                    >
-                      <span className="text-sm">🏪</span>
-                      </Link>
-                    {/* Notifications → /me */}
-                    <Link
-                      href="/me"
-                      className="relative flex items-center justify-center w-8 h-8 rounded-full hover:bg-[#f5f6fa] transition-colors"
-                    >
-                      <span className="text-sm">🔔</span>
-                      {unreadCount > 0 && (
-                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center ring-2 ring-white">
-                          {unreadCount > 9 ? '9+' : unreadCount}
-                        </span>
-                      )}
-                    </Link>
-                    {/* Avatar */}
-                    <Link
-                      href={`/u/${user?.email?.split('@')[0] || ''}`}
-                      className="hidden sm:flex items-center gap-2 pl-2"
-                    >
-                      <div className="w-7 h-7 rounded-full bg-[#6366f1]/10 flex items-center justify-center text-xs font-bold text-[#6366f1]">
-                        {user?.email?.charAt(0).toUpperCase()}
-                      </div>
-                    </Link>
-                    {/* Logout */}
-                    <button
-                      onClick={logout}
-                      className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full hover:bg-red-50 transition-colors text-[#b5b8c8] hover:text-red-400"
-                      title={t('nav.signOut')}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                      </svg>
-                    </button>
-                  </>
-                )}
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                className="text-sm px-5 py-2 bg-[#6366f1] text-white font-semibold rounded-full hover:bg-[#4f46e5] transition-all shadow-sm shadow-[#6366f1]/25"
-              >
-                {t('nav.signIn')}
+            {isAdmin && (
+              <Link href="/admin/marvel-prices" className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/5 transition-colors" title="ตั้งราคากลาง (แอดมิน)">
+                <span className="text-sm">🛡️</span>
               </Link>
             )}
 
             {/* Mobile hamburger */}
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden flex items-center justify-center w-8 h-8 rounded-full hover:bg-[#f5f6fa] transition-colors"
-              aria-label="Menu"
-            >
-              <svg className="w-5 h-5 text-[#1e2235]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/5 transition-colors" aria-label="Menu">
+              <svg className="w-5 h-5 text-hero" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {menuOpen ? (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
@@ -216,51 +103,29 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden border-t border-[#e8eaf0]/60 bg-white/95 backdrop-blur-xl">
+        <div className="md:hidden border-t border-line/70 bg-abyss/95 backdrop-blur-xl">
           <div className="px-4 py-3 space-y-1">
-            {[...navItems, ...moreItems].map(link => (
+            {navItems.map(link => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  pathname === link.href
-                    ? 'text-[#6366f1] bg-[#6366f1]/5'
-                    : 'text-[#5c6078] hover:text-[#1e2235] hover:bg-[#f5f6fa]'
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  isActive(link.href) ? 'text-hero bg-cosmic/10' : 'text-body hover:text-hero hover:bg-white/5'
                 }`}
               >
                 <span>{link.icon}</span>
-                {t(link.labelKey)}
+                {link.fallback}
               </Link>
             ))}
-
-            {isAuthenticated && !isGuest && (
-              <>
-                <div className="border-t border-[#e8eaf0]/60 my-2" />
-                {isAdmin && (
-                  <Link href="/admin" className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#5c6078] hover:text-[#6366f1] hover:bg-[#6366f1]/5 transition-all">
-                    <span>🛡️</span> Admin
-                  </Link>
-                )}
-                <Link href="/seller/apply" className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#5c6078] hover:text-[#6366f1] hover:bg-[#6366f1]/5 transition-all">
-                  <span>🏪</span> {t('nav.sellerApply')}
-                </Link>
-                <Link href={`/u/${user?.email?.split('@')[0] || ''}`} className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#5c6078] hover:text-[#6366f1] hover:bg-[#6366f1]/5 transition-all">
-                  <span>👤</span> {t('nav.profile')}
-                </Link>
-              </>
+            {isAdmin && (
+              <Link href="/admin/marvel-prices" className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-body hover:text-hero hover:bg-white/5 transition-all">
+                <span>🛡️</span> ตั้งราคากลาง
+              </Link>
             )}
 
-            <div className="border-t border-[#e8eaf0]/60 my-2" />
-            <div className="px-4 py-2 flex items-center justify-between">
+            <div className="mv-hr my-2" />
+            <div className="px-4 py-2">
               <LangToggle />
-              {isAuthenticated && !isGuest && (
-                <button
-                  onClick={logout}
-                  className="text-sm font-medium text-red-400 hover:text-red-500 transition-colors"
-                >
-                  {t('nav.signOut')}
-                </button>
-              )}
             </div>
           </div>
         </div>
