@@ -54,7 +54,7 @@ export default function Navbar() {
             </div>
             <div className="hidden sm:flex flex-col leading-none">
               <span className="text-[17px] font-extrabold text-hero tracking-tight font-display">VAULT<span className="text-cosmic">VERSE</span></span>
-              <span className="text-[9px] font-semibold text-marvel tracking-[0.18em] uppercase">Hero Rush · Official TH</span>
+              <span className="text-[10px] font-semibold text-marvel tracking-tight">โดย สมาคมผู้คลั่งไคล้ SuperHero</span>
             </div>
           </Link>
 

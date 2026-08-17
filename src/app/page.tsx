@@ -229,7 +229,7 @@ export default async function Home() {
             <img src="/brand/superhero-th.webp" alt="SuperHero Thailand" className="h-11 w-auto" />
             <div className="leading-tight">
               <div className="font-display text-base font-extrabold text-hero">VAULT<span className="text-cosmic">VERSE</span></div>
-              <div className="text-[11px] text-muted">โดย สมาคมผู้คลั่งไคล้ SuperHero · Official TH</div>
+              <div className="text-[11px] text-muted">โดย สมาคมผู้คลั่งไคล้ SuperHero</div>
             </div>
           </div>
           <p className="text-xs text-muted text-center">ราคากลางเพื่ออ้างอิงเท่านั้น · ไม่ใช่ราคาซื้อขายอย่างเป็นทางการ</p>
