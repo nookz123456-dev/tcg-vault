@@ -229,24 +229,48 @@ export default async function Home() {
       </Reveal>
 
       {/* ===== FOOTER ===== */}
-      <footer className="mt-auto border-t border-line/70">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-5">
-          <div className="flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/superhero-th.webp" alt="SuperHero Thailand" className="h-11 w-auto" />
-            <div className="leading-tight">
-              <div className="font-display text-base font-extrabold text-hero">VAULT<span className="text-cosmic">VERSE</span></div>
-              <div className="text-[11px] text-muted">{t('mhr.nav.byAssoc')}</div>
+      <footer className="mt-auto border-t border-line/70 bg-abyss/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
+            {/* brand */}
+            <div className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/brand/superhero-th.webp" alt="SuperHero Thailand" className="h-12 w-auto" />
+              <div className="leading-tight">
+                <div className="font-display text-lg font-extrabold text-hero">VAULT<span className="text-cosmic">VERSE</span></div>
+                <div className="text-[11px] text-muted mt-1 max-w-[13rem]">{t('mhr.nav.byAssoc')}</div>
+              </div>
+            </div>
+
+            {/* contact */}
+            <div className="flex flex-col gap-3">
+              <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-faint">{t('mhr.footer.contact')}</div>
+              <a
+                href="https://web.facebook.com/groups/1294005495982423?locale=th_TH"
+                target="_blank" rel="noopener noreferrer"
+                className="group inline-flex items-center gap-3 text-sm text-body hover:text-hero transition-colors"
+              >
+                <span className="grid place-items-center w-9 h-9 rounded-xl bg-[#1877F2]/12 text-[#4293ff] border border-[#1877F2]/30 group-hover:bg-[#1877F2]/22 transition-colors shrink-0">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-[18px] h-[18px]"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.95h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.49h-2.79V24C19.61 23.1 24 18.1 24 12.07z"/></svg>
+                </span>
+                <span className="break-all">facebook.com/groups/1294005495982423</span>
+              </a>
+              <a
+                href="mailto:marvelherorush.th@gmail.com"
+                className="group inline-flex items-center gap-3 text-sm text-body hover:text-hero transition-colors"
+              >
+                <span className="grid place-items-center w-9 h-9 rounded-xl bg-cosmic/12 text-cosmic border border-cosmic/30 group-hover:bg-cosmic/22 transition-colors shrink-0">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-[18px] h-[18px]"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z" /><path strokeLinecap="round" strokeLinejoin="round" d="M3.5 7l8.5 6 8.5-6" /></svg>
+                </span>
+                <span className="break-all">marvelherorush.th@gmail.com</span>
+              </a>
             </div>
           </div>
-          <p className="text-xs text-muted text-center">{t('mhr.footer.disclaimer')}</p>
-          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-xs text-muted">
-            <a href="https://web.facebook.com/groups/1294005495982423?locale=th_TH" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-cosmic transition-colors">
-              <span>📘</span> facebook.com/groups/1294005495982423
-            </a>
-            <a href="mailto:marvelherorush.th@gmail.com" className="inline-flex items-center gap-1.5 hover:text-cosmic transition-colors">
-              <span>✉️</span> marvelherorush.th@gmail.com
-            </a>
+
+          {/* bottom bar */}
+          <div className="mt-9 pt-6 border-t border-line/50 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p className="text-[11px] text-muted text-center sm:text-left">{t('mhr.footer.disclaimer')}</p>
+            <p className="text-[11px] text-faint">© {new Date().getFullYear()} {t('mhr.assoc')}</p>
           </div>
         </div>
       </footer>
