@@ -123,7 +123,7 @@ export default async function Home() {
           </div>
 
           {/* real "hand of cards" — fanned, 3D on hover, clickable */}
-          <div className="relative mt-12 h-52 w-full max-w-xl hidden sm:block">
+          <div className="relative mt-14 h-[360px] w-full max-w-3xl hidden md:block">
             {heroHand.map((c, i) => {
               const mid = (heroHand.length - 1) / 2
               const off = i - mid
@@ -133,7 +133,7 @@ export default async function Home() {
                   key={c.id}
                   className="absolute left-1/2 top-2"
                   style={{
-                    transform: `translateX(-50%) translateX(${off * 82}px) translateY(${Math.abs(off) * 18}px) rotate(${off * 9}deg)`,
+                    transform: `translateX(-50%) translateX(${off * 122}px) translateY(${Math.abs(off) * 26}px) rotate(${off * 9}deg)`,
                     zIndex: 10 - Math.abs(off),
                   }}
                 >
@@ -143,7 +143,7 @@ export default async function Home() {
                       <TiltCard holo max={12} className="rounded-xl">
                         <div className="rounded-xl overflow-hidden border border-line" style={{ boxShadow: '0 16px 40px rgba(0,0,0,0.6)' }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={c.image} alt={c.cardNo} className="w-28 sm:w-32 block" />
+                          <img src={c.image} alt={c.cardNo} className="w-44 sm:w-52 block" />
                         </div>
                       </TiltCard>
                     </Link>
