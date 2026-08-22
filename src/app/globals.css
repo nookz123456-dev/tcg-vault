@@ -137,7 +137,10 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); letter-spacing
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.01em;
-  line-height: 1;
+  /* Thai glyphs (bottom vowels/curves) get clipped at line-height:1, and the
+     gradient background-clip:text makes it worse — give them vertical room. */
+  line-height: 1.18;
+  padding-bottom: 0.12em;
   background: linear-gradient(92deg, #ff2b39, #a855f7 55%, #22d3ee);
   -webkit-background-clip: text;
   background-clip: text;
