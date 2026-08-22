@@ -9,6 +9,7 @@ import TiltCard from '@/components/TiltCard'
 import Intro from '@/components/Intro'
 import { marvelCards, marvelSets, MARVEL, RARITY_ORDER, marvelCharacterOf } from '@/lib/marvel'
 import { getMarvelPrices } from '@/lib/marvel-prices.server'
+import { getServerT } from '@/lib/i18n.server'
 import products from '@/lib/marvel-products.json'
 
 const PRODUCT_GLOW: Record<string, string> = {
@@ -19,15 +20,16 @@ const PRODUCT_GLOW: Record<string, string> = {
   SD04: 'rgba(34,192,122,0.24)',
 }
 
-const SET_META: Record<string, { th: string; accent: string; emoji: string }> = {
-  BP01: { th: 'บูสเตอร์ Avengers', accent: 'from-marvel to-marvel-deep', emoji: '📦' },
-  SD01: { th: 'สตาร์ทเตอร์ · Reality', accent: 'from-attr-red to-marvel-deep', emoji: '🔴' },
-  SD02: { th: 'สตาร์ทเตอร์ · Mind', accent: 'from-attr-yellow to-gold', emoji: '🟡' },
-  SD03: { th: 'สตาร์ทเตอร์ · Space', accent: 'from-attr-blue to-cosmic-blue', emoji: '🔵' },
-  SD04: { th: 'สตาร์ทเตอร์ · Time', accent: 'from-attr-green to-cosmic-cyan', emoji: '🟢' },
+const SET_META: Record<string, { th: string; en: string; accent: string; emoji: string }> = {
+  BP01: { th: 'บูสเตอร์ Avengers', en: 'Avengers Booster', accent: 'from-marvel to-marvel-deep', emoji: '📦' },
+  SD01: { th: 'สตาร์ทเตอร์ · Reality', en: 'Starter · Reality', accent: 'from-attr-red to-marvel-deep', emoji: '🔴' },
+  SD02: { th: 'สตาร์ทเตอร์ · Mind', en: 'Starter · Mind', accent: 'from-attr-yellow to-gold', emoji: '🟡' },
+  SD03: { th: 'สตาร์ทเตอร์ · Space', en: 'Starter · Space', accent: 'from-attr-blue to-cosmic-blue', emoji: '🔵' },
+  SD04: { th: 'สตาร์ทเตอร์ · Time', en: 'Starter · Time', accent: 'from-attr-green to-cosmic-cyan', emoji: '🟢' },
 }
 
 export default async function Home() {
+  const { locale, t } = await getServerT()
   const prices = await getMarvelPrices()
   const rIdx = (r: string) => RARITY_ORDER.indexOf(r as typeof RARITY_ORDER[number])
   // Highest-rarity characters, most valuable first — for the featured carousel.
@@ -82,12 +84,11 @@ export default async function Home() {
 
           {/* THAILAND official badge */}
           <div className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-marvel/15 border border-marvel/40 text-marvel-bright text-xs font-bold backdrop-blur-sm">
-            🇹🇭 ราคากลางการ์ด โดยสมาคมผู้คลั่งไคล้ SuperHero
+            {t('mhr.home.badge')}
           </div>
 
           <p className="text-body text-sm sm:text-base max-w-xl mt-6 leading-relaxed">
-            เช็คราคากลางการ์ด Marvel Hero Rush ครบทั้ง {MARVEL.total} ใบจาก {marvelSets.length} เซ็ต —
-            ราคาตั้งโดยทีมงาน อัปเดตสม่ำเสมอ พร้อมคอลเลกชันในที่เดียว
+            {t('mhr.home.subtitle')}
           </p>
 
           {/* search */}
@@ -95,29 +96,29 @@ export default async function Home() {
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted">🔍</span>
             <input
               name="q"
-              placeholder="ค้นหาฮีโร่ / เลขการ์ด (เช่น Iron Man, BP01-001)"
+              placeholder={t('mhr.home.searchPlaceholder')}
               className="w-full pl-11 pr-4 py-3 rounded-xl bg-abyss/80 border border-line text-sm text-hero placeholder:text-faint focus:outline-none focus:border-cosmic/60 backdrop-blur-sm"
             />
           </form>
 
           <div className="flex flex-col sm:flex-row gap-3 mt-4">
             <Link href="/card/marvel" className="px-6 py-3 btn-primary rounded-xl font-bold text-sm">
-              ดูการ์ดทั้งหมด <span className="ml-1">→</span>
+              {t('mhr.home.ctaAll')} <span className="ml-1">→</span>
             </Link>
             <Link href="/sets" className="px-6 py-3 btn-ghost rounded-xl font-bold text-sm backdrop-blur-sm">
-              เช็คราคาตามเซ็ต
+              {t('mhr.home.ctaSets')}
             </Link>
           </div>
 
           <div className="flex items-start gap-5 sm:gap-8 mt-9">
-            <Stat value={String(MARVEL.total)} label="การ์ดทั้งหมด" />
+            <Stat value={String(MARVEL.total)} label={t('mhr.stat.totalCards')} />
             <div className="w-px h-9 bg-line mt-1" />
-            <Stat value={String(marvelSets.length)} label="เซ็ต" />
+            <Stat value={String(marvelSets.length)} label={t('mhr.stat.sets')} />
             <div className="w-px h-9 bg-line mt-1" />
             <div className="text-center lg:text-left">
-              <div className="font-display text-2xl font-extrabold text-gold-bright leading-none">ราคากลาง</div>
+              <div className="font-display text-2xl font-extrabold text-gold-bright leading-none">{t('mhr.priceGuide')}</div>
               <div className="text-xs font-extrabold text-cosmic-cyan mt-1 leading-tight max-w-[10rem] mx-auto lg:mx-0">
-                โดยสมาคมผู้คลั่งไคล้ SuperHero
+                {t('mhr.nav.byAssoc')}
               </div>
             </div>
           </div>
@@ -159,11 +160,12 @@ export default async function Home() {
       <Reveal as="section" className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-14">
         <div className="text-center mb-8">
           <div className="section-eyebrow mb-2">Expansions</div>
-          <h2 className="section-title neon-title text-4xl sm:text-5xl font-extrabold">เซ็ตทั้งหมด</h2>
+          <h2 className="section-title neon-title text-4xl sm:text-5xl font-extrabold">{t('mhr.sec.expansions')}</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {marvelSets.map((s) => {
-            const meta = SET_META[s.id] || { th: s.name, accent: 'from-cosmic to-cosmic-blue', emoji: '🃏' }
+            const meta = SET_META[s.id] || { th: s.name, en: s.name, accent: 'from-cosmic to-cosmic-blue', emoji: '🃏' }
+            const metaName = locale === 'en' ? meta.en : meta.th
             const box = products.find((p) => p.series === s.id)?.image
             return (
               <Link key={s.id} href={`/set/marvel/${s.id}`} className="mv-card rounded-2xl p-4 group flex flex-col items-center text-center">
@@ -171,14 +173,14 @@ export default async function Home() {
                   <div className="absolute inset-0" style={{ background: `radial-gradient(60% 50% at 50% 45%, ${PRODUCT_GLOW[s.id] || 'rgba(139,92,246,0.22)'}, transparent 70%)` }} />
                   {box ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={box} alt={meta.th} className="relative max-h-full object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    <img src={box} alt={metaName} className="relative max-h-full object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                   ) : (
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${meta.accent} grid place-items-center text-2xl`}>{meta.emoji}</div>
                   )}
                 </div>
                 <div className="text-[11px] font-bold text-marvel tracking-wide">{s.code}</div>
-                <div className="text-sm font-bold text-hero mt-0.5 group-hover:text-cosmic transition-colors">{meta.th}</div>
-                <div className="text-xs text-muted mt-1">{s.total} การ์ด</div>
+                <div className="text-sm font-bold text-hero mt-0.5 group-hover:text-cosmic transition-colors">{metaName}</div>
+                <div className="text-xs text-muted mt-1">{s.total} {t('mhr.cards')}</div>
               </Link>
             )
           })}
@@ -193,8 +195,8 @@ export default async function Home() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <div className="section-eyebrow mb-2">Featured Cards</div>
-            <h2 className="section-title neon-title text-4xl sm:text-5xl font-extrabold">การ์ดเรตหายาก</h2>
-            <p className="text-sm text-muted mt-3">คลิกการ์ดเพื่อดูรายละเอียดและราคากลาง</p>
+            <h2 className="section-title neon-title text-4xl sm:text-5xl font-extrabold">{t('mhr.sec.featured')}</h2>
+            <p className="text-sm text-muted mt-3">{t('mhr.sec.featuredSub')}</p>
           </div>
           <div className="relative px-6 sm:px-10">
             <EnergyBolts side="left" />
@@ -202,7 +204,7 @@ export default async function Home() {
             <MarvelFeaturedCarousel cards={featured} prices={prices} />
           </div>
           <div className="text-center mt-9">
-            <Link href="/card/marvel" className="pill-cta">ดูการ์ดทั้งหมด <span>→</span></Link>
+            <Link href="/card/marvel" className="pill-cta">{t('mhr.home.ctaAll')} <span>→</span></Link>
           </div>
         </div>
       </section>
@@ -213,9 +215,9 @@ export default async function Home() {
       <Reveal as="section" className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid md:grid-cols-3 gap-4">
           {[
-            { icon: '🏅', title: 'ราคากลางมาตรฐาน', desc: 'ทุกการ์ดตั้งราคาโดยทีมงานสมาคมผู้คลั่งไคล้ SuperHero ให้เป็นมาตรฐานเดียวกัน' },
-            { icon: '🔄', title: 'อัปเดตสม่ำเสมอ', desc: 'ราคาปรับตามตลาดจริง ไม่ตกยุค เช็คได้ทุกเมื่อ' },
-            { icon: '🗂️', title: 'ครบทุกเซ็ต', desc: `ครบทั้ง ${MARVEL.total} การ์ดตั้งแต่วันเปิดตัว พร้อมรายละเอียดเอฟเฟกต์เต็ม` },
+            { icon: '🏅', title: t('mhr.why1.title'), desc: t('mhr.why1.desc') },
+            { icon: '🔄', title: t('mhr.why2.title'), desc: t('mhr.why2.desc') },
+            { icon: '🗂️', title: t('mhr.why3.title'), desc: t('mhr.why3.desc') },
           ].map((f) => (
             <div key={f.title} className="mv-panel rounded-2xl p-5">
               <div className="w-11 h-11 rounded-xl bg-cosmic/12 border border-cosmic/25 grid place-items-center text-xl mb-3">{f.icon}</div>
@@ -234,12 +236,13 @@ export default async function Home() {
             <img src="/brand/superhero-th.webp" alt="SuperHero Thailand" className="h-11 w-auto" />
             <div className="leading-tight">
               <div className="font-display text-base font-extrabold text-hero">VAULT<span className="text-cosmic">VERSE</span></div>
-              <div className="text-[11px] text-muted">โดย สมาคมผู้คลั่งไคล้ SuperHero</div>
+              <div className="text-[11px] text-muted">{t('mhr.nav.byAssoc')}</div>
             </div>
           </div>
-          <p className="text-xs text-muted text-center">ราคากลางเพื่ออ้างอิงเท่านั้น · ไม่ใช่ราคาซื้อขายอย่างเป็นทางการ</p>
+          <p className="text-xs text-muted text-center">{t('mhr.footer.disclaimer')}</p>
           <div className="flex items-center gap-4 text-xs text-muted">
-            <span>เกี่ยวกับ</span><span>เงื่อนไข</span><span>ติดต่อ</span>
+            <a href="https://web.facebook.com/groups/1294005495982423?locale=th_TH" target="_blank" rel="noopener noreferrer" className="hover:text-cosmic transition-colors">{t('mhr.footer.about')}</a>
+            <a href="mailto:marvelherorush.th@gmail.com" className="hover:text-cosmic transition-colors">{t('mhr.footer.contact')}</a>
           </div>
         </div>
       </footer>

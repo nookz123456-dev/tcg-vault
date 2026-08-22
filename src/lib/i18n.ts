@@ -1,5 +1,7 @@
 // Thai/English UI translations for HoloCheck
 // Card data stays in its original language (EN/JP)
+// NOTE: server-safe (no React). The locale context + hooks live in
+// i18n-client.ts and are re-exported below so existing imports keep working.
 
 const translations = {
   // Nav
@@ -774,6 +776,98 @@ const translations = {
   'pwa.installDesc': { th: 'เพิ่มเข้าหน้าจอหลักเพื่อใช้งานเร็วขึ้น', en: 'Add to home screen for faster access' },
   'pwa.installBtn': { th: 'ติดตั้ง', en: 'Install' },
   'pwa.dismiss': { th: 'ไม่ใช่ตอนนี้', en: 'Not now' },
+
+  // ===== Marvel Hero Rush (mhr) =====
+  // Navbar
+  'mhr.nav.home': { th: 'หน้าแรก', en: 'Home' },
+  'mhr.nav.cards': { th: 'การ์ดทั้งหมด', en: 'All Cards' },
+  'mhr.nav.sets': { th: 'เซ็ต', en: 'Sets' },
+  'mhr.nav.byAssoc': { th: 'โดย สมาคมผู้คลั่งไคล้ SuperHero', en: 'by SuperHero Thailand Association' },
+  'mhr.assoc': { th: 'สมาคมผู้คลั่งไคล้ SuperHero', en: 'SuperHero Thailand Association' },
+
+  // Home hero
+  'mhr.home.badge': { th: '🇹🇭 ราคากลางการ์ด โดยสมาคมผู้คลั่งไคล้ SuperHero', en: '🇹🇭 Card Price Guide · by SuperHero Thailand Association' },
+  'mhr.home.subtitle': { th: 'เช็คราคากลางการ์ด Marvel Hero Rush ครบทุกใบทุกเซ็ต — ราคาตั้งโดยทีมงาน อัปเดตสม่ำเสมอ พร้อมคอลเลกชันในที่เดียว', en: 'Median prices for every Marvel Hero Rush card, across every set — set by our team, updated regularly, all in one place.' },
+  'mhr.home.searchPlaceholder': { th: 'ค้นหาฮีโร่ / เลขการ์ด (เช่น Iron Man, BP01-001)', en: 'Search hero / card no. (e.g. Iron Man, BP01-001)' },
+  'mhr.home.ctaAll': { th: 'ดูการ์ดทั้งหมด', en: 'Browse All Cards' },
+  'mhr.home.ctaSets': { th: 'เช็คราคาตามเซ็ต', en: 'Prices by Set' },
+  'mhr.stat.totalCards': { th: 'การ์ดทั้งหมด', en: 'Total Cards' },
+  'mhr.stat.sets': { th: 'เซ็ต', en: 'Sets' },
+  'mhr.priceGuide': { th: 'ราคากลาง', en: 'Price Guide' },
+
+  // Home sections
+  'mhr.sec.expansions': { th: 'เซ็ตทั้งหมด', en: 'All Expansions' },
+  'mhr.sec.featured': { th: 'การ์ดเรตหายาก', en: 'Featured Rare Cards' },
+  'mhr.sec.featuredSub': { th: 'คลิกการ์ดเพื่อดูรายละเอียดและราคากลาง', en: 'Tap a card for details and its median price' },
+  'mhr.cards': { th: 'การ์ด', en: 'cards' },
+
+  // Home "why" band
+  'mhr.why1.title': { th: 'ราคากลางมาตรฐาน', en: 'Standard Median Prices' },
+  'mhr.why1.desc': { th: 'ทุกการ์ดตั้งราคาโดยทีมงานสมาคมผู้คลั่งไคล้ SuperHero ให้เป็นมาตรฐานเดียวกัน', en: 'Every card is priced by the SuperHero Thailand Association team to one consistent standard.' },
+  'mhr.why2.title': { th: 'อัปเดตสม่ำเสมอ', en: 'Updated Regularly' },
+  'mhr.why2.desc': { th: 'ราคาปรับตามตลาดจริง ไม่ตกยุค เช็คได้ทุกเมื่อ', en: 'Prices track the real market, kept current, check anytime.' },
+  'mhr.why3.title': { th: 'ครบทุกเซ็ต', en: 'Every Set Covered' },
+  'mhr.why3.desc': { th: 'ครบทุกการ์ดตั้งแต่วันเปิดตัว พร้อมรายละเอียดเอฟเฟกต์เต็ม', en: 'Every card since launch, with full effect details.' },
+
+  // Footer
+  'mhr.footer.disclaimer': { th: 'ราคากลางเพื่ออ้างอิงเท่านั้น · ไม่ใช่ราคาซื้อขายอย่างเป็นทางการ', en: 'Median prices for reference only · not an official transaction price' },
+  'mhr.footer.about': { th: 'เกี่ยวกับ', en: 'About' },
+  'mhr.footer.terms': { th: 'เงื่อนไข', en: 'Terms' },
+  'mhr.footer.contact': { th: 'ติดต่อ', en: 'Contact' },
+
+  // Browse / all cards
+  'mhr.browse.eyebrow': { th: 'Marvel Hero Rush · ราคากลางไทย', en: 'Marvel Hero Rush · Thailand' },
+  'mhr.browse.title': { th: 'การ์ดทั้งหมด', en: 'All Cards' },
+  'mhr.browse.countPrefix': { th: 'ราคากลางครบ', en: 'Median prices for' },
+  'mhr.browse.countMid': { th: 'ใบจาก', en: 'cards across' },
+  'mhr.browse.countSuffix': { th: 'เซ็ต · อัปเดตล่าสุด', en: 'sets · updated' },
+  'mhr.browse.searchPlaceholder': { th: 'ค้นหาชื่อ / เลขการ์ด', en: 'Search name / card no.' },
+  'mhr.browse.allSets': { th: 'ทุกเซ็ต', en: 'All sets' },
+  'mhr.browse.allRarities': { th: 'ทุกเรต', en: 'All rarities' },
+  'mhr.browse.allAttrs': { th: 'ทุกธาตุ', en: 'All attributes' },
+  'mhr.browse.showing': { th: 'แสดง', en: 'Showing' },
+  'mhr.browse.noResults': { th: 'ไม่พบการ์ดที่ตรงกับตัวกรอง', en: 'No cards match your filters' },
+  'mhr.browse.priced': { th: 'ตั้งราคาแล้ว', en: 'Priced' },
+  'mhr.browse.unpriced': { th: 'รอตั้งราคา', en: 'Price pending' },
+  'mhr.browse.searchHero': { th: 'ค้นหาชื่อฮีโร่ เลขการ์ด หรือแท็ก (เช่น Avengers)', en: 'Search hero name, card no., or tag (e.g. Avengers)' },
+  'mhr.browse.sortNumber': { th: 'เรียงตามเลขการ์ด', en: 'Sort by card no.' },
+  'mhr.browse.sortPriceDesc': { th: 'ราคาสูง → ต่ำ', en: 'Price high → low' },
+  'mhr.browse.sortPriceAsc': { th: 'ราคาต่ำ → สูง', en: 'Price low → high' },
+  'mhr.browse.sortRarity': { th: 'เรตหายากก่อน', en: 'Rarest first' },
+  'mhr.browse.sortPower': { th: 'พลังสูงสุด', en: 'Highest power' },
+  'mhr.browse.filterSet': { th: 'เซ็ต', en: 'Set' },
+  'mhr.browse.filterColor': { th: 'สี', en: 'Color' },
+  'mhr.browse.filterRarity': { th: 'เรต', en: 'Rarity' },
+  'mhr.browse.filterType': { th: 'ประเภท', en: 'Type' },
+  'mhr.browse.all': { th: 'ทั้งหมด', en: 'All' },
+  'mhr.browse.found': { th: 'พบ', en: 'Found' },
+  'mhr.browse.clearFilters': { th: 'ล้างตัวกรอง', en: 'Clear filters' },
+
+  // Set page
+  'mhr.set.cardsInSet': { th: 'การ์ดในเซ็ต', en: 'Cards in set' },
+  'mhr.set.highRarity': { th: 'การ์ดเรตสูง', en: 'High-rarity cards' },
+  'mhr.set.tabFeatured': { th: 'การ์ดเด่น', en: 'Featured' },
+  'mhr.set.tabAll': { th: 'การ์ดทั้งหมด', en: 'All cards' },
+  'mhr.set.allSets': { th: 'ทุกเซ็ต', en: 'All sets' },
+  'mhr.set.featuredHeading': { th: 'การ์ดเด่นในเซ็ต', en: 'Featured cards in this set' },
+  'mhr.set.featuredSub': { th: 'คลิกการ์ดเพื่อดูรายละเอียดและราคากลาง', en: 'Tap a card for details and its median price' },
+  'mhr.set.allHeadingPrefix': { th: 'การ์ดทั้งหมด', en: 'All' },
+  'mhr.set.allHeadingSuffix': { th: 'ใบ', en: 'cards' },
+
+  // Card detail
+  'mhr.card.medianPrice': { th: 'ราคากลางโดยสมาคม', en: 'Association Median Price' },
+  'mhr.card.setByTeam': { th: 'ตั้งโดยทีมงาน', en: 'Set by our team' },
+  'mhr.card.pending': { th: 'รอตั้งราคา', en: 'Price pending' },
+  'mhr.card.level': { th: 'เลเวล', en: 'Level' },
+  'mhr.card.power': { th: 'พลัง', en: 'Power' },
+  'mhr.card.range': { th: 'ระยะโจมตี', en: 'Attack Range' },
+  'mhr.card.tags': { th: 'แท็ก', en: 'Tags' },
+  'mhr.card.effect': { th: 'เอฟเฟกต์', en: 'Effect' },
+  'mhr.card.otherVersions': { th: 'เวอร์ชันอื่นของการ์ดใบนี้', en: 'Other versions of this card' },
+  'mhr.card.tilt3d': { th: 'เลื่อนเมาส์บนการ์ดเพื่อดูเอฟเฟกต์ 3D ✨', en: 'Hover the card for a 3D effect ✨' },
+  'mhr.card.moreOf': { th: 'การ์ด {name} ใบอื่น', en: 'More {name} cards' },
+  'mhr.card.character': { th: 'ตัวละคร', en: 'Character' },
+  'mhr.card.impact': { th: 'อิมแพ็ค', en: 'Impact' },
 } as const
 
 export type Locale = 'th' | 'en'
@@ -783,23 +877,6 @@ export function t(key: TranslationKey, locale: Locale): string {
   return translations[key]?.[locale] || translations[key]?.['en'] || key
 }
 
-// Simple context without JSX (JSX is in ClientLayout.tsx)
-import { createContext, useContext } from 'react'
-
-export const LocaleContext = createContext<Locale>('th')
-
-export function useLocale() {
-  const locale = useContext(LocaleContext)
-  const setLocale = (newLocale: Locale) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('holocheck-locale', newLocale)
-      window.location.reload()
-    }
-  }
-  return { locale, setLocale }
-}
-
-export function useT() {
-  const locale = useContext(LocaleContext)
-  return (key: TranslationKey) => t(key, locale)
-}
+// Locale context + hooks are React (client) — re-exported from the client module
+// so `import { useT, useLocale, LocaleContext } from '@/lib/i18n'` keeps working.
+export { LocaleContext, useLocale, useT } from './i18n-client'

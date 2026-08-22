@@ -3,15 +3,11 @@
 import { useState, useEffect } from 'react'
 import { LocaleContext, type Locale } from '@/lib/i18n'
 
-export function ClientLayout({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('th')
+export function ClientLayout({ children, initialLocale = 'th' }: { children: React.ReactNode; initialLocale?: Locale }) {
+  // Seed from the server-read cookie so client + server components agree (no flash).
+  const [locale] = useState<Locale>(initialLocale)
 
   useEffect(() => {
-    const stored = localStorage.getItem('tcg-vault-locale')
-    if (stored === 'en' || stored === 'th') {
-      setLocaleState(stored)
-    }
-
     // Register service worker for PWA
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(() => {})

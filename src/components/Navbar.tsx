@@ -4,10 +4,12 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
 import { LangToggle } from '@/components/LangToggle'
+import { useT } from '@/lib/i18n'
 import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const pathname = usePathname()
+  const tt = useT()
   const { user } = useAuth()
   const [isAdmin, setIsAdmin] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -27,9 +29,9 @@ export default function Navbar() {
   useEffect(() => { setMenuOpen(false) }, [pathname])
 
   const navItems = [
-    { href: '/', icon: '🏠', fallback: 'หน้าแรก' },
-    { href: '/card/marvel', icon: '🃏', fallback: 'การ์ดทั้งหมด' },
-    { href: '/sets', icon: '📂', fallback: 'เซ็ต' },
+    { href: '/', icon: '🏠', key: 'mhr.nav.home' as const },
+    { href: '/card/marvel', icon: '🃏', key: 'mhr.nav.cards' as const },
+    { href: '/sets', icon: '📂', key: 'mhr.nav.sets' as const },
   ]
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
@@ -56,7 +58,7 @@ export default function Navbar() {
                     : 'text-muted hover:text-hero hover:bg-white/5'
                 }`}
               >
-                {link.fallback}
+                {tt(link.key)}
               </Link>
             ))}
           </div>
@@ -107,7 +109,7 @@ export default function Navbar() {
                 }`}
               >
                 <span>{link.icon}</span>
-                {link.fallback}
+                {tt(link.key)}
               </Link>
             ))}
             {isAdmin && (

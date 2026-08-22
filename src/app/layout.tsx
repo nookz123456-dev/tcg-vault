@@ -3,6 +3,7 @@ import "./globals.css";
 import { ClientLayout } from "@/components/ClientLayout";
 import { CmdKSearch } from "@/components/CmdKSearch";
 import CosmicBackground from "@/components/CosmicBackground";
+import { getServerLocale } from "@/lib/i18n.server";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -34,13 +35,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getServerLocale();
   return (
-    <html lang="th">
+    <html lang={locale}>
       <head>
         <link rel="apple-touch-icon" href="/icon.svg" />
       </head>
@@ -49,7 +51,7 @@ export default function RootLayout({
         <div className="fixed inset-0 -z-10 pointer-events-none">
           <CosmicBackground />
         </div>
-        <ClientLayout>
+        <ClientLayout initialLocale={locale}>
           {children}
           <CmdKSearch />
         </ClientLayout>

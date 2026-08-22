@@ -6,6 +6,7 @@ import {
   MarvelCard, MarvelSet, RARITY_ORDER, RARITY_META, ATTR_META, ATTRIBUTES,
   cleanMarvelName, formatTHB,
 } from '@/lib/marvel'
+import { useT } from '@/lib/i18n'
 
 type SortKey = 'number' | 'priceDesc' | 'priceAsc' | 'rarity' | 'power'
 
@@ -19,6 +20,7 @@ export default function MarvelBrowser({
   initialQuery?: string
   initialAttr?: string
 }) {
+  const tt = useT()
   const [q, setQ] = useState(initialQuery || '')
   const [series, setSeries] = useState<string>(initialSeries || 'all')
   const [attr, setAttr] = useState<string>(initialAttr || 'all')
@@ -62,44 +64,44 @@ export default function MarvelBrowser({
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="ค้นหาชื่อฮีโร่ เลขการ์ด หรือแท็ก (เช่น Avengers)"
+            placeholder={tt('mhr.browse.searchHero')}
             className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-surface border border-line text-sm text-hero placeholder:text-faint focus:outline-none focus:border-cosmic/60"
           />
         </div>
         <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)}
           className="px-3 py-2.5 rounded-xl bg-surface border border-line text-sm text-body focus:outline-none focus:border-cosmic/60">
-          <option value="number">เรียงตามเลขการ์ด</option>
-          <option value="priceDesc">ราคาสูง → ต่ำ</option>
-          <option value="priceAsc">ราคาต่ำ → สูง</option>
-          <option value="rarity">เรตหายากก่อน</option>
-          <option value="power">พลังสูงสุด</option>
+          <option value="number">{tt('mhr.browse.sortNumber')}</option>
+          <option value="priceDesc">{tt('mhr.browse.sortPriceDesc')}</option>
+          <option value="priceAsc">{tt('mhr.browse.sortPriceAsc')}</option>
+          <option value="rarity">{tt('mhr.browse.sortRarity')}</option>
+          <option value="power">{tt('mhr.browse.sortPower')}</option>
         </select>
       </div>
 
       {/* Filter chips */}
       <div className="space-y-2 mb-5">
-        <ChipRow label="เซ็ต">
-          <Chip active={series === 'all'} onClick={() => setSeries('all')}>ทั้งหมด</Chip>
+        <ChipRow label={tt('mhr.browse.filterSet')}>
+          <Chip active={series === 'all'} onClick={() => setSeries('all')}>{tt('mhr.browse.all')}</Chip>
           {sets.map((s) => (
             <Chip key={s.id} active={series === s.id} onClick={() => setSeries(s.id)}>{s.code}</Chip>
           ))}
         </ChipRow>
-        <ChipRow label="สี">
-          <Chip active={attr === 'all'} onClick={() => setAttr('all')}>ทั้งหมด</Chip>
+        <ChipRow label={tt('mhr.browse.filterColor')}>
+          <Chip active={attr === 'all'} onClick={() => setAttr('all')}>{tt('mhr.browse.all')}</Chip>
           {ATTRIBUTES.map((a) => (
             <Chip key={a} active={attr === a} onClick={() => setAttr(a)}>
               <span className={`inline-block w-2 h-2 rounded-full mr-1.5 align-middle ${ATTR_META[a].dot}`} />{a}
             </Chip>
           ))}
         </ChipRow>
-        <ChipRow label="เรต">
-          <Chip active={rarity === 'all'} onClick={() => setRarity('all')}>ทั้งหมด</Chip>
+        <ChipRow label={tt('mhr.browse.filterRarity')}>
+          <Chip active={rarity === 'all'} onClick={() => setRarity('all')}>{tt('mhr.browse.all')}</Chip>
           {RARITY_ORDER.map((r) => (
             <Chip key={r} active={rarity === r} onClick={() => setRarity(r)}>{r}</Chip>
           ))}
         </ChipRow>
-        <ChipRow label="ประเภท">
-          <Chip active={type === 'all'} onClick={() => setType('all')}>ทั้งหมด</Chip>
+        <ChipRow label={tt('mhr.browse.filterType')}>
+          <Chip active={type === 'all'} onClick={() => setType('all')}>{tt('mhr.browse.all')}</Chip>
           <Chip active={type === 'character'} onClick={() => setType('character')}>Character</Chip>
           <Chip active={type === 'impact'} onClick={() => setType('impact')}>Impact</Chip>
         </ChipRow>
@@ -107,9 +109,9 @@ export default function MarvelBrowser({
 
       {/* Result count */}
       <div className="flex items-center justify-between mb-3">
-        <p className="text-sm text-muted">พบ <span className="text-hero font-bold">{filtered.length}</span> การ์ด</p>
+        <p className="text-sm text-muted">{tt('mhr.browse.found')} <span className="text-hero font-bold">{filtered.length}</span> {tt('mhr.cards')}</p>
         {activeFilters > 0 && (
-          <button onClick={reset} className="text-xs font-semibold text-marvel-bright hover:text-marvel">ล้างตัวกรอง ({activeFilters})</button>
+          <button onClick={reset} className="text-xs font-semibold text-marvel-bright hover:text-marvel">{tt('mhr.browse.clearFilters')} ({activeFilters})</button>
         )}
       </div>
 
@@ -123,7 +125,7 @@ export default function MarvelBrowser({
       {filtered.length === 0 && (
         <div className="text-center py-16 text-muted">
           <div className="text-4xl mb-3">🕸️</div>
-          ไม่พบการ์ดที่ตรงกับตัวกรอง
+          {tt('mhr.browse.noResults')}
         </div>
       )}
     </div>

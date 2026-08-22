@@ -8,6 +8,7 @@ import {
 } from '@/lib/marvel'
 import { getMarvelPrices } from '@/lib/marvel-prices.server'
 import { getMergedCard, getMergedCards } from '@/lib/marvel-variants.server'
+import { getServerT } from '@/lib/i18n.server'
 import TiltCard from '@/components/TiltCard'
 import ShareButton from '@/components/ShareButton'
 
@@ -23,7 +24,7 @@ export default async function MarvelCardDetail({ params }: { params: Promise<{ i
   const card = await getMergedCard(id)
   if (!card) notFound()
 
-  const [prices, allCards] = await Promise.all([getMarvelPrices(), getMergedCards()])
+  const [prices, allCards, { t }] = await Promise.all([getMarvelPrices(), getMergedCards(), getServerT()])
   const price = prices[card.id]
   const rar = RARITY_META[card.rarity]
   const set = marvelSets.find((s) => s.id === card.series)
@@ -59,7 +60,7 @@ export default async function MarvelCardDetail({ params }: { params: Promise<{ i
                   <img src={card.image} alt={cleanMarvelName(card.name)} className="w-full block" />
                 </div>
               </TiltCard>
-              <p className="text-center text-[11px] text-faint mt-3">เลื่อนเมาส์บนการ์ดเพื่อดูเอฟเฟกต์ 3D ✨</p>
+              <p className="text-center text-[11px] text-faint mt-3">{t('mhr.card.tilt3d')}</p>
             </div>
           </div>
 
@@ -69,7 +70,7 @@ export default async function MarvelCardDetail({ params }: { params: Promise<{ i
               <span className={`rarity-chip text-xs px-2 py-0.5 rounded border ${rar?.cls || ''}`}>{card.rarity} · {rar?.label}</span>
               {attr && <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${attr.cls}`}>
                 <span className={`inline-block w-2 h-2 rounded-full mr-1.5 align-middle ${attr.dot}`} />{card.attribute}</span>}
-              <span className="text-xs font-semibold px-2 py-0.5 rounded border border-line text-muted capitalize">{card.cardType}</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded border border-line text-muted">{card.cardType === 'character' ? t('mhr.card.character') : t('mhr.card.impact')}</span>
             </div>
 
             <div className="flex items-start justify-between gap-3">
@@ -84,16 +85,16 @@ export default async function MarvelCardDetail({ params }: { params: Promise<{ i
             <div className="mv-panel rounded-2xl p-5 mt-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-semibold text-muted mb-1">ราคากลางโดยสมาคม</div>
+                  <div className="text-xs font-semibold text-muted mb-1">{t('mhr.card.medianPrice')}</div>
                   <div className={`font-display text-4xl font-extrabold ${price != null ? 'text-gold-bright' : 'text-faint'}`}>
                     {formatTHB(price)}
                   </div>
                 </div>
                 <div className="text-right">
                   {price != null ? (
-                    <span className="text-[10px] font-bold px-2 py-1 rounded bg-gold/15 text-gold-bright border border-gold/30">ตั้งโดยทีมงาน</span>
+                    <span className="text-[10px] font-bold px-2 py-1 rounded bg-gold/15 text-gold-bright border border-gold/30">{t('mhr.card.setByTeam')}</span>
                   ) : (
-                    <span className="text-[10px] font-bold px-2 py-1 rounded bg-white/5 text-muted border border-line">รอตั้งราคา</span>
+                    <span className="text-[10px] font-bold px-2 py-1 rounded bg-white/5 text-muted border border-line">{t('mhr.card.pending')}</span>
                   )}
                 </div>
               </div>
@@ -102,16 +103,16 @@ export default async function MarvelCardDetail({ params }: { params: Promise<{ i
             {/* stats */}
             {card.cardType === 'character' && (
               <div className="grid grid-cols-3 gap-3 mt-5">
-                <StatBox label="เลเวล" value={card.level ?? '—'} />
-                <StatBox label="พลัง" value={card.power?.toLocaleString() ?? '—'} accent />
-                <StatBox label="ระยะโจมตี" value={card.attackRange ?? '—'} />
+                <StatBox label={t('mhr.card.level')} value={card.level ?? '—'} />
+                <StatBox label={t('mhr.card.power')} value={card.power?.toLocaleString() ?? '—'} accent />
+                <StatBox label={t('mhr.card.range')} value={card.attackRange ?? '—'} />
               </div>
             )}
 
             {/* features */}
             {features.length > 0 && (
               <div className="mt-5">
-                <div className="text-xs font-semibold text-muted mb-2">แท็ก</div>
+                <div className="text-xs font-semibold text-muted mb-2">{t('mhr.card.tags')}</div>
                 <div className="flex flex-wrap gap-1.5">
                   {features.map((f) => (
                     <span key={f} className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-cosmic/10 text-cosmic border border-cosmic/25">{f}</span>
@@ -123,7 +124,7 @@ export default async function MarvelCardDetail({ params }: { params: Promise<{ i
             {/* effect */}
             {card.effect && (
               <div className="mt-5">
-                <div className="text-xs font-semibold text-muted mb-2">เอฟเฟกต์</div>
+                <div className="text-xs font-semibold text-muted mb-2">{t('mhr.card.effect')}</div>
                 <div className="mv-panel rounded-xl p-4 text-sm text-body leading-relaxed whitespace-pre-line">{card.effect}</div>
               </div>
             )}
@@ -131,7 +132,7 @@ export default async function MarvelCardDetail({ params }: { params: Promise<{ i
             {/* variants */}
             {variants.length > 0 && (
               <div className="mt-6">
-                <div className="text-xs font-semibold text-muted mb-2">เวอร์ชันอื่นของการ์ดใบนี้</div>
+                <div className="text-xs font-semibold text-muted mb-2">{t('mhr.card.otherVersions')}</div>
                 <div className="flex gap-3 flex-wrap">
                   {variants.map((v) => (
                     <Link key={v.id} href={`/card/marvel/${v.id}`} className="mv-card rounded-lg overflow-hidden w-24 group">
@@ -150,7 +151,7 @@ export default async function MarvelCardDetail({ params }: { params: Promise<{ i
         {sameChar.length > 0 && (
           <div className="mt-14">
             <div className="section-eyebrow mb-1">More {character}</div>
-            <h2 className="section-title neon-title text-2xl sm:text-3xl font-extrabold mb-5">การ์ด {character} ใบอื่น</h2>
+            <h2 className="section-title neon-title text-2xl sm:text-3xl font-extrabold mb-5">{t('mhr.card.moreOf').replace('{name}', character)}</h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
               {sameChar.map((c) => {
                 const rr = RARITY_META[c.rarity]
