@@ -18,6 +18,8 @@ export default function AdminMarvelPrices() {
   const [q, setQ] = useState('')
   const [series, setSeries] = useState('all')
   const [rarity, setRarity] = useState('all')
+  const [cardType, setCardType] = useState('all')
+  const [sort, setSort] = useState('default')
   const [onlyUnpriced, setOnlyUnpriced] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -102,16 +104,44 @@ export default function AdminMarvelPrices() {
 
   const filtered = useMemo(() => {
     const ql = q.trim().toLowerCase()
-    return cards.filter((c) => {
+    const list = cards.filter((c) => {
       if (series !== 'all' && c.series !== series) return false
       if (rarity !== 'all' && c.rarity !== rarity) return false
+      if (cardType !== 'all' && c.cardType !== cardType) return false
       if (onlyUnpriced && prices[c.id] != null && drafts[c.id] === undefined) return false
       if (ql && !c.name.toLowerCase().includes(ql) && !c.cardNo.toLowerCase().includes(ql)) return false
       return true
     })
-  }, [q, series, rarity, onlyUnpriced, prices, drafts])
+    const rIdx = (r: string) => RARITY_ORDER.indexOf(r as typeof RARITY_ORDER[number])
+    const priceOf = (id: string) => (prices[id] ?? -1)
+    const sorted = [...list]
+    if (sort === 'price-desc') sorted.sort((a, b) => priceOf(b.id) - priceOf(a.id))
+    else if (sort === 'price-asc') sorted.sort((a, b) => priceOf(a.id) - priceOf(b.id))
+    else if (sort === 'rarity-desc') sorted.sort((a, b) => rIdx(b.rarity) - rIdx(a.rarity) || a.cardNo.localeCompare(b.cardNo))
+    else if (sort === 'name') sorted.sort((a, b) => cleanMarvelName(a.name).localeCompare(cleanMarvelName(b.name)))
+    // default keeps source order (series → cardNo)
+    return sorted
+  }, [q, series, rarity, cardType, sort, onlyUnpriced, prices, drafts])
 
   const pricedCount = Object.keys(prices).length
+
+  // per-rarity coverage + value stats (over the whole card set, not the filter)
+  const rarityStats = useMemo(() => {
+    const m: Record<string, { total: number; priced: number }> = {}
+    for (const c of cards) {
+      const s = (m[c.rarity] ||= { total: 0, priced: 0 })
+      s.total++
+      if (prices[c.id] != null) s.priced++
+    }
+    return m
+  }, [cards, prices])
+
+  const valueStats = useMemo(() => {
+    const vals = cards.map((c) => prices[c.id]).filter((v): v is number => v != null)
+    if (!vals.length) return { avg: 0, max: 0, sum: 0 }
+    const sum = vals.reduce((a, b) => a + b, 0)
+    return { avg: Math.round(sum / vals.length), max: Math.max(...vals), sum }
+  }, [cards, prices])
 
   function setDraft(id: string, val: string) {
     setDrafts((d) => ({ ...d, [id]: val }))
@@ -232,6 +262,36 @@ export default function AdminMarvelPrices() {
                 style={{ width: `${(pricedCount / cards.length) * 100}%`, background: 'linear-gradient(90deg, var(--color-marvel), var(--color-gold-bright))' }}
               />
             </div>
+
+            {/* value summary */}
+            {pricedCount > 0 && (
+              <div className="flex items-center justify-center gap-5 mt-4 text-xs">
+                <span className="text-muted">เฉลี่ย <b className="text-gold-bright">{formatTHB(valueStats.avg)}</b></span>
+                <span className="w-px h-3 bg-line" />
+                <span className="text-muted">สูงสุด <b className="text-gold-bright">{formatTHB(valueStats.max)}</b></span>
+                <span className="w-px h-3 bg-line" />
+                <span className="text-muted">ยังไม่ตั้ง <b className="text-marvel-bright">{cards.length - pricedCount}</b> ใบ</span>
+              </div>
+            )}
+          </div>
+
+          {/* per-rarity coverage — click to filter */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-5">
+            {RARITY_ORDER.filter((r) => rarityStats[r]).map((r) => {
+              const s = rarityStats[r]
+              const done = s.priced === s.total
+              const active = rarity === r
+              return (
+                <button
+                  key={r}
+                  onClick={() => setRarity(active ? 'all' : r)}
+                  className={`rarity-chip text-[11px] px-2.5 py-1 rounded-lg border transition-all ${RARITY_META[r]?.cls || ''} ${active ? 'ring-2 ring-cosmic/60' : 'opacity-90 hover:opacity-100'}`}
+                  title={`${RARITY_META[r]?.label} · คลิกเพื่อกรอง`}
+                >
+                  {r} <span className={done ? 'text-attr-green font-bold' : 'text-faint'}>{s.priced}/{s.total}</span>
+                </button>
+              )
+            })}
           </div>
         </div>
 
@@ -251,6 +311,18 @@ export default function AdminMarvelPrices() {
             <select value={rarity} onChange={(e) => setRarity(e.target.value)} className="px-3 py-2 rounded-lg bg-surface border border-line text-sm text-body">
               <option value="all">ทุกเรต</option>
               {RARITY_ORDER.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
+            <select value={cardType} onChange={(e) => setCardType(e.target.value)} className="px-3 py-2 rounded-lg bg-surface border border-line text-sm text-body">
+              <option value="all">ทุกชนิด</option>
+              <option value="character">ตัวละคร</option>
+              <option value="impact">อิมแพ็ค</option>
+            </select>
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="px-3 py-2 rounded-lg bg-surface border border-line text-sm text-body">
+              <option value="default">เรียง: ตามเซ็ต</option>
+              <option value="price-desc">ราคา: มาก→น้อย</option>
+              <option value="price-asc">ราคา: น้อย→มาก</option>
+              <option value="rarity-desc">เรต: สูง→ต่ำ</option>
+              <option value="name">ชื่อ: A→Z</option>
             </select>
             <label className="flex items-center gap-2 text-sm text-body px-2 whitespace-nowrap">
               <input type="checkbox" checked={onlyUnpriced} onChange={(e) => setOnlyUnpriced(e.target.checked)} />
@@ -293,19 +365,44 @@ export default function AdminMarvelPrices() {
           <div className="mv-panel rounded-2xl overflow-hidden divide-y divide-line/50">
             {filtered.map((c) => {
               const draft = drafts[c.id]
-              const shownVal = draft !== undefined ? draft : (prices[c.id] != null ? String(prices[c.id]) : '')
+              const cur = prices[c.id]
+              const shownVal = draft !== undefined ? draft : (cur != null ? String(cur) : '')
               const isDirty = dirty[c.id] !== undefined
               const rar = RARITY_META[c.rarity]
+              const set = marvelSets.find((s) => s.id === c.series)
+              const attr = c.attribute ? ATTR_META[c.attribute] : null
+              const features = (c.feature || '').split('/').map((f) => f.trim()).filter(Boolean)
+              const isChar = c.cardType === 'character'
               return (
-                <div key={c.id} className={`flex items-center gap-4 px-4 py-3.5 ${isDirty ? 'bg-cosmic/5' : ''}`}>
+                <div key={c.id} className={`flex items-start gap-4 px-4 py-3.5 ${isDirty ? 'bg-cosmic/5' : ''}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={c.image} alt="" className="w-14 h-20 object-cover rounded-lg border border-line shrink-0" loading="lazy" />
+                  <img src={c.image} alt="" className="w-16 h-[5.7rem] object-cover rounded-lg border border-line shrink-0" loading="lazy" />
                   <div className="min-w-0 flex-1">
-                    <div className="text-base font-semibold text-hero truncate">{cleanMarvelName(c.name)}</div>
-                    <div className="flex items-center gap-2 text-xs text-faint mt-1">
-                      <span>{c.cardNo}</span>
-                      <span className={`rarity-chip px-1.5 py-0.5 rounded border text-[11px] ${rar?.cls || ''}`}>{c.rarity}</span>
-                      {c.attribute && <span className={`w-2.5 h-2.5 rounded-full ${ATTR_META[c.attribute]?.dot}`} />}
+                    {/* line 1: name + view */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-base font-semibold text-hero truncate">{cleanMarvelName(c.name)}</span>
+                      <Link href={`/card/marvel/${c.id}`} target="_blank" className="text-[11px] text-cosmic hover:text-cosmic-cyan shrink-0">ดู ↗</Link>
+                    </div>
+                    {/* line 2: identity chips */}
+                    <div className="flex flex-wrap items-center gap-1.5 text-[11px] mt-1.5">
+                      <span className="text-faint font-mono">{c.cardNo}</span>
+                      {set && <span className="px-1.5 py-0.5 rounded border border-line text-muted">{set.code}</span>}
+                      <span className={`rarity-chip px-1.5 py-0.5 rounded border ${rar?.cls || ''}`}>{c.rarity}</span>
+                      <span className="px-1.5 py-0.5 rounded border border-line text-muted">{isChar ? 'ตัวละคร' : 'อิมแพ็ค'}</span>
+                      {attr && <span className={`px-1.5 py-0.5 rounded border font-semibold ${attr.cls}`}><span className={`inline-block w-1.5 h-1.5 rounded-full mr-1 align-middle ${attr.dot}`} />{attr.label}</span>}
+                    </div>
+                    {/* line 3: character stats + features */}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted mt-1.5">
+                      {isChar && (
+                        <>
+                          {c.level != null && <span>Lv <b className="text-body">{c.level}</b></span>}
+                          {c.power != null && <span>พลัง <b className="text-body">{c.power.toLocaleString()}</b></span>}
+                          {c.attackRange != null && <span>ระยะ <b className="text-body">{c.attackRange}</b></span>}
+                        </>
+                      )}
+                      {features.slice(0, 3).map((f) => (
+                        <span key={f} className="px-1.5 py-0.5 rounded bg-cosmic/10 text-cosmic border border-cosmic/25">{f}</span>
+                      ))}
                     </div>
                   </div>
                   <div className="text-right shrink-0">
@@ -319,6 +416,13 @@ export default function AdminMarvelPrices() {
                         className={`w-36 pl-7 pr-3 py-2.5 rounded-lg bg-surface border text-base text-right text-hero focus:outline-none ${isDirty ? 'border-cosmic/60' : 'border-line'}`}
                       />
                     </div>
+                    {isDirty ? (
+                      <div className="text-[11px] mt-1.5 text-cosmic-cyan font-semibold">
+                        {cur != null ? formatTHB(cur) : '—'} → {dirty[c.id] == null ? <span className="text-marvel-bright">ลบราคา</span> : formatTHB(dirty[c.id] as number)}
+                      </div>
+                    ) : (
+                      <div className="text-[11px] mt-1.5 text-faint">{cur != null ? 'ตั้งราคาแล้ว' : 'ยังไม่ตั้ง'}</div>
+                    )}
                   </div>
                 </div>
               )
