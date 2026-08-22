@@ -307,6 +307,12 @@ body.intro-active .cosmic-bg .stars2 { animation-play-state: paused; }
   .intro-card:first-child, .intro-card:last-child { display: none; }
 }
 
+/* Hero "hand of cards" fan spread — scales the fan to fit each screen.
+   Card width is set via Tailwind (w-28 → w-52); these control the spread. */
+.hero-fan { --fan-x: 56px; --fan-y: 13px; }
+@media (min-width: 640px) { .hero-fan { --fan-x: 92px; --fan-y: 20px; } }
+@media (min-width: 768px) { .hero-fan { --fan-x: 122px; --fan-y: 26px; } }
+
 /* Neon glow on gradient section titles (drop-shadow works on gradient text) */
 .neon-title { filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.45)); }
 

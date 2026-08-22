@@ -123,8 +123,10 @@ export default async function Home() {
             </div>
           </div>
 
-          {/* real "hand of cards" — fanned, 3D on hover, clickable */}
-          <div className="relative mt-14 h-[360px] w-full max-w-3xl hidden md:block">
+          {/* real "hand of cards" — fanned, 3D on hover, clickable.
+             Spread/lift come from CSS vars (--fan-x/--fan-y) so the fan scales
+             to fit every screen — small & tight on phones, wide on desktop. */}
+          <div className="hero-fan relative mt-10 md:mt-14 h-[220px] sm:h-[300px] md:h-[360px] w-full max-w-3xl">
             {heroHand.map((c, i) => {
               const mid = (heroHand.length - 1) / 2
               const off = i - mid
@@ -134,7 +136,7 @@ export default async function Home() {
                   key={c.id}
                   className="absolute left-1/2 top-2"
                   style={{
-                    transform: `translateX(-50%) translateX(${off * 122}px) translateY(${Math.abs(off) * 26}px) rotate(${off * 9}deg)`,
+                    transform: `translateX(-50%) translateX(calc(${off} * var(--fan-x))) translateY(calc(${Math.abs(off)} * var(--fan-y))) rotate(${off * 9}deg)`,
                     zIndex: 10 - Math.abs(off),
                   }}
                 >
@@ -144,7 +146,7 @@ export default async function Home() {
                       <TiltCard holo max={12} className="rounded-xl">
                         <div className="rounded-xl overflow-hidden border border-line" style={{ boxShadow: '0 16px 40px rgba(0,0,0,0.6)' }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={c.image} alt={c.cardNo} className="w-44 sm:w-52 block" />
+                          <img src={c.image} alt={c.cardNo} className="w-28 sm:w-40 md:w-52 block" />
                         </div>
                       </TiltCard>
                     </Link>
