@@ -177,12 +177,20 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); letter-spacing
   100% { opacity: 0.55; transform: scale(1); }
 }
 
-/* cards flying in to form a fan behind the logo */
-.intro-cards { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; z-index: 1; }
+/* card fan — sits in-flow BELOW the logo (no overlap), centered as a group */
+.intro-cards {
+  position: relative;
+  width: 100%;
+  height: 15rem;
+  margin-top: 1.5rem;
+  pointer-events: none;
+}
 .intro-card {
   position: absolute;
-  /* static fan position (translateX + rotate) — pushed below the logo */
-  transform: translateX(-50%) translateX(var(--x)) translateY(9rem) rotate(var(--r));
+  left: 50%;
+  top: 0;
+  /* static fan position — spread (x), gentle arc (y), tilt (r) */
+  transform: translateX(-50%) translateX(var(--x)) translateY(var(--y, 0)) rotate(var(--r));
 }
 .intro-card-fly {
   opacity: 0;
@@ -194,19 +202,35 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); letter-spacing
   100% { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
 }
 .intro-card img {
-  width: 7.5rem;
-  border-radius: 0.6rem;
+  width: 9.5rem;
+  border-radius: 0.7rem;
   border: 1px solid var(--color-line);
-  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.65), 0 0 30px rgba(139, 92, 246, 0.25);
+  box-shadow: 0 18px 52px rgba(0, 0, 0, 0.7), 0 0 36px rgba(139, 92, 246, 0.3);
   display: block;
 }
 
-.intro-content { position: relative; z-index: 2; text-align: center; padding: 1rem; }
+.intro-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .intro-logo {
-  width: min(86vw, 560px);
+  width: min(94vw, 680px);
   opacity: 0; transform: scale(1.25);
   animation: intro-word 1s cubic-bezier(0.2, 1, 0.3, 1) 0.35s forwards;
-  filter: drop-shadow(0 4px 34px rgba(236,29,36,0.55));
+  filter: drop-shadow(0 6px 40px rgba(236,29,36,0.6));
+}
+.intro-credit {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--color-cosmic-cyan);
+  opacity: 0;
+  animation: intro-pop 0.6s ease 1.2s forwards;
 }
 .intro-marvel {
   height: 1.9rem; margin: 0 auto 1rem;

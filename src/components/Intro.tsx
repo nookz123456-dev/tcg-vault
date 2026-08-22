@@ -43,28 +43,39 @@ export default function Intro({ cards = [] }: { cards?: string[] }) {
     <div className={`intro-overlay ${phase === 'out' ? 'intro-out' : ''}`} onClick={skip}>
       <span className="intro-glow" />
 
-      {/* cards fly up into a fan behind the logo */}
-      {cards.length > 0 && (
-        <div className="intro-cards">
-          {cards.slice(0, 5).map((src, i, arr) => {
-            const off = i - (arr.length - 1) / 2
-            return (
-              <div key={i} className="intro-card" style={{ ['--x' as string]: `${off * 92}px`, ['--r' as string]: `${off * 10}deg`, zIndex: 5 - Math.abs(off) }}>
-                <div className="intro-card-fly" style={{ animationDelay: `${0.5 + i * 0.12}s` }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt="" />
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
-
       <div className="intro-content">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/brand/herorush-logo.webp" alt="MARVEL Hero Rush" className="intro-logo" />
-        <div className="intro-tagline">Trading Card Game · Thailand</div>
+
+        {/* cards fly up into a fan below the logo */}
+        {cards.length > 0 && (
+          <div className="intro-cards">
+            {cards.slice(0, 5).map((src, i, arr) => {
+              const off = i - (arr.length - 1) / 2
+              return (
+                <div
+                  key={i}
+                  className="intro-card"
+                  style={{
+                    ['--x' as string]: `${off * 100}px`,
+                    ['--y' as string]: `${Math.abs(off) * 16}px`,
+                    ['--r' as string]: `${off * 10}deg`,
+                    zIndex: 5 - Math.abs(off),
+                  }}
+                >
+                  <div className="intro-card-fly" style={{ animationDelay: `${0.5 + i * 0.12}s` }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="" />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        <div className="intro-credit">โดยสมาคมผู้คลั่งไคล้ SuperHero</div>
       </div>
+
       <button className="intro-skip" onClick={(e) => { e.stopPropagation(); skip() }}>
         ข้าม ✕
       </button>
