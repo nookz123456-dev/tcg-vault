@@ -116,7 +116,7 @@ export default function MarvelBrowser({
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 min-[440px]:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
         {filtered.map((c) => (
           <MarvelTile key={c.id} card={c} price={prices[c.id]} />
         ))}

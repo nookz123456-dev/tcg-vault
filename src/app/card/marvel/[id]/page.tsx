@@ -152,7 +152,7 @@ export default async function MarvelCardDetail({ params }: { params: Promise<{ i
           <div className="mt-14">
             <div className="section-eyebrow mb-1">More {character}</div>
             <h2 className="section-title neon-title text-2xl sm:text-3xl font-extrabold mb-5">{t('mhr.card.moreOf').replace('{name}', character)}</h2>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 min-[440px]:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
               {sameChar.map((c) => {
                 const rr = RARITY_META[c.rarity]
                 return (
