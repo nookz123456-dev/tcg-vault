@@ -109,12 +109,17 @@ export default async function Home() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-8 mt-9">
+          <div className="flex items-start gap-5 sm:gap-8 mt-9">
             <Stat value={String(MARVEL.total)} label="การ์ดทั้งหมด" />
-            <div className="w-px h-9 bg-line" />
+            <div className="w-px h-9 bg-line mt-1" />
             <Stat value={String(marvelSets.length)} label="เซ็ต" />
-            <div className="w-px h-9 bg-line" />
-            <Stat value="ราคากลาง" label="โดยสมาคมผู้คลั่งไคล้ SuperHero" gold />
+            <div className="w-px h-9 bg-line mt-1" />
+            <div className="text-center lg:text-left">
+              <div className="font-display text-2xl font-extrabold text-gold-bright leading-none">ราคากลาง</div>
+              <div className="text-xs font-extrabold text-cosmic-cyan mt-1 leading-tight max-w-[10rem] mx-auto lg:mx-0">
+                โดยสมาคมผู้คลั่งไคล้ SuperHero
+              </div>
+            </div>
           </div>
 
           {/* real "hand of cards" — fanned, 3D on hover, clickable */}
