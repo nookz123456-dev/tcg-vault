@@ -17,7 +17,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Vaultverse — ราคากลางการ์ด Marvel Hero Rush โดยสมาคมผู้คลั่งไคล้ SuperHero",
   description: "ศูนย์รวมราคากลางการ์ด Marvel Hero Rush โดยสมาคมผู้คลั่งไคล้ SuperHero ครบทุกใบทุกเซ็ต พร้อมจัดการคอลเลกชัน",
-  metadataBase: new URL('https://tcg-vault-sandy.vercel.app'),
+  metadataBase: new URL('https://marvel-hero-rush-thailand.vercel.app'),
   icons: {
     icon: "/icon.svg",
   },
@@ -28,11 +28,18 @@ export const metadata: Metadata = {
     title: "Vaultverse",
   },
   openGraph: {
-    title: "Vaultverse — Marvel Hero Rush Price Hub · by SuperHero Thailand",
-    description: "ราคากลางการ์ด Marvel Hero Rush โดยสมาคมผู้คลั่งไคล้ SuperHero ครบทุกใบ",
-    siteName: "Vaultverse",
+    title: "Marvel Hero Rush Thailand · ราคากลางการ์ด",
+    description: "ราคากลางการ์ด Marvel Hero Rush โดยสมาคมผู้คลั่งไคล้ SuperHero ครบทุกใบทุกเซ็ต",
+    siteName: "Marvel Hero Rush Thailand",
     type: "website",
-    images: ["/icon-512.png"],
+    locale: "th_TH",
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Marvel Hero Rush Thailand" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Marvel Hero Rush Thailand · ราคากลางการ์ด",
+    description: "ราคากลางการ์ด Marvel Hero Rush โดยสมาคมผู้คลั่งไคล้ SuperHero ครบทุกใบทุกเซ็ต",
+    images: ["/og.jpg"],
   },
 };
 
