@@ -439,7 +439,7 @@ export default function AdminMarvelPrices() {
                 <div
                   key={c.id}
                   onClick={selectMode ? () => toggleSelect(c.id) : undefined}
-                  className={`flex items-start gap-4 px-4 py-3.5 ${isSelected ? 'bg-cosmic/15' : isDirty ? 'bg-cosmic/5' : ''} ${selectMode ? 'cursor-pointer hover:bg-white/5' : ''}`}
+                  className={`flex items-start gap-3 sm:gap-4 px-3 sm:px-4 py-3 sm:py-3.5 ${isSelected ? 'bg-cosmic/15' : isDirty ? 'bg-cosmic/5' : ''} ${selectMode ? 'cursor-pointer hover:bg-white/5' : ''}`}
                 >
                   {selectMode && (
                     <input
@@ -451,11 +451,11 @@ export default function AdminMarvelPrices() {
                     />
                   )}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={c.image} alt="" className="w-16 h-[5.7rem] object-cover rounded-lg border border-line shrink-0" loading="lazy" />
+                  <img src={c.image} alt="" className="w-12 h-[4.3rem] sm:w-16 sm:h-[5.7rem] object-cover rounded-lg border border-line shrink-0" loading="lazy" />
                   <div className="min-w-0 flex-1">
                     {/* line 1: name + view */}
                     <div className="flex items-center gap-2">
-                      <span className="text-base font-semibold text-hero truncate">{cleanMarvelName(c.name)}</span>
+                      <span className="text-sm sm:text-base font-semibold text-hero truncate">{cleanMarvelName(c.name)}</span>
                       <Link href={`/card/marvel/${c.id}`} target="_blank" onClick={(e) => e.stopPropagation()} className="text-[11px] text-cosmic hover:text-cosmic-cyan shrink-0">ดู ↗</Link>
                     </div>
                     {/* line 2: identity chips */}
@@ -489,7 +489,7 @@ export default function AdminMarvelPrices() {
                         onChange={(e) => setDraft(c.id, e.target.value)}
                         onClick={(e) => e.stopPropagation()}
                         placeholder="—"
-                        className={`w-36 pl-7 pr-3 py-2.5 rounded-lg bg-surface border text-base text-right text-hero focus:outline-none ${isDirty ? 'border-cosmic/60' : 'border-line'}`}
+                        className={`w-24 sm:w-36 pl-7 pr-3 py-2.5 rounded-lg bg-surface border text-sm sm:text-base text-right text-hero focus:outline-none ${isDirty ? 'border-cosmic/60' : 'border-line'}`}
                       />
                     </div>
                     {isDirty ? (
