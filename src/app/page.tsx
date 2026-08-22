@@ -240,9 +240,13 @@ export default async function Home() {
             </div>
           </div>
           <p className="text-xs text-muted text-center">{t('mhr.footer.disclaimer')}</p>
-          <div className="flex items-center gap-4 text-xs text-muted">
-            <a href="https://web.facebook.com/groups/1294005495982423?locale=th_TH" target="_blank" rel="noopener noreferrer" className="hover:text-cosmic transition-colors">{t('mhr.footer.about')}</a>
-            <a href="mailto:marvelherorush.th@gmail.com" className="hover:text-cosmic transition-colors">{t('mhr.footer.contact')}</a>
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-xs text-muted">
+            <a href="https://web.facebook.com/groups/1294005495982423?locale=th_TH" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-cosmic transition-colors">
+              <span>📘</span> facebook.com/groups/1294005495982423
+            </a>
+            <a href="mailto:marvelherorush.th@gmail.com" className="inline-flex items-center gap-1.5 hover:text-cosmic transition-colors">
+              <span>✉️</span> marvelherorush.th@gmail.com
+            </a>
           </div>
         </div>
       </footer>
