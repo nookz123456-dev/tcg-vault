@@ -17,15 +17,20 @@ export default function Intro({ cards = [] }: { cards?: string[] }) {
     sessionStorage.setItem('mhr_intro_seen', '1')
     setPhase('playing')
     document.body.style.overflow = 'hidden'
+    // freeze the heavy animated backdrop (blurred nebulas / stars) while the
+    // intro plays — it's fully covered anyway, and animating blur tanks mobile.
+    document.body.classList.add('intro-active')
     const tOut = setTimeout(() => setPhase('out'), 3200)
     const tEnd = setTimeout(() => {
       setPhase('hidden')
       document.body.style.overflow = ''
+      document.body.classList.remove('intro-active')
     }, 3900)
     return () => {
       clearTimeout(tOut)
       clearTimeout(tEnd)
       document.body.style.overflow = ''
+      document.body.classList.remove('intro-active')
     }
   }, [])
 
@@ -34,6 +39,7 @@ export default function Intro({ cards = [] }: { cards?: string[] }) {
     setTimeout(() => {
       setPhase('hidden')
       document.body.style.overflow = ''
+      document.body.classList.remove('intro-active')
     }, 600)
   }
 

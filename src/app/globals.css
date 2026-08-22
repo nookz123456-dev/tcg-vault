@@ -170,6 +170,7 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); letter-spacing
   background: radial-gradient(circle, rgba(236,29,36,0.35), rgba(139,92,246,0.18) 40%, transparent 65%);
   opacity: 0;
   animation: intro-burst 1.6s ease 0.2s forwards;
+  will-change: transform, opacity;
 }
 @keyframes intro-burst {
   0% { opacity: 0; transform: scale(0.6); }
@@ -195,6 +196,8 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); letter-spacing
 .intro-card-fly {
   opacity: 0;
   animation: intro-fly 0.85s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 @keyframes intro-fly {
   0% { transform: translateY(75vh) scale(0.6) rotate(-10deg); opacity: 0; }
@@ -223,6 +226,7 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); letter-spacing
   opacity: 0; transform: scale(1.25);
   animation: intro-word 1s cubic-bezier(0.2, 1, 0.3, 1) 0.35s forwards;
   filter: drop-shadow(0 6px 40px rgba(236,29,36,0.6));
+  will-change: transform, opacity;
 }
 .intro-credit {
   font-family: var(--font-display);
@@ -283,6 +287,24 @@ h1, h2, h3, h4, .font-display { font-family: var(--font-display); letter-spacing
 
 @media (prefers-reduced-motion: reduce) {
   .intro-overlay { display: none; }
+}
+
+/* While the intro plays, pause the animated backdrop (blurred nebulas + stars).
+   It's fully covered by the opaque overlay, and animating blur wrecks mobile FPS. */
+body.intro-active .cosmic-bg .neb,
+body.intro-active .cosmic-bg .stars,
+body.intro-active .cosmic-bg .stars2 { animation-play-state: paused; }
+
+/* Lighten the intro on small screens so it stays smooth (fewer heavy shadows,
+   smaller glow, only the middle 3 cards fly in). */
+@media (max-width: 640px) {
+  .intro-glow { width: 40rem; height: 40rem; }
+  .intro-cards { height: 12rem; }
+  .intro-card img {
+    width: 7rem;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.6);
+  }
+  .intro-card:first-child, .intro-card:last-child { display: none; }
 }
 
 /* Neon glow on gradient section titles (drop-shadow works on gradient text) */
