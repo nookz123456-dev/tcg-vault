@@ -346,7 +346,7 @@ export default function AdminMarvelPrices() {
             <select value={cardType} onChange={(e) => setCardType(e.target.value)} className="px-3 py-2 rounded-lg bg-surface border border-line text-sm text-body">
               <option value="all">ทุกชนิด</option>
               <option value="character">ตัวละคร</option>
-              <option value="impact">อิมแพ็ค</option>
+              <option value="impact">Rush Point</option>
             </select>
             <select value={sort} onChange={(e) => setSort(e.target.value)} className="px-3 py-2 rounded-lg bg-surface border border-line text-sm text-body">
               <option value="default">เรียง: ตามเซ็ต</option>
@@ -463,7 +463,7 @@ export default function AdminMarvelPrices() {
                       <span className="text-faint font-mono">{c.cardNo}</span>
                       {set && <span className="px-1.5 py-0.5 rounded border border-line text-muted">{set.code}</span>}
                       <span className={`rarity-chip px-1.5 py-0.5 rounded border ${rar?.cls || ''}`}>{c.rarity}</span>
-                      <span className="px-1.5 py-0.5 rounded border border-line text-muted">{isChar ? 'ตัวละคร' : 'อิมแพ็ค'}</span>
+                      <span className="px-1.5 py-0.5 rounded border border-line text-muted">{isChar ? 'ตัวละคร' : 'Rush Point'}</span>
                       {attr && <span className={`px-1.5 py-0.5 rounded border font-semibold ${attr.cls}`}><span className={`inline-block w-1.5 h-1.5 rounded-full mr-1 align-middle ${attr.dot}`} />{attr.label}</span>}
                     </div>
                     {/* line 3: character stats + features */}

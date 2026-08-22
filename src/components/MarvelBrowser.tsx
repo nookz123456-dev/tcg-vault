@@ -103,7 +103,7 @@ export default function MarvelBrowser({
         <ChipRow label={tt('mhr.browse.filterType')}>
           <Chip active={type === 'all'} onClick={() => setType('all')}>{tt('mhr.browse.all')}</Chip>
           <Chip active={type === 'character'} onClick={() => setType('character')}>Character</Chip>
-          <Chip active={type === 'impact'} onClick={() => setType('impact')}>Impact</Chip>
+          <Chip active={type === 'impact'} onClick={() => setType('impact')}>Rush Point</Chip>
         </ChipRow>
       </div>
 

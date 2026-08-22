@@ -870,7 +870,7 @@ const translations = {
   'mhr.card.tilt3d': { th: 'เลื่อนเมาส์บนการ์ดเพื่อดูเอฟเฟกต์ 3D ✨', en: 'Hover the card for a 3D effect ✨' },
   'mhr.card.moreOf': { th: 'การ์ด {name} ใบอื่น', en: 'More {name} cards' },
   'mhr.card.character': { th: 'ตัวละคร', en: 'Character' },
-  'mhr.card.impact': { th: 'อิมแพ็ค', en: 'Impact' },
+  'mhr.card.impact': { th: 'Rush Point', en: 'Rush Point' },
 } as const
 
 export type Locale = 'th' | 'en'
