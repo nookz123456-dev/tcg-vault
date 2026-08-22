@@ -82,7 +82,7 @@ export default async function Home() {
 
           {/* THAILAND official badge */}
           <div className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-marvel/15 border border-marvel/40 text-marvel-bright text-xs font-bold backdrop-blur-sm">
-            🇹🇭 ศูนย์ราคากลางอย่างเป็นทางการ · THAILAND
+            🇹🇭 ราคากลางการ์ด โดยสมาคมผู้คลั่งไคล้ SuperHero
           </div>
 
           <p className="text-body text-sm sm:text-base max-w-xl mt-6 leading-relaxed">
@@ -114,7 +114,7 @@ export default async function Home() {
             <div className="w-px h-9 bg-line" />
             <Stat value={String(marvelSets.length)} label="เซ็ต" />
             <div className="w-px h-9 bg-line" />
-            <Stat value="Official" label="ราคากลาง" gold />
+            <Stat value="อ้างอิง" label="ราคากลาง" gold />
           </div>
 
           {/* real "hand of cards" — fanned, 3D on hover, clickable */}
@@ -208,7 +208,7 @@ export default async function Home() {
       <Reveal as="section" className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid md:grid-cols-3 gap-4">
           {[
-            { icon: '🏅', title: 'ราคากลางทางการ', desc: 'ทุกการ์ดตั้งราคาโดยทีมงาน Vaultverse ให้เป็นมาตรฐานเดียวกันทั้งประเทศ' },
+            { icon: '🏅', title: 'ราคากลางมาตรฐาน', desc: 'ทุกการ์ดตั้งราคาโดยทีมงานสมาคมผู้คลั่งไคล้ SuperHero ให้เป็นมาตรฐานเดียวกัน' },
             { icon: '🔄', title: 'อัปเดตสม่ำเสมอ', desc: 'ราคาปรับตามตลาดจริง ไม่ตกยุค เช็คได้ทุกเมื่อ' },
             { icon: '🗂️', title: 'ครบทุกเซ็ต', desc: `ครบทั้ง ${MARVEL.total} การ์ดตั้งแต่วันเปิดตัว พร้อมรายละเอียดเอฟเฟกต์เต็ม` },
           ].map((f) => (

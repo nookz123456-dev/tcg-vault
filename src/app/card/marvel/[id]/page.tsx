@@ -84,7 +84,7 @@ export default async function MarvelCardDetail({ params }: { params: Promise<{ i
             <div className="mv-panel rounded-2xl p-5 mt-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-semibold text-muted mb-1">ราคากลางอย่างเป็นทางการ</div>
+                  <div className="text-xs font-semibold text-muted mb-1">ราคากลางโดยสมาคม</div>
                   <div className={`font-display text-4xl font-extrabold ${price != null ? 'text-gold-bright' : 'text-faint'}`}>
                     {formatTHB(price)}
                   </div>

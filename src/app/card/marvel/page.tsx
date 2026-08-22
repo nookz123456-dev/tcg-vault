@@ -22,7 +22,7 @@ export default async function MarvelCardsPage({
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
         {/* header */}
         <div className="text-center mb-8">
-          <div className="section-eyebrow mb-2">Marvel Hero Rush · Official TH</div>
+          <div className="section-eyebrow mb-2">Marvel Hero Rush · โดยสมาคมผู้คลั่งไคล้ SuperHero</div>
           <h2 className="section-title neon-title text-4xl sm:text-5xl font-extrabold">การ์ดทั้งหมด</h2>
           <p className="text-sm text-muted mt-3">
             ราคากลางครบ {cards.length} ใบจาก {marvelSets.length} เซ็ต · อัปเดตล่าสุด {MARVEL.updatedAt}
