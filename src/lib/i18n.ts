@@ -814,6 +814,9 @@ const translations = {
   'mhr.footer.about': { th: 'เกี่ยวกับ', en: 'About' },
   'mhr.footer.terms': { th: 'เงื่อนไข', en: 'Terms' },
   'mhr.footer.contact': { th: 'ติดต่อ', en: 'Contact' },
+  'mhr.footer.menu': { th: 'เมนู', en: 'Menu' },
+  'mhr.footer.tagline': { th: 'ศูนย์รวมราคากลางการ์ด Marvel Hero Rush สำหรับนักสะสมชาวไทย โดยสมาคมผู้คลั่งไคล้ SuperHero', en: 'The Marvel Hero Rush median-price hub for Thai collectors, by the SuperHero Thailand Association.' },
+  'mhr.footer.followFb': { th: 'ติดตามข่าวสารและพูดคุยในกลุ่ม Facebook', en: 'Follow news and chat in our Facebook group' },
 
   // Browse / all cards
   'mhr.browse.eyebrow': { th: 'Marvel Hero Rush · ราคากลางไทย', en: 'Marvel Hero Rush · Thailand' },
