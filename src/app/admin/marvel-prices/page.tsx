@@ -35,6 +35,11 @@ export default function AdminMarvelPrices() {
   const [bulkRarity, setBulkRarity] = useState('R')
   const [bulkValue, setBulkValue] = useState('')
 
+  // multi-select helper (pick specific cards, price them together)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [selectMode, setSelectMode] = useState(false)
+  const [multiValue, setMultiValue] = useState('')
+
   const verify = (key: string) =>
     fetch('/api/admin/login', {
       method: 'POST',
@@ -154,6 +159,32 @@ export default function AdminMarvelPrices() {
       if (c.rarity === bulkRarity) next[c.id] = bulkValue
     }
     setDrafts(next)
+  }
+
+  // ---- multi-select ----
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const n = new Set(prev)
+      if (n.has(id)) n.delete(id); else n.add(id)
+      return n
+    })
+  }
+  function selectAllFiltered() {
+    setSelected(new Set(filtered.map((c) => c.id)))
+  }
+  function clearSelect() {
+    setSelected(new Set())
+  }
+  function applyMulti() {
+    if (multiValue === '' || selected.size === 0) return
+    const next: Record<string, string> = { ...drafts }
+    for (const id of selected) next[id] = multiValue
+    setDrafts(next)
+  }
+  function exitSelectMode() {
+    setSelectMode(false)
+    clearSelect()
+    setMultiValue('')
   }
 
   async function save() {
@@ -341,7 +372,37 @@ export default function AdminMarvelPrices() {
               className="w-28 px-2 py-1.5 rounded-lg bg-surface border border-line text-sm text-hero"
             />
             <button onClick={applyBulk} className="px-3 py-1.5 rounded-lg btn-ghost text-xs font-semibold">ใส่ให้ทุกใบ</button>
+            <button
+              onClick={() => (selectMode ? exitSelectMode() : setSelectMode(true))}
+              className={`ml-auto px-3 py-1.5 rounded-lg text-xs font-semibold ${selectMode ? 'btn-primary' : 'btn-ghost'}`}
+            >
+              {selectMode ? 'ปิดโหมดเลือก ✕' : '☑ เลือกทีละใบ'}
+            </button>
           </div>
+
+          {/* multi-select action bar */}
+          {selectMode && (
+            <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-cosmic/30">
+              <span className="text-xs font-bold text-cosmic">เลือกแล้ว {selected.size} ใบ</span>
+              <button onClick={selectAllFiltered} className="px-2.5 py-1.5 rounded-lg btn-ghost text-xs font-semibold">เลือกทั้งหมดที่แสดง ({filtered.length})</button>
+              <button onClick={clearSelect} disabled={selected.size === 0} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold ${selected.size === 0 ? 'btn-ghost opacity-50' : 'btn-ghost'}`}>ล้างที่เลือก</button>
+              <span className="w-px h-5 bg-line mx-1" />
+              <div className="relative">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-faint">฿</span>
+                <input
+                  type="number" value={multiValue} onChange={(e) => setMultiValue(e.target.value)} placeholder="ราคา"
+                  className="w-28 pl-6 pr-2 py-1.5 rounded-lg bg-surface border border-line text-sm text-hero"
+                />
+              </div>
+              <button
+                onClick={applyMulti}
+                disabled={multiValue === '' || selected.size === 0}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold ${multiValue === '' || selected.size === 0 ? 'btn-ghost opacity-50' : 'btn-primary'}`}
+              >
+                ใส่ราคาให้ {selected.size} ใบที่เลือก
+              </button>
+            </div>
+          )}
         </div>
 
         {/* save bar */}
@@ -373,15 +434,29 @@ export default function AdminMarvelPrices() {
               const attr = c.attribute ? ATTR_META[c.attribute] : null
               const features = (c.feature || '').split('/').map((f) => f.trim()).filter(Boolean)
               const isChar = c.cardType === 'character'
+              const isSelected = selected.has(c.id)
               return (
-                <div key={c.id} className={`flex items-start gap-4 px-4 py-3.5 ${isDirty ? 'bg-cosmic/5' : ''}`}>
+                <div
+                  key={c.id}
+                  onClick={selectMode ? () => toggleSelect(c.id) : undefined}
+                  className={`flex items-start gap-4 px-4 py-3.5 ${isSelected ? 'bg-cosmic/15' : isDirty ? 'bg-cosmic/5' : ''} ${selectMode ? 'cursor-pointer hover:bg-white/5' : ''}`}
+                >
+                  {selectMode && (
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelect(c.id)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="mt-1 w-4 h-4 shrink-0 accent-cosmic"
+                    />
+                  )}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={c.image} alt="" className="w-16 h-[5.7rem] object-cover rounded-lg border border-line shrink-0" loading="lazy" />
                   <div className="min-w-0 flex-1">
                     {/* line 1: name + view */}
                     <div className="flex items-center gap-2">
                       <span className="text-base font-semibold text-hero truncate">{cleanMarvelName(c.name)}</span>
-                      <Link href={`/card/marvel/${c.id}`} target="_blank" className="text-[11px] text-cosmic hover:text-cosmic-cyan shrink-0">ดู ↗</Link>
+                      <Link href={`/card/marvel/${c.id}`} target="_blank" onClick={(e) => e.stopPropagation()} className="text-[11px] text-cosmic hover:text-cosmic-cyan shrink-0">ดู ↗</Link>
                     </div>
                     {/* line 2: identity chips */}
                     <div className="flex flex-wrap items-center gap-1.5 text-[11px] mt-1.5">
@@ -412,6 +487,7 @@ export default function AdminMarvelPrices() {
                         type="number" inputMode="numeric" min={0}
                         value={shownVal}
                         onChange={(e) => setDraft(c.id, e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
                         placeholder="—"
                         className={`w-36 pl-7 pr-3 py-2.5 rounded-lg bg-surface border text-base text-right text-hero focus:outline-none ${isDirty ? 'border-cosmic/60' : 'border-line'}`}
                       />
