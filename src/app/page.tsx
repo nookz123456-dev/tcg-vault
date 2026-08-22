@@ -231,9 +231,9 @@ export default async function Home() {
       {/* ===== FOOTER ===== */}
       <footer className="mt-auto border-t border-line/70 bg-abyss/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-6">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
             {/* brand */}
-            <div className="col-span-2 md:col-span-4">
+            <div className="max-w-sm">
               <div className="flex items-center gap-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/brand/superhero-th.webp" alt="SuperHero Thailand" className="h-12 w-auto" />
@@ -242,39 +242,11 @@ export default async function Home() {
                   <div className="text-[11px] text-muted mt-1">{t('mhr.nav.byAssoc')}</div>
                 </div>
               </div>
-              <p className="text-xs text-muted mt-4 max-w-xs leading-relaxed">{t('mhr.footer.tagline')}</p>
-            </div>
-
-            {/* menu */}
-            <div className="md:col-span-2">
-              <h4 className="text-[10px] font-bold uppercase tracking-[0.18em] text-faint mb-3">{t('mhr.footer.menu')}</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/" className="text-body hover:text-cosmic transition-colors">{t('mhr.nav.home')}</Link></li>
-                <li><Link href="/card/marvel" className="text-body hover:text-cosmic transition-colors">{t('mhr.nav.cards')}</Link></li>
-                <li><Link href="/sets" className="text-body hover:text-cosmic transition-colors">{t('mhr.nav.sets')}</Link></li>
-              </ul>
-            </div>
-
-            {/* sets */}
-            <div className="md:col-span-2">
-              <h4 className="text-[10px] font-bold uppercase tracking-[0.18em] text-faint mb-3">{t('mhr.nav.sets')}</h4>
-              <ul className="space-y-2 text-sm">
-                {marvelSets.map((s) => {
-                  const meta = SET_META[s.id]
-                  const name = meta ? (locale === 'en' ? meta.en : meta.th) : s.name
-                  return (
-                    <li key={s.id}>
-                      <Link href={`/set/marvel/${s.id}`} className="text-body hover:text-cosmic transition-colors">
-                        <span className="text-marvel font-bold mr-1.5">{s.code}</span>{name}
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
+              <p className="text-xs text-muted mt-4 leading-relaxed">{t('mhr.footer.tagline')}</p>
             </div>
 
             {/* contact */}
-            <div className="col-span-2 md:col-span-4">
+            <div>
               <h4 className="text-[10px] font-bold uppercase tracking-[0.18em] text-faint mb-3">{t('mhr.footer.contact')}</h4>
               <p className="text-xs text-muted mb-3">{t('mhr.footer.followFb')}</p>
               <div className="flex flex-col gap-3">
