@@ -114,7 +114,7 @@ export default async function Home() {
             <div className="w-px h-9 bg-line" />
             <Stat value={String(marvelSets.length)} label="เซ็ต" />
             <div className="w-px h-9 bg-line" />
-            <Stat value="อ้างอิง" label="ราคากลาง" gold />
+            <Stat value="ราคากลาง" label="โดยสมาคมผู้คลั่งไคล้ SuperHero" gold />
           </div>
 
           {/* real "hand of cards" — fanned, 3D on hover, clickable */}
