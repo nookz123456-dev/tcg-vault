@@ -27,6 +27,7 @@ export default function Navbar() {
   useEffect(() => { setMenuOpen(false) }, [pathname])
 
   const navItems = [
+    { href: '/', icon: '🏠', fallback: 'หน้าแรก' },
     { href: '/card/marvel', icon: '🃏', fallback: 'การ์ดทั้งหมด' },
     { href: '/sets', icon: '📂', fallback: 'เซ็ต' },
   ]
@@ -37,25 +38,10 @@ export default function Navbar() {
     <nav className="border-b border-line/70 bg-abyss/80 backdrop-blur-xl sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="relative w-9 h-9 grid place-items-center">
-              <svg viewBox="0 0 40 40" className="w-9 h-9" fill="none">
-                <defs>
-                  <linearGradient id="vv" x1="0" y1="0" x2="40" y2="40">
-                    <stop offset="0" stopColor="#ff2b39" />
-                    <stop offset="0.55" stopColor="#8b5cf6" />
-                    <stop offset="1" stopColor="#22d3ee" />
-                  </linearGradient>
-                </defs>
-                <path d="M20 3l14.7 8.5v17L20 37 5.3 28.5v-17L20 3z" stroke="url(#vv)" strokeWidth="2" fill="rgba(139,92,246,0.08)" />
-                <path d="M13 14l7 13 7-13" stroke="url(#vv)" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              </svg>
-            </div>
-            <div className="hidden sm:flex flex-col leading-none">
-              <span className="text-[17px] font-extrabold text-hero tracking-tight font-display">VAULT<span className="text-cosmic">VERSE</span></span>
-              <span className="text-[10px] font-semibold text-marvel tracking-tight">โดย สมาคมผู้คลั่งไคล้ SuperHero</span>
-            </div>
+          {/* Logo — official HERO RUSH mark */}
+          <Link href="/" className="flex items-center shrink-0" title="Marvel Hero Rush Thailand">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/herorush-logo.webp" alt="Marvel Hero Rush" className="h-9 sm:h-10 w-auto" />
           </Link>
 
           {/* Center nav - pill style */}
@@ -76,7 +62,14 @@ export default function Navbar() {
           </div>
 
           {/* Right side */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            {/* association mark */}
+            <div className="hidden sm:flex items-center gap-2">
+              <span className="text-[9px] font-semibold text-faint uppercase tracking-wider">by</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/brand/superhero-th.webp" alt="สมาคมผู้คลั่งไคล้ SuperHero" title="โดย สมาคมผู้คลั่งไคล้ SuperHero" className="h-7 w-auto" />
+              <div className="w-px h-6 bg-line ml-1" />
+            </div>
             <div className="hidden sm:block">
               <LangToggle />
             </div>
@@ -124,8 +117,10 @@ export default function Navbar() {
             )}
 
             <div className="mv-hr my-2" />
-            <div className="px-4 py-2">
+            <div className="px-4 py-2 flex items-center justify-between">
               <LangToggle />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/brand/superhero-th.webp" alt="สมาคมผู้คลั่งไคล้ SuperHero" className="h-6 w-auto opacity-90" />
             </div>
           </div>
         </div>
