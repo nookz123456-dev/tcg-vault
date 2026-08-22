@@ -4,6 +4,7 @@ import { ClientLayout } from "@/components/ClientLayout";
 import { CmdKSearch } from "@/components/CmdKSearch";
 import CosmicBackground from "@/components/CosmicBackground";
 import { getServerLocale } from "@/lib/i18n.server";
+import { Analytics } from "@vercel/analytics/next";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -55,6 +56,7 @@ export default async function RootLayout({
           {children}
           <CmdKSearch />
         </ClientLayout>
+        <Analytics />
       </body>
     </html>
   );
