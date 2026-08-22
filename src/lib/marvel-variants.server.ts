@@ -1,12 +1,11 @@
-// Server-only store for admin-managed rarity variants.
+// Server-only store for admin rarity OVERRIDES (moves).
 //
 // The base 267 cards come from the official API (static marvel-data.json).
-// Admins can add EXTRA rarity variants (e.g. a SEC print of a Common card) that
-// don't exist in the API. Those live in Vercel Edge Config (key "variants") in
-// prod, or a local JSON file in dev — same adapter style as prices.
+// Admins can MOVE a card to a different rarity — one override per card number,
+// applied in place. No clones, no duplicates. Stored in Vercel Edge Config
+// (key "variants") in prod, or a local JSON file in dev — same adapter as prices.
 //
-// getMergedCards() = base cards + admin variants (cloned from the base card,
-// reusing its art, with a derived id and the new rarity).
+// getMergedCards() = base cards with those rarity overrides applied.
 //
 // NOTE: server-only — import from server components / route handlers only.
 import { promises as fs } from 'fs'
@@ -22,7 +21,8 @@ const EDGE_WRITE_TOKEN = process.env.VERCEL_EDGE_WRITE_TOKEN
 const useEdge = Boolean(process.env.EDGE_CONFIG && EDGE_ID)
 
 export interface Variant {
-  cardNo: string
+  id?: string      // base card id (precise, per-print). Legacy entries may omit it.
+  cardNo: string   // kept for display + legacy fallback
   rarity: string
 }
 
@@ -70,38 +70,42 @@ export async function getVariants(): Promise<Variant[]> {
   return readVariants()
 }
 
-export async function addVariant(cardNo: string, rarity: string): Promise<Variant[]> {
+// Move ONE card (by its unique id) to a rarity. Upsert: one override per id,
+// so re-applying just changes the target rarity (never duplicates). Keyed by id
+// so parallel prints that share a card number are moved independently.
+export async function addVariant(id: string, cardNo: string, rarity: string): Promise<Variant[]> {
   const list = await readVariants()
-  if (!list.some((v) => v.cardNo === cardNo && v.rarity === rarity)) {
-    list.push({ cardNo, rarity })
-  }
+  const existing = list.find((v) => v.id === id)
+  if (existing) existing.rarity = rarity
+  else list.push({ id, cardNo, rarity })
   await writeVariants(list)
   return list
 }
 
-export async function removeVariant(cardNo: string, rarity: string): Promise<Variant[]> {
-  const list = (await readVariants()).filter((v) => !(v.cardNo === cardNo && v.rarity === rarity))
+// Reset a card back to its original rarity (remove its override).
+// Matches by id, plus legacy card-number entries (which have no id).
+export async function removeVariant(id: string, cardNo?: string): Promise<Variant[]> {
+  const list = (await readVariants()).filter((v) => !(v.id === id || (!v.id && v.cardNo === cardNo)))
   await writeVariants(list)
   return list
 }
 
-// Derived id for a variant card (deterministic, URL-safe).
-export function variantId(baseId: string, rarity: string) {
-  return `${baseId}__${rarity}`
-}
-
-// base cards + admin-added variants
+// base cards with admin rarity overrides applied in place (no clones, no dups).
+// Prefer per-id overrides; fall back to legacy per-cardNo entries (no id).
 export async function getMergedCards(): Promise<MarvelCard[]> {
-  const variants = await readVariants()
-  const extra: MarvelCard[] = []
-  for (const v of variants) {
-    const base = marvelCards.find((c) => c.cardNo === v.cardNo)
-    if (!base) continue
-    // skip if that rarity already exists in the base data
-    if (marvelCards.some((c) => c.cardNo === v.cardNo && c.rarity === v.rarity)) continue
-    extra.push({ ...base, id: variantId(base.id, v.rarity), rarity: v.rarity })
+  const overrides = await readVariants()
+  if (!overrides.length) return marvelCards
+  const byId = new Map<string, string>()
+  const byCardNo = new Map<string, string>()
+  for (const o of overrides) {
+    if (o.id) byId.set(o.id, o.rarity)
+    else byCardNo.set(o.cardNo, o.rarity)
   }
-  return extra.length ? [...marvelCards, ...extra] : marvelCards
+  return marvelCards.map((c) =>
+    byId.has(c.id) ? { ...c, rarity: byId.get(c.id)! }
+    : byCardNo.has(c.cardNo) ? { ...c, rarity: byCardNo.get(c.cardNo)! }
+    : c
+  )
 }
 
 export async function getMergedCard(id: string): Promise<MarvelCard | undefined> {

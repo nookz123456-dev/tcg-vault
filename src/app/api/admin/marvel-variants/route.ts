@@ -19,18 +19,23 @@ export async function POST(req: NextRequest) {
   if (!authorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  let body: { action?: string; cardNo?: string; rarity?: string }
+  let body: { action?: string; id?: string; cardNo?: string; rarity?: string }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
-  const { action, cardNo, rarity } = body
-  if (!cardNo || !rarity) {
-    return NextResponse.json({ error: 'ต้องระบุ cardNo และ rarity' }, { status: 400 })
-  }
+  const { action, id, cardNo, rarity } = body
   try {
-    const variants = action === 'remove' ? await removeVariant(cardNo, rarity) : await addVariant(cardNo, rarity)
+    if (action === 'remove') {
+      if (!id && !cardNo) return NextResponse.json({ error: 'ต้องระบุ id หรือ cardNo' }, { status: 400 })
+      const variants = await removeVariant(id || '', cardNo)
+      return NextResponse.json({ success: true, variants })
+    }
+    if (!id || !cardNo || !rarity) {
+      return NextResponse.json({ error: 'ต้องระบุ id, cardNo และ rarity' }, { status: 400 })
+    }
+    const variants = await addVariant(id, cardNo, rarity)
     return NextResponse.json({ success: true, variants })
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message || 'บันทึกไม่สำเร็จ' }, { status: 500 })
