@@ -34,6 +34,7 @@ export default function Navbar() {
     { href: '/', icon: '🏠', key: 'mhr.nav.home' as const },
     { href: '/card/marvel', icon: '🃏', key: 'mhr.nav.cards' as const },
     { href: '/sets', icon: '📂', key: 'mhr.nav.sets' as const },
+    { href: '/deck', icon: '⚔️', key: 'mhr.nav.decks' as const },
     { href: '/wishlist', icon: '⭐', key: 'mhr.nav.wishlist' as const },
   ]
 
