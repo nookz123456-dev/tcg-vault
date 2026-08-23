@@ -11,6 +11,7 @@ import { getMergedCard, getMergedCards } from '@/lib/marvel-variants.server'
 import { getServerT } from '@/lib/i18n.server'
 import TiltCard from '@/components/TiltCard'
 import ShareButton from '@/components/ShareButton'
+import WishlistButton from '@/components/WishlistButton'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -80,6 +81,8 @@ export default async function MarvelCardDetail({ params }: { params: Promise<{ i
               </div>
               <ShareButton title={`${cleanMarvelName(card.name)} · Vaultverse`} />
             </div>
+
+            <div className="mt-4"><WishlistButton id={card.id} /></div>
 
             {/* PRICE */}
             <div className="mv-panel rounded-2xl p-5 mt-5">

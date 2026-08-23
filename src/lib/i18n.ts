@@ -871,6 +871,21 @@ const translations = {
   'mhr.card.moreOf': { th: 'การ์ด {name} ใบอื่น', en: 'More {name} cards' },
   'mhr.card.character': { th: 'ตัวละคร', en: 'Character' },
   'mhr.card.impact': { th: 'Rush Point', en: 'Rush Point' },
+
+  // Wishlist
+  'mhr.nav.wishlist': { th: 'วิชลิสต์', en: 'Wishlist' },
+  'mhr.wl.add': { th: 'เพิ่มในวิชลิสต์', en: 'Add to wishlist' },
+  'mhr.wl.saved': { th: 'อยู่ในวิชลิสต์', en: 'In wishlist' },
+  'mhr.wl.remove': { th: 'เอาออกจากวิชลิสต์', en: 'Remove from wishlist' },
+  'mhr.wl.title': { th: 'วิชลิสต์ของฉัน', en: 'My Wishlist' },
+  'mhr.wl.subtitle': { th: 'การ์ดที่คุณอยากได้ · เก็บไว้ในเครื่องนี้', en: 'Cards you want · saved on this device' },
+  'mhr.wl.empty': { th: 'ยังไม่มีการ์ดในวิชลิสต์', en: 'Your wishlist is empty' },
+  'mhr.wl.emptyHint': { th: 'กดรูปดาว ⭐ ที่การ์ดใบไหนก็ได้เพื่อเพิ่ม', en: 'Tap the ⭐ on any card to add it' },
+  'mhr.wl.browse': { th: 'ไปดูการ์ด', en: 'Browse cards' },
+  'mhr.wl.count': { th: 'ใบ', en: 'cards' },
+  'mhr.wl.totalValue': { th: 'มูลค่ารวม', en: 'Total value' },
+  'mhr.wl.clear': { th: 'ล้างทั้งหมด', en: 'Clear all' },
+  'mhr.wl.clearConfirm': { th: 'ล้างวิชลิสต์ทั้งหมด?', en: 'Clear the whole wishlist?' },
 } as const
 
 export type Locale = 'th' | 'en'

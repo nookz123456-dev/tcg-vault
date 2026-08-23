@@ -5,11 +5,13 @@ import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
 import { LangToggle } from '@/components/LangToggle'
 import { useT } from '@/lib/i18n'
+import { useWishlist } from '@/lib/wishlist'
 import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const pathname = usePathname()
   const tt = useT()
+  const { count: wishlistCount } = useWishlist()
   const { user } = useAuth()
   const [isAdmin, setIsAdmin] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -32,6 +34,7 @@ export default function Navbar() {
     { href: '/', icon: '🏠', key: 'mhr.nav.home' as const },
     { href: '/card/marvel', icon: '🃏', key: 'mhr.nav.cards' as const },
     { href: '/sets', icon: '📂', key: 'mhr.nav.sets' as const },
+    { href: '/wishlist', icon: '⭐', key: 'mhr.nav.wishlist' as const },
   ]
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
@@ -59,6 +62,9 @@ export default function Navbar() {
                 }`}
               >
                 {tt(link.key)}
+                {link.href === '/wishlist' && wishlistCount > 0 && (
+                  <span className="ml-1.5 inline-grid place-items-center min-w-[18px] h-[18px] px-1 rounded-full bg-gold/20 text-gold-bright text-[10px] font-bold align-middle">{wishlistCount}</span>
+                )}
               </Link>
             ))}
           </div>
@@ -110,6 +116,9 @@ export default function Navbar() {
               >
                 <span>{link.icon}</span>
                 {tt(link.key)}
+                {link.href === '/wishlist' && wishlistCount > 0 && (
+                  <span className="ml-auto inline-grid place-items-center min-w-[20px] h-5 px-1.5 rounded-full bg-gold/20 text-gold-bright text-[11px] font-bold">{wishlistCount}</span>
+                )}
               </Link>
             ))}
             {isAdmin && (
